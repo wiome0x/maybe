@@ -1,0 +1,8 @@
+---
+zh-CN:
+  password_mailer:
+    password_reset:
+      cta: 重置密码
+      ignore_if_not_requested: 如果您没有发起此请求，可以忽略此邮件。
+      request_made: 我们收到了重置您 Maybe 密码的请求，请点击链接进行重置。
+      subject: 'Maybe：重置您的密码'

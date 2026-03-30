@@ -1,0 +1,24 @@
+---
+zh-CN:
+  helpers:
+    label:
+      user:
+        invite_code: 邀请码
+    submit:
+      user:
+        create: 继续
+  registrations:
+    create:
+      failure: 注册时出现问题。
+      invalid_invite_code: 邀请码无效，请重试。
+      success: 注册成功。
+    new:
+      invitation_message: "%{inviter} 邀请您以%{role}身份加入"
+      join_family_title: 加入 %{family}
+      role_admin: 管理员
+      role_member: 成员
+      submit: 创建账户
+      title: 创建您的账户
+      welcome_body: 首先，您需要注册一个新账户。之后可以在应用内配置其他设置。
+      welcome_title: 欢迎使用自托管版 Maybe！
+      password_placeholder: 输入您的密码

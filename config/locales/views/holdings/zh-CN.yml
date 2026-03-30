@@ -1,0 +1,35 @@
+---
+zh-CN:
+  holdings:
+    cash:
+      brokerage_cash: 券商现金
+    destroy:
+      success: 持仓已删除
+    holding:
+      per_share: 每股
+      shares: "%{qty} 股"
+    index:
+      average_cost: 平均成本
+      holdings: 持仓
+      name: 名称
+      new_holding: 新交易
+      no_holdings: 暂无持仓
+      return: 总回报
+      weight: 权重
+    missing_price_tooltip:
+      description: 该投资缺少数据，无法计算回报或价值。
+      missing_data: 数据缺失
+    show:
+      avg_cost_label: 平均成本
+      current_market_price_label: 当前市价
+      delete: 删除
+      delete_subtitle: 此操作将删除持仓及该账户上所有相关交易，且无法撤销。
+      delete_title: 删除持仓
+      history: 历史
+      overview: 概览
+      portfolio_weight_label: 组合权重
+      settings: 设置
+      ticker_label: 代码
+      trade_history_entry: "%{qty} 股 %{security}，价格 %{price}"
+      total_return_label: 总回报
+      unknown: 未知

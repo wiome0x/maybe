@@ -1,0 +1,13 @@
+---
+zh-CN:
+  pages:
+    changelog:
+      title: 最新动态
+    dashboard:
+      net_worth_chart:
+        data_not_available: 所选时段暂无数据
+        title: 净资产
+      no_account_empty_state:
+        new_account: 新建账户
+        no_account_subtitle: 尚未添加账户，暂无数据可显示。添加您的第一个账户以开始查看仪表盘数据。
+        no_account_title: 暂无账户

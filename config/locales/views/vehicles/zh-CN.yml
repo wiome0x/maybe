@@ -1,0 +1,25 @@
+---
+zh-CN:
+  vehicles:
+    edit:
+      edit: 编辑 %{account}
+    form:
+      make: 品牌
+      make_placeholder: 丰田
+      mileage: 里程
+      mileage_placeholder: '15000'
+      mileage_unit: 单位
+      model: 型号
+      model_placeholder: 凯美瑞
+      year: 年份
+      year_placeholder: '2023'
+    new:
+      title: 输入车辆信息
+    overview:
+      current_price: 当前价格
+      make_model: 品牌型号
+      mileage: 里程
+      purchase_price: 购入价格
+      trend: 趋势
+      unknown: 未知
+      year: 年份

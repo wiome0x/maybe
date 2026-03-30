@@ -1,0 +1,30 @@
+---
+zh-CN:
+  valuations:
+    form:
+      amount: 金额
+      submit: 添加余额更新
+    header:
+      balance: 余额
+    index:
+      change: 变动
+      date: 日期
+      new_entry: 新记录
+      no_valuations: 该账户暂无估值记录
+      valuations: 价值
+      value: 价值
+    new:
+      title: 新余额
+    show:
+      amount: 金额
+      date_label: 日期
+      delete: 删除
+      delete_subtitle: 此操作无法撤销
+      delete_title: 删除记录
+      details: 详情
+      name_label: 名称
+      name_placeholder: 输入记录名称
+      note_label: 备注
+      note_placeholder: 添加关于此记录的详细信息
+      overview: 概览
+      settings: 设置

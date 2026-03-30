@@ -1,0 +1,27 @@
+---
+zh-CN:
+  onboardings:
+    header:
+      sign_out: 退出登录
+    preferences:
+      currency: 货币
+      date_format: 日期格式
+      example: 示例账户
+      locale: 语言
+      preview: 根据偏好设置预览数据显示效果。
+      submit: 完成
+      subtitle: 让我们配置您的偏好设置。
+      title: 配置偏好设置
+    profile:
+      country: 国家
+      first_name: 名
+      household_name: 家庭名称
+      last_name: 姓
+      profile_image: 头像
+      submit: 继续
+      subtitle: 让我们完善您的个人资料。
+      title: 基本设置
+    show:
+      message: 很高兴您的到来。接下来我们会问您几个问题来完善您的个人资料，然后帮您完成设置。
+      setup: 设置账户
+      title: 认识 Maybe

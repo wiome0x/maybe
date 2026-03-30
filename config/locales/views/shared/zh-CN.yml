@@ -1,0 +1,14 @@
+---
+zh-CN:
+  shared:
+    confirm_modal:
+      accept: 确认
+      body_html: "<p>此操作无法撤销</p>"
+      cancel: 取消
+      title: 确定吗？
+    money_field:
+      label: 金额
+    syncing_notice:
+      syncing: 正在同步账户数据...
+    trend_change:
+      no_change: "无变化"
