@@ -4,7 +4,13 @@ module ExchangeRate::Provided
   class_methods do
     def provider
       registry = Provider::Registry.for_concept(:exchange_rates)
-      registry.get_provider(:synth)
+
+      case ENV["EXCHANGE_RATE_PROVIDER"]
+      when "currency_api"
+        registry.get_provider(:currency_api)
+      else
+        registry.get_provider(:synth)
+      end
     end
 
     def find_or_fetch_rate(from:, to:, date: Date.current, cache: true)
