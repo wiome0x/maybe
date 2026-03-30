@@ -1,0 +1,34 @@
+<%# locals: (import:) %>
+
+<div class="p-4 rounded-lg bg-container-inset mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <%= icon("info", size: "sm") %>
+    <p class="text-sm font-medium text-primary">Interactive Brokers Activity Statement</p>
+  </div>
+  <p class="text-sm text-secondary">
+    Upload your IBKR Activity Statement CSV directly. The system will automatically extract stock trades
+    from the report. Export from: IBKR Portal → Performance & Reports → Statements → Activity → CSV.
+  </p>
+</div>
+
+<%= styled_form_with model: @import, url: import_configuration_path(@import), scope: :import, method: :patch, class: "space-y-4" do |form| %>
+  <%= form.hidden_field :date_col_label, value: "date" %>
+  <%= form.hidden_field :date_format, value: "%Y-%m-%d" %>
+  <%= form.hidden_field :ticker_col_label, value: "ticker" %>
+  <%= form.hidden_field :exchange_operating_mic_col_label, value: "exchange_operating_mic" %>
+  <%= form.hidden_field :currency_col_label, value: "currency" %>
+  <%= form.hidden_field :qty_col_label, value: "qty" %>
+  <%= form.hidden_field :price_col_label, value: "price" %>
+  <%= form.hidden_field :name_col_label, value: "name" %>
+  <%= form.hidden_field :signage_convention, value: "inflows_positive" %>
+  <%= form.hidden_field :number_format, value: "1,234.56" %>
+
+  <% unless import.account.present? %>
+    <div class="space-y-2">
+      <p class="text-sm font-medium text-primary">Map to account</p>
+      <p class="text-sm text-secondary">Select the investment account to import trades into.</p>
+    </div>
+  <% end %>
+
+  <%= form.submit "Apply configuration", disabled: import.complete? %>
+<% end %>
