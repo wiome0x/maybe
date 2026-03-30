@@ -17,6 +17,9 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
+      - name: Update Brakeman to latest
+        run: bundle update brakeman --jobs 4 --retry 3
+
       - name: Scan for security vulnerabilities in Ruby dependencies
         run: bin/brakeman --no-pager
 
