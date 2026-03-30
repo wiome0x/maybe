@@ -30,8 +30,10 @@ services:
       <<: *rails_env
 
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   worker:
     build:
@@ -41,16 +43,24 @@ services:
     restart: unless-stopped
     environment:
       <<: *rails_env
+      RUBY_YJIT_ENABLE: "0"
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
 
   redis:
     image: redis:latest
     ports:
-      - "6379:6379"
+      - "16379:6379"
     restart: unless-stopped
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   db:
     image: postgres:latest
     restart: unless-stopped
@@ -59,7 +69,12 @@ services:
     environment:
       <<: *db_env
     ports:
-      - "5432:5432"
+      - "15432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres-data:
