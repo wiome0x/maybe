@@ -39,6 +39,10 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace:cached
+      - bundle_cache:/bundle
+    working_dir: /workspace
     command: bundle exec sidekiq
     restart: unless-stopped
     environment:
