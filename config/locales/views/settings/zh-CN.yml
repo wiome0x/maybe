@@ -6,6 +6,15 @@ zh-CN:
         page_title: 账单
         subscription_subtitle: 更新您的订阅和账单信息
         subscription_title: 管理订阅
+        subscribed_to: "您当前订阅了 <span class=\"font-medium\">%{plan}</span>。"
+        renews_on: "您的方案将于 <span class=\"font-medium\">%{date}</span> 续费。"
+        trialing: 您正在试用 Maybe
+        days_remaining: "剩余 %{days} 天"
+        not_subscribed: "您当前<span class=\"font-medium\">未订阅</span>"
+        not_subscribed_hint: "订阅 Maybe+ 后，您将在此看到账单设置。"
+        manage: 管理
+        choose_plan: 选择方案
+        billing_via_stripe: 通过 Stripe 计费
     preferences:
       show:
         country: 国家
@@ -63,12 +72,16 @@ zh-CN:
         remove_invitation: 移除邀请
         remove_member: 移除成员
         save: 保存
+        email_change_pending: "您已请求将邮箱更改为 %{email}。请前往邮箱确认以使更改生效。"
+        data_import_export: 数据导入/导出
+        export_data: 导出数据
     securities:
       show:
         page_title: 安全
     settings_nav:
       accounts_label: 账户
       api_key_label: API 密钥
+      back: 返回
       billing_label: 账单
       categories_label: 分类
       feedback_label: 反馈

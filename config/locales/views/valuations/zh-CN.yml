@@ -17,6 +17,8 @@ zh-CN:
       title: 新余额
     show:
       amount: 金额
+      account_value: 该日期的账户价值
+      update_value: 更新价值
       date_label: 日期
       delete: 删除
       delete_subtitle: 此操作无法撤销

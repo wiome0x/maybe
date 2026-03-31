@@ -11,7 +11,7 @@ alwaysApply: true
   - Read [project-design.mdc](mdc:.cursor/rules/project-design.mdc) to understand the codebase
   - Read [project-conventions.mdc](mdc:.cursor/rules/project-conventions.mdc) to understand _how_ to write code for the codebase
   - Read [ui-ux-design-guidelines.mdc](mdc:.cursor/rules/ui-ux-design-guidelines.mdc) to understand how to implement frontend code specifically
-- Ignore i18n methods and files. Hardcode strings in English for now to optimize speed of development.
+- Use Rails i18n for all user-facing strings. Always use `t()` helper in views and add translations to the appropriate locale files under `config/locales/`.
 
 ## Prohibited actions
 

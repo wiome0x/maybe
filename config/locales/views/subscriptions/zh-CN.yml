@@ -2,3 +2,13 @@
 zh-CN:
   subscriptions:
     self_hosted_alert: "Maybe+ 在自托管模式下不可用。"
+    upgrade:
+      account_settings: 账户设置
+      sign_out: 退出登录
+      trial_remaining: "您的试用期还剩 %{days} 天"
+      trial_over: 您的试用期已结束
+      unlock: 解锁
+      today: 今天
+      subtitle: 要继续使用 Maybe，请选择以下方案。
+      subscribe: 订阅并解锁 Maybe
+      stripe_redirect: 下一步将跳转到 Stripe 处理账单。

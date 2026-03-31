@@ -1,6 +1,13 @@
 ---
 zh-CN:
   users:
+    user_menu:
+      version: "版本："
+      settings: 设置
+      changelog: 更新日志
+      feedback: 反馈
+      contact: 联系我们
+      log_out: 退出登录
     destroy:
       success: 您的账户已删除。
     update:

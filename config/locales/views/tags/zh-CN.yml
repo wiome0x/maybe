@@ -13,6 +13,7 @@ zh-CN:
     index:
       empty: 暂无标签
       new: 新建标签
+      delete_all: 全部删除
       tags: 标签
     new:
       new: 新建标签

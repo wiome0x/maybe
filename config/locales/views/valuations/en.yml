@@ -17,6 +17,8 @@ en:
       title: New balance
     show:
       amount: Amount
+      account_value: Account value on date
+      update_value: Update value
       date_label: Date
       delete: Delete
       delete_subtitle: This action cannot be undone

@@ -6,6 +6,15 @@ en:
         page_title: Billing
         subscription_subtitle: Update your subscription and billing details
         subscription_title: Manage subscription
+        subscribed_to: "You are currently subscribed to the <span class=\"font-medium\">%{plan}</span>."
+        renews_on: "Your plan renews on <span class=\"font-medium\">%{date}</span>."
+        trialing: You are currently trialing Maybe
+        days_remaining: "%{days} days remaining"
+        not_subscribed: "You are currently <span class=\"font-medium\">not subscribed</span>"
+        not_subscribed_hint: "Once you subscribe to Maybe+, you'll see your billing settings here."
+        manage: Manage
+        choose_plan: Choose plan
+        billing_via_stripe: Billing via Stripe
     preferences:
       show:
         country: Country
@@ -66,12 +75,16 @@ en:
         remove_invitation: Remove Invitation
         remove_member: Remove Member
         save: Save
+        email_change_pending: "You have requested to change your email to %{email}. Please go to your email and confirm for the change to take effect."
+        data_import_export: Data Import/Export
+        export_data: Export data
     securities:
       show:
         page_title: Security
     settings_nav:
       accounts_label: Accounts
       api_key_label: API Key
+      back: Back
       billing_label: Billing
       categories_label: Categories
       feedback_label: Feedback

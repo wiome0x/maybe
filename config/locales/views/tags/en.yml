@@ -13,6 +13,7 @@ en:
     index:
       empty: No tags yet
       new: New tag
+      delete_all: Delete all
       tags: Tags
     new:
       new: New tag

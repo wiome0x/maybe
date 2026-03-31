@@ -1,3 +1,13 @@
 en:
   subscriptions:
     self_hosted_alert: "Maybe+ is not available in self-hosted mode."
+    upgrade:
+      account_settings: Account Settings
+      sign_out: Sign out
+      trial_remaining: "Your trial has %{days} days remaining"
+      trial_over: Your trial is over
+      unlock: Unlock
+      today: today
+      subtitle: To continue using Maybe pick a plan below.
+      subscribe: Subscribe and unlock Maybe
+      stripe_redirect: In the next step, you'll be redirected to Stripe which handles our billing.

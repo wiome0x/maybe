@@ -59,6 +59,21 @@ en:
     empty:
       message: No imports yet.
       new: New import
+    failure:
+      title: Import failed
+      description: Please check that your file format, for any errors and that all required fields are filled, then come back and try again.
+      try_again: Try again
+    success:
+      title: Import successful
+      description: Your imported data has been successfully added to the app and is now ready for use.
+      back_to_dashboard: Back to dashboard
+    ready:
+      publish: Publish import
+    importing:
+      title: Import in progress
+      description: Your import is in progress. Check the imports menu for status updates or click 'Check Status' to refresh the page for updates. Feel free to continue using the app.
+      check_status: Check status
+      back_to_dashboard: Back to dashboard
     import:
       complete: Complete
       delete: Delete

@@ -40,15 +40,58 @@ en:
       settings: Settings
       tags_label: Tags
       uncategorized: "(uncategorized)"
+      exclude_title: Exclude
+      exclude_description: Excluded transactions will be removed from budgeting calculations and reports.
+      one_time_title: "One-time %{type}"
+      income: Income
+      expense: Expense
+      one_time_description: One-time transactions will be excluded from certain budgeting calculations and reports to help you see what's really important.
+      transfer_title: Transfer or Debt Payment?
+      transfer_description: Transfers and payments are special types of transactions that indicate money movement between 2 accounts.
+      open_matcher: Open matcher
     header:
       edit_categories: Edit categories
       edit_imports: Edit imports
       edit_merchants: Edit merchants
       edit_tags: Edit tags
       import: Import
+      new_rule: New rule
+      edit_rules: Edit rules
     index:
+      title: Transactions
+      new_rule: New rule
+      edit_rules: Edit rules
+      edit_categories: Edit categories
+      edit_tags: Edit tags
+      edit_merchants: Edit merchants
+      edit_imports: Edit imports
+      import: Import
+      new_transaction: New transaction
+      transaction_label: transaction
+      category_label: category
+      amount_label: amount
       transaction: transaction
       transactions: transactions
+    summary:
+      total_transactions: Total transactions
+      income: Income
+      expenses: Expenses
+    bulk_updates:
+      new:
+        title: Edit transactions
+        overview: Overview
+        date: Date
+        transactions: Transactions
+        select_category: Select a category
+        category: Category
+        select_merchant: Select a merchant
+        merchant: Merchant
+        none: None
+        tags: Tags
+        notes: Notes
+        notes_placeholder: Enter a note that will be applied to selected transactions
+        cancel: Cancel
+        save: Save
     searches:
       filters:
         amount_filter:
@@ -81,3 +124,5 @@ en:
         equal_to: equal to
         greater_than: greater than
         less_than: less than
+        placeholder: Search transactions...
+        filter: Filter
