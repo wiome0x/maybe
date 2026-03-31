@@ -277,3 +277,172 @@ environment:
 ### rails 命令找不到
 
 使用 `bundle exec rails` 代替 `rails`。
+
+### PID 文件残留导致 Rails 无法启动
+
+报错 `A server is already running`，删除残留 PID 文件：
+
+```bash
+rm -f tmp/pids/server.pid
+bin/dev
+```
+
+### Worker 容器报 "Could not locate Gemfile"
+
+worker 服务缺少 volumes 和 working_dir 配置，确保 `docker-compose.yml` 中 worker 有：
+
+```yaml
+worker:
+  volumes:
+    - ..:/workspace:cached
+    - bundle_cache:/bundle
+  working_dir: /workspace
+```
+
+### SELinux 阻止 Nginx 反向代理（CentOS）
+
+Nginx 错误日志显示 `connect() to 127.0.0.1:9001 failed (13: Permission denied)`，这是 SELinux 阻止 Nginx 连接上游端口：
+
+```bash
+setsebool -P httpd_can_network_connect 1
+systemctl restart nginx
+```
+
+`-P` 参数使设置永久生效。
+
+## 七、HTTPS 与 SSL 配置
+
+### 1. 安装 Nginx 和 Certbot
+
+```bash
+dnf install -y nginx certbot python3-certbot-nginx
+systemctl start nginx
+systemctl enable nginx
+```
+
+### 2. 配置 Nginx 反向代理
+
+创建 `/etc/nginx/conf.d/maybe.conf`：
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    root /var/www/html;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:9001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+### 3. 申请 SSL 证书
+
+```bash
+mkdir -p /var/www/html/.well-known/acme-challenge
+nginx -t
+systemctl reload nginx
+certbot --nginx -d your-domain.com
+```
+
+Certbot 会自动修改 Nginx 配置添加 SSL，证书每 90 天自动续期。
+
+### 4. 配置 Rails 识别 HTTPS
+
+在 `.env.local` 中添加：
+
+```env
+RAILS_ASSUME_SSL=true
+APP_DOMAIN=your-domain.com
+```
+
+## 八、Plaid API 配置
+
+### 1. 注册并获取 API Key
+
+- 注册 [https://dashboard.plaid.com](https://dashboard.plaid.com)
+- 获取 `client_id` 和 `secret`（sandbox 环境免费）
+
+### 2. 配置环境变量
+
+在 `.env.local` 中添加：
+
+```env
+PLAID_CLIENT_ID=your_client_id
+PLAID_SECRET=your_secret
+PLAID_ENV=sandbox
+```
+
+### 3. 配置 OAuth Redirect URI（重要）
+
+在 Plaid Dashboard → Team Settings → API → Allowed redirect URIs 中添加：
+
+```
+https://your-domain.com/accounts
+```
+
+注意事项：
+- Plaid 要求 redirect URI 必须使用 `https` 协议
+- 不接受 `http://` + IP 地址的格式
+- 必须使用域名 + 有效 SSL 证书
+- Sandbox 环境也需要配置 redirect URI
+
+### 4. 需要申请的 Plaid 产品
+
+| 产品 | 用途 |
+|------|------|
+| Transactions | 银行交易记录同步 |
+| Investments | 券商持仓和投资交易 |
+| Liabilities | 信用卡/贷款负债信息 |
+
+Sandbox 环境不需要审批即可测试所有产品。测试账号：用户名 `user_good`，密码 `pass_good`。
+
+### 5. 验证 Plaid 配置
+
+```bash
+# 进入容器
+docker compose -f .devcontainer/docker-compose.yml exec app bash
+
+# 检查配置是否加载
+bundle exec rails runner "puts Rails.application.config.plaid.present?"
+
+# 测试 API 连通性
+bundle exec rails runner "
+provider = Provider::Registry.plaid_provider_for_region(:us)
+puts provider.present? ? 'Plaid OK' : 'Plaid not configured'
+"
+```
+
+## 九、AI 助手配置
+
+### 方案 1：使用 OpenAI
+
+```env
+OPENAI_ACCESS_TOKEN=sk-xxx
+```
+
+### 方案 2：使用 OpenRouter（推荐，支持多模型）
+
+```env
+OPENROUTER_API_KEY=sk-or-v1-xxx
+OPENROUTER_MODELS=google/gemini-2.5-flash,anthropic/claude-sonnet-4
+```
+
+OpenRouter 一个 key 可以使用 Google、Anthropic、OpenAI 等多家模型，获取 key：[https://openrouter.ai/keys](https://openrouter.ai/keys)
+
+### 验证 AI 配置
+
+```bash
+bundle exec rails runner "puts ENV['OPENROUTER_API_KEY'].present?"
+```
+
+注意：`.env.local` 中不要使用中文注释，可能导致 dotenv 解析失败。
