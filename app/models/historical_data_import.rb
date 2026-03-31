@@ -27,6 +27,36 @@ class HistoricalDataImport < Import
     10_000
   end
 
+  # HistoricalDataImport reads csv_rows directly in import!, so skip standard row generation
+  def generate_rows_from_csv
+    # no-op: we don't use the import_rows table
+  end
+
+  def sync_mappings
+    # no-op: no mappings needed
+  end
+
+  def mapping_steps
+    []
+  end
+
+  def dry_run
+    { records: csv_rows.count }
+  end
+
+  # Skip standard cleaned/publishable checks since we don't use rows
+  def configured?
+    uploaded?
+  end
+
+  def cleaned?
+    configured?
+  end
+
+  def publishable?
+    cleaned?
+  end
+
   private
 
     def import!

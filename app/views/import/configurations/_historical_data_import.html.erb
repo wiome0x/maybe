@@ -3,16 +3,61 @@
 <%= styled_form_with model: @import, url: import_configuration_path(@import), scope: :import, method: :patch, class: "space-y-4" do |form| %>
   <%= form.select :date_col_label, import.csv_headers, { include_blank: "Select column", label: "Date" }, required: true %>
   <%= form.select :ticker_col_label, import.csv_headers, { include_blank: "Select column", label: "Ticker" }, required: true %>
-
-  <% form.fields_for :column_mappings do |cm| %>
-    <%= cm.select :close, import.csv_headers, { include_blank: "Select column", label: "Close" }, required: true %>
-    <%= cm.select :open, import.csv_headers, { include_blank: "Leave empty", label: "Open" } %>
-    <%= cm.select :high, import.csv_headers, { include_blank: "Leave empty", label: "High" } %>
-    <%= cm.select :low, import.csv_headers, { include_blank: "Leave empty", label: "Low" } %>
-    <%= cm.select :volume, import.csv_headers, { include_blank: "Leave empty", label: "Volume" } %>
-  <% end %>
-
   <%= form.select :currency_col_label, import.csv_headers, { include_blank: "Default (#{import.family.currency})", label: "Currency" } %>
+
+  <fieldset class="space-y-4">
+    <legend class="text-sm font-medium text-primary">Price Columns</legend>
+
+    <div class="form-field">
+      <label class="form-field__label" for="import_column_mappings_close">Close (required)</label>
+      <select name="import[column_mappings][close]" id="import_column_mappings_close" class="form-field__input" required>
+        <option value="">Select column</option>
+        <% import.csv_headers.each do |header| %>
+          <option value="<%= header %>" <%= "selected" if import.column_mappings&.dig("close") == header %>><%= header %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label class="form-field__label" for="import_column_mappings_open">Open</label>
+      <select name="import[column_mappings][open]" id="import_column_mappings_open" class="form-field__input">
+        <option value="">Leave empty</option>
+        <% import.csv_headers.each do |header| %>
+          <option value="<%= header %>" <%= "selected" if import.column_mappings&.dig("open") == header %>><%= header %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label class="form-field__label" for="import_column_mappings_high">High</label>
+      <select name="import[column_mappings][high]" id="import_column_mappings_high" class="form-field__input">
+        <option value="">Leave empty</option>
+        <% import.csv_headers.each do |header| %>
+          <option value="<%= header %>" <%= "selected" if import.column_mappings&.dig("high") == header %>><%= header %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label class="form-field__label" for="import_column_mappings_low">Low</label>
+      <select name="import[column_mappings][low]" id="import_column_mappings_low" class="form-field__input">
+        <option value="">Leave empty</option>
+        <% import.csv_headers.each do |header| %>
+          <option value="<%= header %>" <%= "selected" if import.column_mappings&.dig("low") == header %>><%= header %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label class="form-field__label" for="import_column_mappings_volume">Volume</label>
+      <select name="import[column_mappings][volume]" id="import_column_mappings_volume" class="form-field__input">
+        <option value="">Leave empty</option>
+        <% import.csv_headers.each do |header| %>
+          <option value="<%= header %>" <%= "selected" if import.column_mappings&.dig("volume") == header %>><%= header %></option>
+        <% end %>
+      </select>
+    </div>
+  </fieldset>
 
   <%= form.submit "Apply configuration", disabled: import.complete? %>
 <% end %>

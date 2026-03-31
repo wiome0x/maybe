@@ -11,7 +11,11 @@ class Import::ConfigurationsController < ApplicationController
     @import.generate_rows_from_csv
     @import.reload.sync_mappings
 
-    redirect_to import_clean_path(@import), notice: "Import configured successfully."
+    if @import.is_a?(HistoricalDataImport)
+      redirect_to import_confirm_path(@import), notice: "Import configured successfully."
+    else
+      redirect_to import_clean_path(@import), notice: "Import configured successfully."
+    end
   end
 
   private
@@ -39,6 +43,7 @@ class Import::ConfigurationsController < ApplicationController
         :signage_convention,
         :amount_type_strategy,
         :amount_type_inflow_value,
+        column_mappings: {},
       )
     end
 end
