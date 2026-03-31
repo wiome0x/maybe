@@ -9,6 +9,7 @@ en:
     preferences:
       show:
         country: Country
+        trend_color: Trend colors
         currency: Currency
         date_format: Date format
         general_subtitle: Configure your preferences

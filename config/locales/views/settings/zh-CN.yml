@@ -9,6 +9,7 @@ zh-CN:
     preferences:
       show:
         country: 国家
+        trend_color: 涨跌颜色
         currency: 货币
         date_format: 日期格式
         general_subtitle: 配置您的偏好设置

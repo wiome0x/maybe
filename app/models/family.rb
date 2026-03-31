@@ -1,6 +1,8 @@
 class Family < ApplicationRecord
   include PlaidConnectable, Syncable, AutoTransferMatchable, Subscribeable
 
+  TREND_COLOR_PREFERENCES = %w[green_up red_up].freeze
+
   DATE_FORMATS = [
     [ "MM-DD-YYYY", "%m-%d-%Y" ],
     [ "DD.MM.YYYY", "%d.%m.%Y" ],
@@ -35,6 +37,7 @@ class Family < ApplicationRecord
 
   validates :locale, inclusion: { in: I18n.available_locales.map(&:to_s) }
   validates :date_format, inclusion: { in: DATE_FORMATS.map(&:last) }
+  validates :trend_color_preference, inclusion: { in: TREND_COLOR_PREFERENCES }
 
   def assigned_merchants
     merchant_ids = transactions.where.not(merchant_id: nil).pluck(:merchant_id).uniq

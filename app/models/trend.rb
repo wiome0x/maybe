@@ -7,10 +7,11 @@ class Trend
 
   validates :current, presence: true
 
-  def initialize(current:, previous:, favorable_direction: nil)
+  def initialize(current:, previous:, favorable_direction: nil, color_preference: nil)
     @current = current
     @previous = previous || 0
     @favorable_direction = (favorable_direction.presence_in(DIRECTIONS) || "up").inquiry
+    @color_preference = color_preference || Current.family&.trend_color_preference || "green_up"
 
     validate!
   end
@@ -26,11 +27,14 @@ class Trend
   end
 
   def color
+    up_color = @color_preference == "red_up" ? red_hex : green_hex
+    down_color = @color_preference == "red_up" ? green_hex : red_hex
+
     case direction
     when "up"
-      favorable_direction.down? ? red_hex : green_hex
+      favorable_direction.down? ? down_color : up_color
     when "down"
-      favorable_direction.down? ? green_hex : red_hex
+      favorable_direction.down? ? up_color : down_color
     else
       gray_hex
     end
