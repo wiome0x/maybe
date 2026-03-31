@@ -81,11 +81,7 @@ class Provider::Registry
 
         models = ENV.fetch("OPENROUTER_MODELS", "google/gemini-2.5-flash,anthropic/claude-sonnet-4,openai/gpt-4.1").split(",").map(&:strip)
 
-        Provider::Openai.new(
-          access_token,
-          uri_base: "https://openrouter.ai/api/v1",
-          models: models
-        )
+        Provider::Openrouter.new(access_token, models: models)
       end
   end
 

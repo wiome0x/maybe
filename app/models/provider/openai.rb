@@ -6,15 +6,12 @@ class Provider::Openai < Provider
 
   MODELS = %w[gpt-4.1]
 
-  def initialize(access_token, uri_base: nil, models: nil)
-    client_options = { access_token: access_token }
-    client_options[:uri_base] = uri_base if uri_base.present?
-    @client = ::OpenAI::Client.new(**client_options)
-    @supported_models = models || MODELS
+  def initialize(access_token)
+    @client = ::OpenAI::Client.new(access_token: access_token)
   end
 
   def supports_model?(model)
-    @supported_models.include?(model)
+    MODELS.include?(model)
   end
 
   def auto_categorize(transactions: [], user_categories: [])
