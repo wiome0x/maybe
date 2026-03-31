@@ -24,7 +24,7 @@ services:
     ports:
       - "9001:3000"
 
-    command: bash -c "rm -f tmp/pids/server.pid && bin/dev"
+    command: bash -c "rm -f tmp/pids/server.pid && sleep infinity"
 
     environment:
       <<: *rails_env

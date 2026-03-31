@@ -155,6 +155,14 @@ bundle exec rails db:setup
 bin/dev
 ```
 
+app 容器的 command 是 sleep infinity，Rails 不会自动启动。每次容器重启后需要手动进去跑 bin/dev。
+```bash
+docker compose -f .devcontainer/docker-compose.yml exec app bash
+rm -f tmp/pids/server.pid
+bin/dev
+```
+
+
 浏览器访问 `http://your-server-ip:9000`。
 
 ## 三、日常开发流程
