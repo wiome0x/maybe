@@ -21,4 +21,23 @@ module ChatsHelper
       "gpt-4.1"
     end
   end
+
+  def ai_provider_logo
+    registry = Provider::Registry.for_concept(:llm)
+    provider = registry.providers.compact.first
+    return nil unless provider
+
+    if provider.is_a?(Provider::Openrouter)
+      model = ENV.fetch("OPENROUTER_MODELS", "google/gemini-2.5-flash").split(",").first.strip
+      if model.start_with?("google/")
+        "provider-google.svg"
+      elsif model.start_with?("anthropic/")
+        "provider-anthropic.svg"
+      elsif model.start_with?("openai/")
+        "provider-openai.svg"
+      end
+    elsif provider.is_a?(Provider::Openai)
+      "provider-openai.svg"
+    end
+  end
 end
