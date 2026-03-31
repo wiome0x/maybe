@@ -1,4 +1,6 @@
 class MarketsController < ApplicationController
+  before_action :ensure_watchlist_defaults
+
   def stocks
     watchlist = Current.family.watchlist_items.stocks.ordered
     @quotes = fetch_stock_quotes(watchlist)
@@ -32,5 +34,9 @@ class MarketsController < ApplicationController
     rescue => e
       Rails.logger.warn("Failed to fetch crypto quotes: #{e.message}")
       []
+    end
+
+    def ensure_watchlist_defaults
+      WatchlistItem.seed_defaults_for(Current.family)
     end
 end

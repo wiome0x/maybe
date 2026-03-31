@@ -17,35 +17,40 @@
 
         <div class="bg-container rounded-lg shadow-border-xs">
           <% @quotes.each_with_index do |quote, idx| %>
-            <div class="px-4 py-3 grid grid-cols-12 items-center text-sm">
-              <div class="col-span-3 flex items-center gap-3">
-                <%= render DS::FilledIcon.new(variant: :text, text: quote.symbol, size: "sm", rounded: true) %>
-                <div>
-                  <p class="font-medium text-primary"><%= quote.symbol %></p>
-                  <p class="text-xs text-secondary truncate"><%= quote.name %></p>
+            <div data-controller="market-chart"
+                 data-market-chart-symbol-value="<%= quote.symbol %>"
+                 data-market-chart-name-value="<%= quote.symbol %> - <%= quote.name %>">
+
+              <div class="px-4 py-3 grid grid-cols-12 items-center text-sm" data-market-chart-target="row">
+                <div class="col-span-3 flex items-center gap-3">
+                  <%= render DS::FilledIcon.new(variant: :text, text: quote.symbol, size: "sm", rounded: true) %>
+                  <div>
+                    <p class="font-medium text-primary"><%= quote.symbol %></p>
+                    <p class="text-xs text-secondary truncate"><%= quote.name %></p>
+                  </div>
+                </div>
+                <div class="col-span-2 text-right">
+                  <p class="font-medium text-primary">$<%= quote.price_formatted %></p>
+                </div>
+                <div class="col-span-2 text-right" data-market-chart-target="details">
+                  <p class="font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>">
+                    <%= quote.change_formatted %>
+                  </p>
+                </div>
+                <div class="col-span-2 text-right text-secondary" data-market-chart-target="details"><%= quote.volume_formatted %></div>
+                <div class="col-span-2 text-right text-secondary" data-market-chart-target="details"><%= quote.market_cap_formatted %></div>
+                <div class="col-span-1 text-right">
+                  <button type="button"
+                          class="p-1.5 rounded-md hover:bg-surface-hover text-secondary hover:text-primary"
+                          data-action="click->market-chart#toggle">
+                    <%= icon "chart-candlestick", size: "sm" %>
+                  </button>
                 </div>
               </div>
-              <div class="col-span-2 text-right">
-                <p class="font-medium text-primary">$<%= quote.price_formatted %></p>
-              </div>
-              <div class="col-span-2 text-right">
-                <p class="font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>">
-                  <%= quote.change_formatted %>
-                </p>
-              </div>
-              <div class="col-span-2 text-right text-secondary"><%= quote.volume_formatted %></div>
-              <div class="col-span-2 text-right text-secondary"><%= quote.market_cap_formatted %></div>
-              <div class="col-span-1 text-right">
-                <button type="button"
-                        class="p-1.5 rounded-md hover:bg-surface-hover text-secondary hover:text-primary"
-                        data-controller="market-chart"
-                        data-action="click->market-chart#open"
-                        data-market-chart-symbol-value="<%= quote.symbol %>"
-                        data-market-chart-name-value="<%= quote.symbol %> - <%= quote.name %>">
-                  <%= icon "chart-candlestick", size: "sm" %>
-                </button>
-              </div>
+
+              <div data-market-chart-target="chart" hidden class="px-4 pb-3"></div>
             </div>
+
             <% if idx < @quotes.size - 1 %>
               <%= render "shared/ruler" %>
             <% end %>

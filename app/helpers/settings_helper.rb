@@ -8,6 +8,7 @@ module SettingsHelper
     { name: "Billing", path: :settings_billing_path, condition: :not_self_hosted? },
     { name: "Accounts", path: :accounts_path },
     { name: "Imports", path: :imports_path },
+    { name: "Database", path: :settings_database_path, condition: :admin_user? },
     { name: "Tags", path: :tags_path },
     { name: "Categories", path: :categories_path },
     { name: "Rules", path: :rules_path },
@@ -62,5 +63,9 @@ module SettingsHelper
   private
     def not_self_hosted?
       !self_hosted?
+    end
+
+    def admin_user?
+      Current.user&.admin?
     end
 end

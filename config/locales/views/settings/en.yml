@@ -90,6 +90,7 @@ en:
       feedback_label: Feedback
       general_section_title: General
       imports_label: Imports
+      database_label: Database
       logout: Logout
       merchants_label: Merchants
       other_section_title: More

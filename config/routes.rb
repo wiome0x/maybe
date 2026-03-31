@@ -65,6 +65,12 @@ Rails.application.routes.draw do
     resource :api_key, only: [ :show, :new, :create, :destroy ]
     resource :watchlist, only: :show
     resources :watchlist_items, only: %i[create destroy], controller: "watchlists"
+    resource :database, only: :show, controller: "databases" do
+      collection do
+        get :table
+        get :export_table
+      end
+    end
   end
 
   get "markets/stocks", to: "markets#stocks", as: :market_stocks
