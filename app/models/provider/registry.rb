@@ -73,6 +73,20 @@ class Provider::Registry
 
         Provider::Openai.new(access_token)
       end
+
+      def openrouter
+        access_token = ENV["OPENROUTER_API_KEY"]
+
+        return nil unless access_token.present?
+
+        models = ENV.fetch("OPENROUTER_MODELS", "google/gemini-2.5-flash,anthropic/claude-sonnet-4,openai/gpt-4.1").split(",").map(&:strip)
+
+        Provider::Openai.new(
+          access_token,
+          uri_base: "https://openrouter.ai/api/v1",
+          models: models
+        )
+      end
   end
 
   def initialize(concept)
@@ -102,7 +116,7 @@ class Provider::Registry
       when :securities
         %i[synth]
       when :llm
-        %i[openai]
+        %i[openai openrouter]
       else
         %i[synth plaid_us plaid_eu github openai]
       end
