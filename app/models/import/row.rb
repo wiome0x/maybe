@@ -23,7 +23,7 @@ class Import::Row < ApplicationRecord
   end
 
   def signed_amount
-    if import.type == "TradeImport"
+    if import.type.in?(%w[TradeImport IbkrImport]) && price.present? && qty.present?
       price.to_d * apply_trade_signage_convention(qty.to_d)
     else
       apply_transaction_signage_convention(amount.to_d)
