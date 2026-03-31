@@ -1,0 +1,9 @@
+---
+en:
+  news:
+    index:
+      home: Home
+      title: Financial News
+      source: Source - Eastmoney
+      empty: No news available
+      empty_hint: Unable to fetch news at this time. Please try again later.

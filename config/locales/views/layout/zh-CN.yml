@@ -7,6 +7,7 @@ zh-CN:
       budgets: 预算
       stocks: 美股
       crypto: 加密货币
+      news: 资讯
       assistant: 助手
     auth:
       existing_account: 已有账户？

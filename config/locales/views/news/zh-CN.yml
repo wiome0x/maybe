@@ -1,0 +1,9 @@
+---
+zh-CN:
+  news:
+    index:
+      home: 首页
+      title: 财经资讯
+      source: 来源 - 东方财富
+      empty: 暂无资讯
+      empty_hint: 无法获取资讯，请稍后重试。

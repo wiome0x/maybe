@@ -7,6 +7,7 @@ en:
       budgets: Budgets
       stocks: Stocks
       crypto: Crypto
+      news: News
       assistant: Assistant
     auth:
       existing_account: Already have an account?

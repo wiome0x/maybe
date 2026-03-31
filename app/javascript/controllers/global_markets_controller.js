@@ -3,23 +3,25 @@ import { Controller } from "@hotwired/stimulus";
 export default class extends Controller {
   static targets = ["indices", "clocks"];
 
+  // Order: China, US, Europe, Japan
   INDICES = [
-    { name: "S&P 500", symbol: "SPX",   flag: "🇺🇸" },
-    { name: "NASDAQ",  symbol: "IXIC",  flag: "🇺🇸" },
-    { name: "DOW",     symbol: "DJI",   flag: "🇺🇸" },
-    { name: "日经225", symbol: "NI225", flag: "🇯🇵" },
-    { name: "上证",    symbol: "SHCOMP",flag: "🇨🇳" },
-    { name: "恒生",    symbol: "HSI",   flag: "🇭🇰" },
-    { name: "DAX",     symbol: "DAX",   flag: "🇩🇪" },
-    { name: "FTSE100", symbol: "UKX",   flag: "🇬🇧" },
+    { name: "上证",    symbol: "SHCOMP", flag: "🇨🇳" },
+    { name: "恒生",    symbol: "HSI",    flag: "🇭🇰" },
+    { name: "S&P 500", symbol: "SPX",    flag: "🇺🇸" },
+    { name: "NASDAQ",  symbol: "IXIC",   flag: "🇺🇸" },
+    { name: "DOW",     symbol: "DJI",    flag: "🇺🇸" },
+    { name: "DAX",     symbol: "DAX",    flag: "🇩🇪" },
+    { name: "FTSE100", symbol: "UKX",    flag: "🇬🇧" },
+    { name: "日经225", symbol: "NI225",  flag: "🇯🇵" },
   ];
 
+  // Order: China, US, UK, EU, Japan
   EXCHANGES = [
-    { flag: "🇨🇳", city: "北京",      tz: "Asia/Shanghai",    open: "09:30", close: "15:00" },
-    { flag: "🇯🇵", city: "东京",      tz: "Asia/Tokyo",       open: "09:00", close: "15:00" },
-    { flag: "🇬🇧", city: "伦敦",      tz: "Europe/London",    open: "08:00", close: "16:30" },
-    { flag: "🇪🇺", city: "法兰克福",  tz: "Europe/Berlin",    open: "09:00", close: "17:30" },
-    { flag: "🇺🇸", city: "纽约",      tz: "America/New_York", open: "09:30", close: "16:00" },
+    { flag: "🇨🇳", city: "北京",     tz: "Asia/Shanghai",    open: "09:30", close: "15:00" },
+    { flag: "🇺🇸", city: "纽约",     tz: "America/New_York", open: "09:30", close: "16:00" },
+    { flag: "🇬🇧", city: "伦敦",     tz: "Europe/London",    open: "08:00", close: "16:30" },
+    { flag: "🇪🇺", city: "法兰克福", tz: "Europe/Berlin",    open: "09:00", close: "17:30" },
+    { flag: "🇯🇵", city: "东京",     tz: "Asia/Tokyo",       open: "09:00", close: "15:00" },
   ];
 
   connect() {
@@ -80,11 +82,11 @@ export default class extends Controller {
 
       if (isOpen) {
         const r = closeMin - current;
-        statusEl.textContent = `开市中 · ${Math.floor(r/60)}h${r%60}m`;
+        statusEl.textContent = `开市中 · ${Math.floor(r / 60)}h${r % 60}m`;
         statusEl.className = "text-xs text-green-500";
       } else if (!isWeekend && current < openMin) {
         const w = openMin - current;
-        statusEl.textContent = `休市 · ${Math.floor(w/60)}h${w%60}m 后开市`;
+        statusEl.textContent = `休市 · ${Math.floor(w / 60)}h${w % 60}m 后开市`;
         statusEl.className = "text-xs text-secondary";
       } else {
         statusEl.textContent = isWeekend ? "周末休市" : "已收盘";

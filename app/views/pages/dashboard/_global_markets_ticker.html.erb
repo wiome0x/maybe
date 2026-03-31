@@ -1,5 +1,5 @@
-<div class="space-y-2" data-controller="global-markets">
-  <div class="bg-container rounded-xl shadow-border-xs px-4 py-2.5 overflow-x-auto">
+<div class="bg-container rounded-xl shadow-border-xs p-4 space-y-3" data-controller="global-markets">
+  <div class="overflow-x-auto">
     <div class="flex items-center gap-6 text-sm whitespace-nowrap min-w-max">
       <div class="flex items-center gap-1.5 text-secondary shrink-0">
         <%= icon "globe", size: "sm" %>
@@ -11,8 +11,10 @@
     </div>
   </div>
 
-  <div class="bg-container rounded-xl shadow-border-xs px-4 py-2.5">
-    <div class="flex items-center justify-between gap-4 text-sm overflow-x-auto" data-global-markets-target="clocks">
+  <%= render "shared/ruler" %>
+
+  <div class="overflow-x-auto">
+    <div class="flex items-center justify-between gap-6 text-sm" data-global-markets-target="clocks">
     </div>
   </div>
 </div>
