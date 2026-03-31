@@ -2,25 +2,25 @@
 zh-CN:
   family_merchants:
     create:
-      error: '创建商家失败：%{error}'
-      success: 新商家创建成功
+      error: '创建交易方失败：%{error}'
+      success: 新交易方创建成功
     destroy:
-      success: 商家删除成功
+      success: 交易方删除成功
     edit:
-      title: 编辑商家
+      title: 编辑交易方
     form:
-      name_placeholder: 商家名称
+      name_placeholder: 交易方名称
     index:
-      empty: 暂无商家
-      new: 新建商家
-      title: 商家
+      empty: 暂无交易方
+      new: 新建交易方
+      title: 交易方
     merchant:
-      confirm_accept: 删除商家
-      confirm_body: 确定要删除此商家吗？删除后将取消所有关联交易的商家关联，可能影响您的报表。
-      confirm_title: 确认删除商家？
-      delete: 删除商家
-      edit: 编辑商家
+      confirm_accept: 删除交易方
+      confirm_body: 确定要删除此交易方吗？删除后将取消所有关联交易的交易方关联，可能影响您的报表。
+      confirm_title: 确认删除交易方？
+      delete: 删除交易方
+      edit: 编辑交易方
     new:
-      title: 新建商家
+      title: 新建交易方
     update:
-      success: 商家更新成功
+      success: 交易方更新成功

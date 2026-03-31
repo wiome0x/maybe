@@ -29,7 +29,7 @@ zh-CN:
       delete_subtitle: 此操作将永久删除该交易，影响您的历史余额，且无法撤销。
       delete_title: 删除交易
       details: 详情
-      merchant_label: 商家
+      merchant_label: 交易方
       name_label: 名称
       nature: 类型
       none: "（无）"
@@ -51,7 +51,7 @@ zh-CN:
     header:
       edit_categories: 编辑分类
       edit_imports: 编辑导入
-      edit_merchants: 编辑商家
+      edit_merchants: 编辑交易方
       edit_tags: 编辑标签
       import: 导入
       new_rule: 新建规则
@@ -62,7 +62,7 @@ zh-CN:
       edit_rules: 编辑规则
       edit_categories: 编辑分类
       edit_tags: 编辑标签
-      edit_merchants: 编辑商家
+      edit_merchants: 编辑交易方
       edit_imports: 编辑导入
       import: 导入
       new_transaction: 新交易
@@ -83,8 +83,8 @@ zh-CN:
         transactions: 交易
         select_category: 选择分类
         category: 分类
-        select_merchant: 选择商家
-        merchant: 商家
+        select_merchant: 选择交易方
+        merchant: 交易方
         none: 无
         tags: 标签
         notes: 备注
@@ -116,7 +116,7 @@ zh-CN:
         category_filter: 分类
         clear_filters: 清除筛选
         date_filter: 日期
-        merchant_filter: 商家
+        merchant_filter: 交易方
         tag_filter: 标签
         type_filter: 类型
       search:

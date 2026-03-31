@@ -43,7 +43,7 @@ zh-CN:
           body: 确定要永久删除您的账户吗？此操作不可逆。
           title: 确认删除账户？
         confirm_reset:
-          body: 确定要重置账户吗？这将删除所有账户、分类、商家、标签及其他数据，但保留用户账户。此操作无法撤销。
+          body: 确定要重置账户吗？这将删除所有账户、分类、交易方、标签及其他数据，但保留用户账户。此操作无法撤销。
           title: 确认重置账户？
         confirm_remove_invitation:
           body: 确定要移除对 %{email} 的邀请吗？
@@ -55,7 +55,7 @@ zh-CN:
         delete_account: 删除账户
         delete_account_warning: 删除账户将永久移除所有数据，且无法撤销。
         reset_account: 重置账户
-        reset_account_warning: 重置账户将删除所有账户、分类、商家、标签及其他数据，但保留用户账户。
+        reset_account_warning: 重置账户将删除所有账户、分类、交易方、标签及其他数据，但保留用户账户。
         email: 邮箱
         first_name: 名
         household_form_input_placeholder: 输入家庭名称
@@ -88,7 +88,7 @@ zh-CN:
       general_section_title: 通用
       imports_label: 导入
       logout: 退出登录
-      merchants_label: 商家
+      merchants_label: 交易方
       other_section_title: 更多
       preferences_label: 偏好设置
       profile_label: 账户
