@@ -33,7 +33,8 @@ services:
     environment:
       <<: *rails_env
     env_file:
-      - ../.env.local    depends_on:
+      - ../.env.local
+    depends_on:
       db:
         condition: service_healthy
       redis:
