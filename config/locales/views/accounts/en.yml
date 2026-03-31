@@ -1,6 +1,16 @@
 ---
 en:
   accounts:
+    account_types:
+      depository: Cash
+      investment: Investment
+      crypto: Crypto
+      property: Property
+      vehicle: Vehicle
+      credit_card: Credit Card
+      loan: Loan
+      other_asset: Other Asset
+      other_liability: Other Liability
     account_sidebar_tabs:
       assets: Assets
       debts: Debts
@@ -35,6 +45,10 @@ en:
       sync: Sync all
     new:
       import_accounts: Import accounts
+      container:
+        select: Select
+        navigate: Navigate
+        close: Close
       method_selector:
         connected_entry: Link account
         connected_entry_eu: Link EU account

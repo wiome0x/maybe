@@ -1,6 +1,16 @@
 ---
 zh-CN:
   accounts:
+    account_types:
+      depository: 现金
+      investment: 投资
+      crypto: 加密货币
+      property: 房产
+      vehicle: 车辆
+      credit_card: 信用卡
+      loan: 贷款
+      other_asset: 其他资产
+      other_liability: 其他负债
     account_sidebar_tabs:
       assets: 资产
       debts: 负债
@@ -35,6 +45,10 @@ zh-CN:
       sync: 同步全部
     new:
       import_accounts: 导入账户
+      container:
+        select: 选择
+        navigate: 导航
+        close: 关闭
       method_selector:
         connected_entry: 关联账户
         connected_entry_eu: 关联欧洲账户
