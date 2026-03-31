@@ -10,6 +10,10 @@ x-rails-env: &rails_env
   POSTGRES_PASSWORD: postgres
   BUNDLE_PATH: /bundle
   REDIS_URL: redis://redis:6379/1
+  OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+  OPENROUTER_MODELS: ${OPENROUTER_MODELS:-google/gemini-2.5-flash}
+  OPENAI_ACCESS_TOKEN: ${OPENAI_ACCESS_TOKEN}
+  EXCHANGE_RATE_PROVIDER: ${EXCHANGE_RATE_PROVIDER}
 
 services:
   app:
@@ -28,8 +32,8 @@ services:
 
     environment:
       <<: *rails_env
-
-    depends_on:
+    env_file:
+      - ../.env.local    depends_on:
       db:
         condition: service_healthy
       redis:
@@ -48,6 +52,8 @@ services:
     environment:
       <<: *rails_env
       RUBY_YJIT_ENABLE: "0"
+    env_file:
+      - ../.env.local
     depends_on:
       redis:
         condition: service_healthy
