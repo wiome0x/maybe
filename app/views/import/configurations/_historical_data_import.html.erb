@@ -1,0 +1,18 @@
+<%# locals: (import:) %>
+
+<%= styled_form_with model: @import, url: import_configuration_path(@import), scope: :import, method: :patch, class: "space-y-4" do |form| %>
+  <%= form.select :date_col_label, import.csv_headers, { include_blank: "Select column", label: "Date" }, required: true %>
+  <%= form.select :ticker_col_label, import.csv_headers, { include_blank: "Select column", label: "Ticker" }, required: true %>
+
+  <% form.fields_for :column_mappings do |cm| %>
+    <%= cm.select :close, import.csv_headers, { include_blank: "Select column", label: "Close" }, required: true %>
+    <%= cm.select :open, import.csv_headers, { include_blank: "Leave empty", label: "Open" } %>
+    <%= cm.select :high, import.csv_headers, { include_blank: "Leave empty", label: "High" } %>
+    <%= cm.select :low, import.csv_headers, { include_blank: "Leave empty", label: "Low" } %>
+    <%= cm.select :volume, import.csv_headers, { include_blank: "Leave empty", label: "Volume" } %>
+  <% end %>
+
+  <%= form.select :currency_col_label, import.csv_headers, { include_blank: "Default (#{import.family.currency})", label: "Currency" } %>
+
+  <%= form.submit "Apply configuration", disabled: import.complete? %>
+<% end %>
