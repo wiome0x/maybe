@@ -81,15 +81,42 @@ class Provider::Openrouter < Provider
 
     def build_tools(functions)
       functions.map do |fn|
+        schema = fn[:params_schema] || { type: "object", properties: {} }
+        cleaned = clean_schema(schema)
+
         {
           type: "function",
           function: {
             name: fn[:name],
             description: fn[:description],
-            parameters: fn[:params_schema]
+            parameters: cleaned
           }
         }
       end
+    end
+
+    # OpenRouter/Gemini are stricter about JSON Schema than OpenAI
+    def clean_schema(schema)
+      cleaned = schema.deep_dup
+      cleaned.delete(:additionalProperties)
+
+      if cleaned[:properties]
+        cleaned[:properties].each do |key, prop|
+          # Remove empty enum arrays (invalid JSON Schema)
+          if prop[:items].is_a?(Hash) && prop[:items][:enum].is_a?(Array) && prop[:items][:enum].empty?
+            prop.delete(:items)
+            prop[:type] = "array"
+            prop[:items] = { type: "string" }
+          end
+        end
+      end
+
+      # Remove required fields that aren't in properties
+      if cleaned[:required] && cleaned[:properties]
+        cleaned[:required] = cleaned[:required].select { |r| cleaned[:properties].key?(r.to_sym) || cleaned[:properties].key?(r.to_s) }
+      end
+
+      cleaned
     end
 
     def sync_response(body)
