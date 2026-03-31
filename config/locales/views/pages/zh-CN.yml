@@ -27,3 +27,10 @@ zh-CN:
         no_account_subtitle: 尚未添加账户，暂无数据可显示。添加您的第一个账户以开始查看仪表盘数据。
         no_account_title: 暂无账户
         no_account_graph_hint: 添加账户以显示净资产数据
+    global_markets:
+      title: 全球股市
+      beijing: 北京
+      tokyo: 东京
+      london: 伦敦
+      frankfurt: 法兰克福
+      new_york: 纽约

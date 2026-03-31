@@ -9,6 +9,7 @@ zh-CN:
       change: 涨跌幅
       volume: 成交量
       market_cap: 市值
+      chart: 图表
       empty: 自选列表为空
       empty_hint: 在设置 → 自选管理中添加股票。
       manage: 管理自选
@@ -20,6 +21,7 @@ zh-CN:
       change: 涨跌幅
       volume: 成交量
       market_cap: 市值
+      chart: 图表
       empty: 自选列表为空
       empty_hint: 在设置 → 自选管理中添加加密货币。
       manage: 管理自选

@@ -1,6 +1,14 @@
 module ApplicationHelper
   include Pagy::Frontend
 
+  def trend_up_color_class
+    Current.family&.trend_color_preference == "red_up" ? "text-red-500" : "text-green-500"
+  end
+
+  def trend_down_color_class
+    Current.family&.trend_color_preference == "red_up" ? "text-green-500" : "text-red-500"
+  end
+
   def styled_form_with(**options, &block)
     options[:builder] = StyledFormBuilder
     form_with(**options, &block)

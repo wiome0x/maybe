@@ -11,7 +11,8 @@
           <div class="col-span-2 text-right"><%= t(".price") %></div>
           <div class="col-span-2 text-right"><%= t(".change") %></div>
           <div class="col-span-2 text-right"><%= t(".volume") %></div>
-          <div class="col-span-3 text-right"><%= t(".market_cap") %></div>
+          <div class="col-span-2 text-right"><%= t(".market_cap") %></div>
+          <div class="col-span-1 text-right"><%= t(".chart") %></div>
         </div>
 
         <div class="bg-container rounded-lg shadow-border-xs">
@@ -28,12 +29,22 @@
                 <p class="font-medium text-primary">$<%= quote.price_formatted %></p>
               </div>
               <div class="col-span-2 text-right">
-                <p class="font-medium <%= quote.change_positive? ? 'text-green-500' : 'text-red-500' %>">
+                <p class="font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>">
                   <%= quote.change_formatted %>
                 </p>
               </div>
               <div class="col-span-2 text-right text-secondary"><%= quote.volume_formatted %></div>
-              <div class="col-span-3 text-right text-secondary"><%= quote.market_cap_formatted %></div>
+              <div class="col-span-2 text-right text-secondary"><%= quote.market_cap_formatted %></div>
+              <div class="col-span-1 text-right">
+                <button type="button"
+                        class="p-1.5 rounded-md hover:bg-surface-hover text-secondary hover:text-primary"
+                        data-controller="market-chart"
+                        data-action="click->market-chart#open"
+                        data-market-chart-symbol-value="<%= quote.symbol %>"
+                        data-market-chart-name-value="<%= quote.symbol %> - <%= quote.name %>">
+                  <%= icon "chart-candlestick", size: "sm" %>
+                </button>
+              </div>
             </div>
             <% if idx < @quotes.size - 1 %>
               <%= render "shared/ruler" %>

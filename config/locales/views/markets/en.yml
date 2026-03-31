@@ -9,6 +9,7 @@ en:
       change: Change
       volume: Volume
       market_cap: Market Cap
+      chart: Chart
       empty: No stocks in your watchlist
       empty_hint: Add stocks in Settings → Watchlist to track them here.
       manage: Manage Watchlist
@@ -20,6 +21,7 @@ en:
       change: Change
       volume: Volume
       market_cap: Market Cap
+      chart: Chart
       empty: No cryptocurrencies in your watchlist
       empty_hint: Add cryptocurrencies in Settings → Watchlist to track them here.
       manage: Manage Watchlist
