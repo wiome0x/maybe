@@ -37,11 +37,11 @@ export default class extends Controller {
 
   renderClocks() {
     this.clocksTarget.innerHTML = this.EXCHANGES.map((ex, i) => `
-      <div class="flex items-center gap-2 shrink-0">
-        <span class="text-lg">${ex.flag}</span>
-        <div>
-          <p class="text-primary font-medium text-sm" id="clock-time-${i}"></p>
-          <p class="text-xs text-secondary" id="clock-status-${i}"></p>
+      <div class="flex items-center gap-2">
+        <span class="text-base">${ex.flag}</span>
+        <div class="min-w-0">
+          <p class="text-primary font-medium text-sm whitespace-nowrap" id="clock-time-${i}"></p>
+          <p class="text-xs whitespace-nowrap" id="clock-status-${i}"></p>
         </div>
       </div>
     `).join("");
@@ -83,25 +83,24 @@ export default class extends Controller {
         const rh = Math.floor(r / 60);
         const rm = r % 60;
         statusEl.textContent = `交易中 · ${rh}小时${rm}分后收盘`;
-        statusEl.className = "text-xs text-green-500";
+        statusEl.className = "text-xs whitespace-nowrap text-green-500";
       } else if (isWeekend) {
         statusEl.textContent = "周末休市";
-        statusEl.className = "text-xs text-secondary";
+        statusEl.className = "text-xs whitespace-nowrap text-secondary";
       } else if (current < openMin) {
         const w = openMin - current;
         const wh = Math.floor(w / 60);
         const wm = w % 60;
         statusEl.textContent = `未开盘 · ${wh}小时${wm}分后开盘`;
-        statusEl.className = "text-xs text-secondary";
+        statusEl.className = "text-xs whitespace-nowrap text-secondary";
       } else {
         statusEl.textContent = "已收盘";
-        statusEl.className = "text-xs text-secondary";
+        statusEl.className = "text-xs whitespace-nowrap text-secondary";
       }
     });
   }
 
   async loadIndices() {
-    // Try fetching from our own backend proxy to avoid CORS issues
     try {
       const res = await fetch("/markets/indices.json");
       if (res.ok) {
@@ -112,30 +111,38 @@ export default class extends Controller {
         }
       }
     } catch { /* fall through */ }
-
-    // Fallback: show names without prices
     this.renderIndices({});
   }
 
   renderIndices(priceMap) {
     const isRedUp = document.body.dataset.trendColor === "red_up";
+
     const html = this.INDICES.map(idx => {
       const q = priceMap[idx.symbol];
       const price = q?.price;
       const pct = q?.change_percent;
-      const priceStr = price != null ? Number(price).toLocaleString("en-US", { maximumFractionDigits: 2 }) : "--";
-      const pctStr = pct != null ? `${pct >= 0 ? "+" : ""}${Number(pct).toFixed(2)}%` : "";
+      const priceStr = price != null
+        ? Number(price).toLocaleString("en-US", { maximumFractionDigits: 2 })
+        : "--";
+      const pctStr = pct != null
+        ? `${pct >= 0 ? "+" : ""}${Number(pct).toFixed(2)}%`
+        : "";
+
       let color = "text-secondary";
       if (pct != null) {
         const up = pct >= 0;
-        color = isRedUp ? (up ? "text-red-500" : "text-green-500") : (up ? "text-green-500" : "text-red-500");
+        color = isRedUp
+          ? (up ? "text-red-500" : "text-green-500")
+          : (up ? "text-green-500" : "text-red-500");
       }
-      return `<span class="flex items-center gap-1.5">
+
+      return `<div class="flex items-baseline gap-1.5 whitespace-nowrap">
         <span class="text-secondary">${idx.flag} ${idx.name}</span>
         <span class="font-medium text-primary">${priceStr}</span>
         ${pctStr ? `<span class="font-medium ${color}">${pctStr}</span>` : ""}
-      </span>`;
-    }).join('<span class="text-subdued">·</span>');
+      </div>`;
+    }).join("");
+
     this.indicesTarget.innerHTML = html;
   }
 }

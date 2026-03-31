@@ -24,9 +24,17 @@
             </div>
 
             <%# Name + Ticker %>
-            <div class="flex-1 min-w-0">
+            <div class="w-28 shrink-0">
               <p class="font-medium text-primary text-base truncate"><%= quote.name %></p>
               <p class="text-sm text-secondary"><%= quote.symbol %></p>
+            </div>
+
+            <%# Mini Chart %>
+            <div class="flex-1 h-14 min-w-0 hidden md:block">
+              <div class="tradingview-widget-container h-full w-full"
+                   data-controller="mini-chart"
+                   data-mini-chart-symbol-value="<%= quote.symbol %>">
+              </div>
             </div>
 
             <%# Price + Change %>
