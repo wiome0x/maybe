@@ -21,7 +21,7 @@
                  data-market-chart-symbol-value="BINANCE:<%= quote.symbol %>USDT"
                  data-market-chart-name-value="<%= quote.symbol %> - <%= quote.name %>">
 
-              <div class="px-4 py-3 grid grid-cols-12 items-center text-sm" data-market-chart-target="row">
+              <div class="px-4 py-3 grid grid-cols-12 items-center text-sm">
                 <div class="col-span-3 flex items-center gap-3">
                   <% if quote.logo_url.present? %>
                     <%= image_tag quote.logo_url, class: "w-6 h-6 rounded-full", loading: "lazy", alt: quote.symbol %>
@@ -36,13 +36,13 @@
                 <div class="col-span-2 text-right">
                   <p class="font-medium text-primary">$<%= quote.price_formatted %></p>
                 </div>
-                <div class="col-span-2 text-right" data-market-chart-target="details">
+                <div class="col-span-2 text-right">
                   <p class="font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>">
                     <%= quote.change_formatted %>
                   </p>
                 </div>
-                <div class="col-span-2 text-right text-secondary" data-market-chart-target="details"><%= quote.volume_formatted %></div>
-                <div class="col-span-2 text-right text-secondary" data-market-chart-target="details"><%= quote.market_cap_formatted %></div>
+                <div class="col-span-2 text-right text-secondary"><%= quote.volume_formatted %></div>
+                <div class="col-span-2 text-right text-secondary"><%= quote.market_cap_formatted %></div>
                 <div class="col-span-1 text-right">
                   <button type="button"
                           class="p-1.5 rounded-md hover:bg-surface-hover text-secondary hover:text-primary"
@@ -52,7 +52,7 @@
                 </div>
               </div>
 
-              <div data-market-chart-target="chart" hidden class="px-4 pb-3"></div>
+              <div data-market-chart-target="chart" hidden class="px-4 pb-4"></div>
             </div>
 
             <% if idx < @quotes.size - 1 %>

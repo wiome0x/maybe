@@ -1,0 +1,45 @@
+<%= content_for :page_title, "Database" %>
+
+<%= settings_section title: "Database Tables", subtitle: "View and export data from all tables" do %>
+  <div class="space-y-2">
+    <div class="bg-container-inset rounded-xl p-1">
+      <div class="px-4 py-2 grid grid-cols-12 text-xs font-medium text-secondary uppercase">
+        <div class="col-span-6">Table</div>
+        <div class="col-span-3 text-right">Rows</div>
+        <div class="col-span-3 text-right">Actions</div>
+      </div>
+
+      <div class="bg-container rounded-lg shadow-border-xs">
+        <% @tables.each_with_index do |table, idx| %>
+          <div class="px-4 py-3 grid grid-cols-12 items-center text-sm">
+            <div class="col-span-6">
+              <p class="font-medium text-primary font-mono"><%= table[:name] %></p>
+            </div>
+            <div class="col-span-3 text-right">
+              <p class="text-secondary"><%= number_with_delimiter(table[:count]) %></p>
+            </div>
+            <div class="col-span-3 flex items-center justify-end gap-2">
+              <%= render DS::Link.new(
+                text: "View",
+                variant: "ghost",
+                icon: "eye",
+                size: :sm,
+                href: settings_database_table_path(table: table[:name])
+              ) %>
+              <%= render DS::Link.new(
+                text: "CSV",
+                variant: "ghost",
+                icon: "download",
+                size: :sm,
+                href: settings_database_export_path(table: table[:name])
+              ) %>
+            </div>
+          </div>
+          <% if idx < @tables.size - 1 %>
+            <%= render "shared/ruler" %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

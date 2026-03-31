@@ -1,0 +1,60 @@
+<%= content_for :page_title, @table_name %>
+
+<%= settings_section title: @table_name, subtitle: "#{number_with_delimiter(@total)} rows" do %>
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <%= render DS::Link.new(
+        text: "Back",
+        icon: "chevron-left",
+        variant: "ghost",
+        href: settings_database_path
+      ) %>
+      <%= render DS::Link.new(
+        text: "Export CSV",
+        icon: "download",
+        variant: "secondary",
+        href: settings_database_export_path(table: @table_name)
+      ) %>
+    </div>
+
+    <div class="overflow-x-auto bg-container-inset rounded-xl p-1">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-xs font-medium text-secondary uppercase">
+            <% @columns.each do |col| %>
+              <th class="px-3 py-2 text-left whitespace-nowrap"><%= col.name %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody class="bg-container rounded-lg shadow-border-xs">
+          <% @rows.each do |row| %>
+            <tr class="border-t border-secondary">
+              <% @columns.each do |col| %>
+                <td class="px-3 py-2 text-primary whitespace-nowrap max-w-[200px] truncate font-mono text-xs">
+                  <%= row[col.name] %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+          <% if @rows.empty? %>
+            <tr>
+              <td colspan="<%= @columns.size %>" class="px-3 py-8 text-center text-secondary">No data</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if @total_pages > 1 %>
+      <div class="flex items-center justify-center gap-2">
+        <% if @page > 1 %>
+          <%= render DS::Link.new(text: "Previous", variant: "ghost", href: settings_database_table_path(table: @table_name, page: @page - 1)) %>
+        <% end %>
+        <span class="text-sm text-secondary"><%= @page %> / <%= @total_pages %></span>
+        <% if @page < @total_pages %>
+          <%= render DS::Link.new(text: "Next", variant: "ghost", href: settings_database_table_path(table: @table_name, page: @page + 1)) %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
