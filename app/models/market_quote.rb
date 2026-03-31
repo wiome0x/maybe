@@ -27,6 +27,7 @@ MarketQuote = Data.define(
   end
 
   def volume_formatted
+    return "--" if volume.nil? || volume == 0
     format_large_number(volume)
   end
 

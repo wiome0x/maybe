@@ -8,6 +8,7 @@ en:
       price: Price
       change: Change
       change_label: Change
+      prev_close_label: Prev Close
       volume: Volume
       volume_label: Volume
       market_cap: Market Cap
@@ -25,8 +26,12 @@ en:
       name: Name
       price: Price
       change: Change
+      change_label: 24h Change
       volume: Volume
+      volume_label: 24h Volume
       market_cap: Market Cap
+      market_cap_label: Market Cap
+      high_low_label: 24h High / Low
       chart: Chart
       manage: Manage
       empty: No cryptocurrencies in your watchlist

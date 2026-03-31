@@ -8,6 +8,7 @@ zh-CN:
       price: 价格
       change: 涨跌幅
       change_label: 涨跌幅
+      prev_close_label: 前收盘
       volume: 成交量
       volume_label: 成交量
       market_cap: 市值
@@ -25,8 +26,12 @@ zh-CN:
       name: 名称
       price: 价格
       change: 涨跌幅
+      change_label: 24h涨跌
       volume: 成交量
+      volume_label: 24h成交量
       market_cap: 市值
+      market_cap_label: 市值
+      high_low_label: 24h最高/最低
       chart: 图表
       manage: 管理
       empty: 自选列表为空

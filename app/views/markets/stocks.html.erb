@@ -32,8 +32,8 @@
             <%# Data Grid - middle area %>
             <div class="flex-1 min-w-0 hidden md:grid grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-1 text-xs">
               <div>
-                <p class="text-secondary"><%= t(".change_label") %></p>
-                <p class="font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>"><%= quote.change_formatted %></p>
+                <p class="text-secondary"><%= t(".prev_close_label") %></p>
+                <p class="font-medium text-primary">$<%= quote.prev_close_formatted %></p>
               </div>
               <div>
                 <p class="text-secondary"><%= t(".volume_label") %></p>
