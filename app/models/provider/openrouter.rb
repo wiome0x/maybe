@@ -26,6 +26,8 @@ class Provider::Openrouter < Provider
       }
       body[:tools] = tools if tools.any?
 
+      Rails.logger.info("[OpenRouter] Request body: #{body.to_json}")
+
       if streamer.present?
         stream_response(body, streamer)
       else
