@@ -1,0 +1,67 @@
+---
+en:
+  rules:
+    index:
+      title: Rules
+      delete_all: Delete all rules
+      new_rule: New rule
+      ai_warning: AI-enabled rule actions will cost money.  Be sure to filter as narrowly as possible to avoid unnecessary costs.
+      rules_label: Rules
+      sort_by: "Sort by:"
+      sort_name: Name
+      sort_updated_at: Updated At
+      no_rules: No rules yet
+      no_rules_description: Set up rules to perform actions to your transactions and other data on every account sync.
+    rule:
+      if_label: IF
+      then_label: THEN
+      for_label: FOR
+      and_more: "and %{count} more"
+      condition:
+        one: condition
+        other: conditions
+      action:
+        one: action
+        other: actions
+      to: to
+      all_past_and_future: "All past and future %{resource_type}"
+      on_or_after: "%{resource_type} on or after %{date}"
+      edit: Edit
+      reapply: Re-apply rule
+      delete: Delete
+    form:
+      rule_name: Rule name (optional)
+      name_placeholder: Enter a name for this rule
+      if_label: IF
+      then_label: THEN
+      for_label: FOR
+      add_condition: Add condition
+      add_condition_group: Add condition group
+      add_action: Add action
+      all_past_and_future: "All past and future %{resource_type}"
+      starting_from: Starting from
+    confirm:
+      confirm_title: Confirm changes
+      confirm_title_named: "Confirm changes to \"%{name}\""
+      confirm_body_html: "You are about to apply this rule to <span class=\"text-primary font-medium\">%{count} %{resource_type}</span> that meet the specified rule criteria.  Please confirm if you wish to proceed with this change."
+      confirm_button: Confirm changes
+    category_rule_cta:
+      updated_to: "Updated to %{category}"
+      description: You can create a rule to automatically categorize transactions like this one
+      dont_show_again: "Don't show this again"
+      dismiss: Dismiss
+      create_rule: Create rule
+    new:
+      title: New rule
+    edit:
+      title: Edit rule
+    create:
+      success: Rule created
+    update:
+      success: Rule updated
+    destroy:
+      success: Rule deleted
+    destroy_all:
+      success: All rules deleted
+    apply:
+      success: Rule applied

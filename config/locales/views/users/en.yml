@@ -4,8 +4,7 @@ en:
     user_menu:
       version: "Version:"
       settings: Settings
-      changelog: Changelog
-      feedback: Feedback
+      changelog: Commit Log
       contact: Contact
       log_out: Log out
     destroy:

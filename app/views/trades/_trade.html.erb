@@ -12,12 +12,28 @@
 
         <div class="max-w-full">
           <%= tag.div class: ["flex items-center gap-2"] do %>
-            <%= render DS::FilledIcon.new(
-              variant: :text,
-              text: entry.name,
-              size: "sm",
-              rounded: true
-            ) %>
+            <% if trade.security&.ticker.present? %>
+              <%= image_tag "https://logo.synthfinance.com/ticker/#{trade.security.ticker}",
+                    class: "w-6 h-6 rounded-full shrink-0 object-cover",
+                    alt: trade.security.ticker,
+                    loading: "lazy",
+                    onerror: "this.replaceWith(this.nextElementSibling);this.nextElementSibling?.classList.remove('hidden')" %>
+              <span class="hidden">
+                <%= render DS::FilledIcon.new(
+                  variant: :text,
+                  text: entry.name,
+                  size: "sm",
+                  rounded: true
+                ) %>
+              </span>
+            <% else %>
+              <%= render DS::FilledIcon.new(
+                variant: :text,
+                text: entry.name,
+                size: "sm",
+                rounded: true
+              ) %>
+            <% end %>
 
             <div class="truncate">
               <%= link_to entry.name,

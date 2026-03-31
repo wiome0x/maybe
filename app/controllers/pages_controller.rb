@@ -28,19 +28,7 @@ class PagesController < ApplicationController
   end
 
   def changelog
-    @release_notes = github_provider.fetch_latest_release_notes
-
-    # Fallback if no release notes are available
-    if @release_notes.nil?
-      @release_notes = {
-        avatar: "https://github.com/maybe-finance.png",
-        username: "maybe-finance",
-        name: "Release notes unavailable",
-        published_at: Date.current,
-        body: "<p>Unable to fetch the latest release notes at this time. Please check back later or visit our <a href='https://github.com/maybe-finance/maybe/releases' target='_blank'>GitHub releases page</a> directly.</p>"
-      }
-    end
-
+    @commits = fetch_git_commits
     render layout: "settings"
   end
 
@@ -55,6 +43,28 @@ class PagesController < ApplicationController
   private
     def github_provider
       Provider::Registry.get_provider(:github)
+    end
+
+    def fetch_git_commits(limit: 30)
+      log = `git log --pretty=format:"%H|%h|%s|%an|%ae|%ai" -n #{limit} 2>/dev/null`
+      return [] if log.blank?
+
+      log.lines.map do |line|
+        parts = line.chomp.split("|", 6)
+        next if parts.size < 6
+
+        {
+          sha: parts[0],
+          short_sha: parts[1],
+          message: parts[2],
+          author_name: parts[3],
+          author_email: parts[4],
+          date: Time.parse(parts[5]).in_time_zone(Current.family&.timezone || "UTC")
+        }
+      end.compact
+    rescue => e
+      Rails.logger.warn("Failed to fetch git commits: #{e.message}")
+      []
     end
 
     def build_cashflow_sankey_data(income_totals, expense_totals, currency_symbol)

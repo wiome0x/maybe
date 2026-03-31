@@ -1,0 +1,33 @@
+---
+zh-CN:
+  budgets:
+    show:
+      categories: 分类
+      edit: 编辑
+      budgeted_tab: 预算
+      actual_tab: 实际
+    budget_header:
+      today: 今天
+    budget_categories:
+      categories_label: 分类
+      amount: 金额
+    actuals_summary:
+      income: 收入
+      expenses: 支出
+    budgeted_summary:
+      expected_income: 预期收入
+      earned: "%{amount} 已赚取"
+      over: "%{amount} 超出"
+      left: "%{amount} 剩余"
+      budgeted: 预算
+      spent: "%{amount} 已支出"
+    edit:
+      title: 设置您的预算
+      subtitle: 在下方输入您的月收入和计划支出来设置预算。
+      budgeted_spending: 预算支出
+      expected_income: 预期收入
+      autosuggest_title: 自动建议收入和支出预算
+      autosuggest_description: 基于交易历史生成建议。AI 可能出错，请在继续前核实。
+      continue: 继续
+    over_allocation_warning:
+      title: 超额分配

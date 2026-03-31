@@ -1,27 +1,46 @@
 <%= content_for :page_title, t(".title") %>
 
 <div class="bg-container shadow-border-xs rounded-xl p-4 grow overflow-y-auto">
-  <div class="flex flex-col md:flex-row justify-between gap-4 mb-12 last:mb-0">
-    <div class="w-full md:w-1/3">
-      <div class="md:px-3 flex items-center gap-3">
-        <% if @release_notes[:avatar].present? %>
-          <div class="fg-inverse shrink-0 w-9 h-9">
-            <%= image_tag @release_notes[:avatar], class: "rounded-full w-full h-full object-cover" %>
-          </div>
-        <% else %>
-          <div class="bg-gray-300 text-gray-600 shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium">
-            <%= @release_notes[:username]&.first&.upcase || "?" %>
-          </div>
-        <% end %>
-        <div>
-          <a class="text-primary font-medium text-sm" href="https://github.com/<%= @release_notes[:username] %>"><%= "@#{@release_notes[:username]}" %></a>
-          <div class="text-secondary text-sm"><%= @release_notes[:published_at]&.strftime("%B %d, %Y") || "Date unavailable" %></div>
+  <h2 class="text-lg font-medium text-primary mb-4"><%= t(".title") %></h2>
+
+  <% if @commits.any? %>
+    <div class="space-y-1">
+      <% @commits.group_by { |c| c[:date].to_date }.each do |date, commits| %>
+        <div class="px-3 py-2">
+          <p class="text-xs font-medium text-secondary uppercase"><%= I18n.l(date, format: :long) %></p>
         </div>
+
+        <div class="bg-container-inset rounded-lg p-1">
+          <% commits.each_with_index do |commit, idx| %>
+            <div class="flex items-start gap-3 px-3 py-2.5 bg-container rounded-md shadow-border-xs">
+              <div class="shrink-0 mt-0.5">
+                <%= icon("git-commit", size: "sm", class: "text-secondary") %>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-primary font-medium truncate"><%= commit[:message] %></p>
+                <p class="text-xs text-secondary mt-0.5">
+                  <%= commit[:author_name] %>
+                  <span class="text-subdued">&middot;</span>
+                  <code class="text-xs"><%= commit[:short_sha] %></code>
+                  <span class="text-subdued">&middot;</span>
+                  <%= commit[:date].strftime("%H:%M") %>
+                </p>
+              </div>
+            </div>
+
+            <% if idx < commits.size - 1 %>
+              <%= render "shared/ruler" %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="flex justify-center items-center py-20">
+      <div class="text-center">
+        <p class="text-sm text-secondary">No commit history available.</p>
       </div>
     </div>
-    <div class="w-full md:w-2/3 text-secondary text-sm prose prose--github-release-notes">
-      <h2 class="mb-5 text-xl text-primary"><%= @release_notes[:name] %></h2>
-      <%= (@release_notes[:body] || "No release notes available").html_safe %>
-    </div>
-  </div>
+  <% end %>
 </div>

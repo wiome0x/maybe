@@ -7,6 +7,13 @@
     </span>
 
     <div class="flex items-center gap-4">
+      <% if entry.trade&.security&.ticker.present? %>
+        <%= image_tag "https://logo.synthfinance.com/ticker/#{entry.trade.security.ticker}",
+              class: "w-8 h-8 rounded-full shrink-0 object-cover",
+              alt: entry.trade.security.ticker,
+              loading: "lazy" %>
+      <% end %>
+
       <h3 class="font-medium">
         <span class="text-2xl">
           <%= format_money entry.amount_money %>

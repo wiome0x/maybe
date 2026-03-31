@@ -31,14 +31,8 @@
     <% end %>
 
     <% menu.with_item(variant: "link", text: t(".settings"), icon: "settings", href: settings_profile_path(return_to: request.fullpath)) %>
-    <% menu.with_item(variant: "link", text: t(".changelog"), icon: "box", href: changelog_path) %>
-
-    <% if self_hosted? %>
-      <% menu.with_item(variant: "link", text: t(".feedback"), icon: "megaphone", href: feedback_path) %>
-      <% menu.with_item(variant: "link", text: t(".contact"), icon: "message-square-more", href: "https://link.maybe.co/discord") %>
-    <% else %>
-      <% menu.with_item(variant: "button", text: t(".contact"), icon: "message-square-more", data: { action: "intercom#show" }) %>
-    <% end %>
+    <% menu.with_item(variant: "link", text: t(".changelog"), icon: "git-commit", href: changelog_path) %>
+    <% menu.with_item(variant: "link", text: t(".contact"), icon: "mail", href: "mailto:bond@mindcont.com") %>
 
     <% menu.with_item(variant: "divider") %>
 

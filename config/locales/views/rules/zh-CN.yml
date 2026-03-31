@@ -1,0 +1,67 @@
+---
+zh-CN:
+  rules:
+    index:
+      title: 规则
+      delete_all: 删除所有规则
+      new_rule: 新建规则
+      ai_warning: 启用 AI 的规则操作会产生费用，请尽量缩小筛选范围以避免不必要的开销。
+      rules_label: 规则
+      sort_by: "排序方式："
+      sort_name: 名称
+      sort_updated_at: 更新时间
+      no_rules: 暂无规则
+      no_rules_description: 设置规则，在每次账户同步时对交易和其他数据执行操作。
+    rule:
+      if_label: 如果
+      then_label: 则
+      for_label: 适用于
+      and_more: "以及另外 %{count} 个"
+      condition:
+        one: 条件
+        other: 条件
+      action:
+        one: 操作
+        other: 操作
+      to: 至
+      all_past_and_future: "所有过去和未来的%{resource_type}"
+      on_or_after: "%{date} 及之后的%{resource_type}"
+      edit: 编辑
+      reapply: 重新应用规则
+      delete: 删除
+    form:
+      rule_name: 规则名称（可选）
+      name_placeholder: 输入规则名称
+      if_label: 如果
+      then_label: 则
+      for_label: 适用于
+      add_condition: 添加条件
+      add_condition_group: 添加条件组
+      add_action: 添加操作
+      all_past_and_future: "所有过去和未来的%{resource_type}"
+      starting_from: 从以下日期开始
+    confirm:
+      confirm_title: 确认更改
+      confirm_title_named: "确认对"%{name}"的更改"
+      confirm_body_html: "您即将对符合规则条件的 <span class=\"text-primary font-medium\">%{count} 条%{resource_type}</span> 应用此规则，请确认是否继续。"
+      confirm_button: 确认更改
+    category_rule_cta:
+      updated_to: "已更新为 %{category}"
+      description: 您可以创建规则来自动分类类似的交易
+      dont_show_again: 不再显示
+      dismiss: 忽略
+      create_rule: 创建规则
+    new:
+      title: 新建规则
+    edit:
+      title: 编辑规则
+    create:
+      success: 规则已创建
+    update:
+      success: 规则已更新
+    destroy:
+      success: 规则已删除
+    destroy_all:
+      success: 所有规则已删除
+    apply:
+      success: 规则已应用
