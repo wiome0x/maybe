@@ -5,16 +5,25 @@ module Maybe
     end
 
     def commit_sha
-      if Rails.env.production?
-        ENV["BUILD_COMMIT_SHA"]
-      else
-        `git rev-parse HEAD`.chomp
+      @commit_sha ||= begin
+        if Rails.env.production?
+          ENV["BUILD_COMMIT_SHA"].presence || git_commit_sha
+        else
+          git_commit_sha
+        end
       end
     end
 
     private
       def semver
-        "0.6.0"
+        @semver ||= begin
+          tag = `git describe --tags --abbrev=0 2>/dev/null`.chomp
+          tag.present? ? tag.sub(/\Av/, "") : "0.0.0"
+        end
+      end
+
+      def git_commit_sha
+        `git rev-parse HEAD 2>/dev/null`.chomp.presence
       end
   end
 end

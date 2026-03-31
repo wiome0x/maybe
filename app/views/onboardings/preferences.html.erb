@@ -80,7 +80,7 @@
             { data: { action: "onboarding#setLocale" } } %>
 
           <%= family_form.select :currency,
-            Money::Currency.as_options.map { |currency| [ "#{currency.name} (#{currency.iso_code})", currency.iso_code ] },
+            Money::Currency.as_options.map { |currency| [ currency.display_option_label, currency.iso_code ] },
             { label: t(".currency"), required: true, selected: params[:currency] || @user.family.currency },
             { data: { action: "onboarding#setCurrency" } } %>
 

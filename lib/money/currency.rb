@@ -73,6 +73,17 @@ class Money::Currency
     (1.0/10**default_precision)
   end
 
+  def display_name
+    zh_name = I18n.t("currencies.#{iso_code}", locale: I18n.locale, default: nil)
+    zh_name || name
+  end
+
+  def display_option_label
+    parts = [ iso_code ]
+    parts << symbol if symbol.present? && symbol != iso_code
+    "#{parts.join(' ')} - #{display_name}"
+  end
+
   def <=>(other)
     return nil unless other.is_a?(Money::Currency)
     @iso_code <=> other.iso_code

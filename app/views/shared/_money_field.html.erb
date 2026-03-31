@@ -67,7 +67,7 @@
       <% unless options[:hide_currency] %>
         <div>
           <%= form.select currency_method,
-                        Money::Currency.as_options.map(&:iso_code),
+                        Money::Currency.as_options.map { |c| [c.display_option_label, c.iso_code] },
                         { inline: true, selected: currency.iso_code },
                         {
                           class: "w-fit pr-5 disabled:text-subdued form-field__input",
