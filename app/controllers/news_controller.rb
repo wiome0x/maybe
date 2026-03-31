@@ -20,7 +20,8 @@ class NewsController < ApplicationController
       response = http.request(request)
       return [] unless response.is_a?(Net::HTTPSuccess)
 
-      parse_news_html(response.body)
+      body = response.body.force_encoding("GBK").encode("UTF-8", invalid: :replace, undef: :replace)
+      parse_news_html(body)
     rescue => e
       Rails.logger.warn("Failed to fetch news: #{e.message}")
       []

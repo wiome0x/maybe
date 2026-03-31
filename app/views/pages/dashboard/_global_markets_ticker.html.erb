@@ -14,7 +14,12 @@
   <%= render "shared/ruler" %>
 
   <div class="overflow-x-auto">
-    <div class="flex items-center justify-between gap-6 text-sm" data-global-markets-target="clocks">
+    <div class="flex items-center gap-6 text-sm whitespace-nowrap min-w-max">
+      <div class="flex items-center gap-1.5 text-secondary shrink-0">
+        <%= icon "clock", size: "sm" %>
+        <span class="font-medium"><%= t("pages.dashboard.global_markets.world_time") %></span>
+      </div>
+      <div class="flex items-center gap-6" data-global-markets-target="clocks"></div>
     </div>
   </div>
 </div>

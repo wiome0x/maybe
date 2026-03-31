@@ -3,19 +3,17 @@ import { Controller } from "@hotwired/stimulus";
 export default class extends Controller {
   static targets = ["indices", "clocks"];
 
-  // Order: China, US, Europe, Japan
   INDICES = [
-    { name: "上证",    symbol: "SHCOMP", flag: "🇨🇳" },
-    { name: "恒生",    symbol: "HSI",    flag: "🇭🇰" },
-    { name: "S&P 500", symbol: "SPX",    flag: "🇺🇸" },
-    { name: "NASDAQ",  symbol: "IXIC",   flag: "🇺🇸" },
-    { name: "DOW",     symbol: "DJI",    flag: "🇺🇸" },
-    { name: "DAX",     symbol: "DAX",    flag: "🇩🇪" },
-    { name: "FTSE100", symbol: "UKX",    flag: "🇬🇧" },
-    { name: "日经225", symbol: "NI225",  flag: "🇯🇵" },
+    { name: "上证",    symbol: "000001.SS", flag: "🇨🇳" },
+    { name: "恒生",    symbol: "^HSI",      flag: "🇭🇰" },
+    { name: "S&P 500", symbol: "^GSPC",     flag: "🇺🇸" },
+    { name: "NASDAQ",  symbol: "^IXIC",     flag: "🇺🇸" },
+    { name: "DOW",     symbol: "^DJI",      flag: "🇺🇸" },
+    { name: "DAX",     symbol: "^GDAXI",    flag: "🇩🇪" },
+    { name: "FTSE100", symbol: "^FTSE",     flag: "🇬🇧" },
+    { name: "日经225", symbol: "^N225",     flag: "🇯🇵" },
   ];
 
-  // Order: China, US, UK, EU, Japan
   EXCHANGES = [
     { flag: "🇨🇳", city: "北京",     tz: "Asia/Shanghai",    open: "09:30", close: "15:00" },
     { flag: "🇺🇸", city: "纽约",     tz: "America/New_York", open: "09:30", close: "16:00" },
@@ -82,45 +80,51 @@ export default class extends Controller {
 
       if (isOpen) {
         const r = closeMin - current;
-        statusEl.textContent = `开市中 · ${Math.floor(r / 60)}h${r % 60}m`;
+        const rh = Math.floor(r / 60);
+        const rm = r % 60;
+        statusEl.textContent = `交易中 · ${rh}小时${rm}分后收盘`;
         statusEl.className = "text-xs text-green-500";
-      } else if (!isWeekend && current < openMin) {
+      } else if (isWeekend) {
+        statusEl.textContent = "周末休市";
+        statusEl.className = "text-xs text-secondary";
+      } else if (current < openMin) {
         const w = openMin - current;
-        statusEl.textContent = `休市 · ${Math.floor(w / 60)}h${w % 60}m 后开市`;
+        const wh = Math.floor(w / 60);
+        const wm = w % 60;
+        statusEl.textContent = `未开盘 · ${wh}小时${wm}分后开盘`;
         statusEl.className = "text-xs text-secondary";
       } else {
-        statusEl.textContent = isWeekend ? "周末休市" : "已收盘";
+        statusEl.textContent = "已收盘";
         statusEl.className = "text-xs text-secondary";
       }
     });
   }
 
   async loadIndices() {
-    const symbols = this.INDICES.map(i => i.symbol).join(",");
+    // Try fetching from our own backend proxy to avoid CORS issues
     try {
-      const res = await fetch(
-        `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=regularMarketPrice,regularMarketChangePercent`,
-        { headers: { Accept: "application/json" } }
-      );
-      if (!res.ok) throw new Error("fetch failed");
-      const data = await res.json();
-      const results = data?.quoteResponse?.result || [];
-      const map = {};
-      results.forEach(q => { map[q.symbol] = q; });
-      this.renderIndices(map);
-    } catch {
-      this.renderIndices({});
-    }
+      const res = await fetch("/markets/indices.json");
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Object.keys(data).length > 0) {
+          this.renderIndices(data);
+          return;
+        }
+      }
+    } catch { /* fall through */ }
+
+    // Fallback: show names without prices
+    this.renderIndices({});
   }
 
   renderIndices(priceMap) {
     const isRedUp = document.body.dataset.trendColor === "red_up";
     const html = this.INDICES.map(idx => {
       const q = priceMap[idx.symbol];
-      const price = q?.regularMarketPrice;
-      const pct = q?.regularMarketChangePercent;
-      const priceStr = price != null ? price.toLocaleString("en-US", { maximumFractionDigits: 2 }) : "--";
-      const pctStr = pct != null ? `${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%` : "";
+      const price = q?.price;
+      const pct = q?.change_percent;
+      const priceStr = price != null ? Number(price).toLocaleString("en-US", { maximumFractionDigits: 2 }) : "--";
+      const pctStr = pct != null ? `${pct >= 0 ? "+" : ""}${Number(pct).toFixed(2)}%` : "";
       let color = "text-secondary";
       if (pct != null) {
         const up = pct >= 0;

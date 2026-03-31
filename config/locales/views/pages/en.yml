@@ -30,6 +30,7 @@ en:
         no_account_graph_hint: Add accounts to display net worth data
     global_markets:
       title: Global Markets
+      world_time: World Time
       beijing: Beijing
       tokyo: Tokyo
       london: London

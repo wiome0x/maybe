@@ -37,7 +37,10 @@ class WatchlistItem < ApplicationRecord
   scope :ordered, -> { order(:position, :created_at) }
 
   class << self
+    # Only seed once per family. Uses a cache key so deleted items won't re-seed.
     def seed_defaults_for(family)
+      cache_key = "watchlist_seeded_#{family.id}"
+      return if Rails.cache.exist?(cache_key)
       return if family.watchlist_items.any?
 
       items = []
@@ -51,6 +54,7 @@ class WatchlistItem < ApplicationRecord
       end
 
       insert_all(items)
+      Rails.cache.write(cache_key, true, expires_in: nil)
     end
   end
 

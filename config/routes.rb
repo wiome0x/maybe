@@ -75,6 +75,7 @@ Rails.application.routes.draw do
 
   get "markets/stocks", to: "markets#stocks", as: :market_stocks
   get "markets/cryptos", to: "markets#cryptos", as: :market_cryptos
+  get "markets/indices", to: "markets#indices", as: :market_indices
   get "news", to: "news#index", as: :news
 
   resource :subscription, only: %i[new show create] do

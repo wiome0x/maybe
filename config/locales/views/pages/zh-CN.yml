@@ -29,6 +29,7 @@ zh-CN:
         no_account_graph_hint: 添加账户以显示净资产数据
     global_markets:
       title: 全球股市
+      world_time: 全球时间
       beijing: 北京
       tokyo: 东京
       london: 伦敦
