@@ -1,0 +1,50 @@
+<div class="space-y-4">
+  <h2 class="text-sm font-medium text-primary">Price Trends</h2>
+
+  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3" data-controller="ticker-search">
+    <div class="form-field w-full sm:w-auto sm:min-w-[200px]">
+      <label class="form-field__label" for="ticker_search">Ticker</label>
+      <input type="text"
+             id="ticker_search"
+             name="ticker"
+             placeholder="e.g. AAPL"
+             class="form-field__input"
+             data-ticker-search-target="input"
+             data-action="input->ticker-search#search" />
+    </div>
+
+    <div class="form-field w-full sm:w-auto">
+      <label class="form-field__label" for="start_date">Start Date</label>
+      <input type="date"
+             id="start_date"
+             name="start_date"
+             class="form-field__input"
+             data-ticker-search-target="startDate"
+             data-action="change->ticker-search#search" />
+    </div>
+
+    <div class="form-field w-full sm:w-auto">
+      <label class="form-field__label" for="end_date">End Date</label>
+      <input type="date"
+             id="end_date"
+             name="end_date"
+             class="form-field__input"
+             data-ticker-search-target="endDate"
+             data-action="change->ticker-search#search" />
+    </div>
+  </div>
+
+  <%= turbo_frame_tag "trend_chart" do %>
+    <div data-controller="trend-chart"
+         data-trend-chart-prices-value="[]"
+         class="rounded-lg bg-container-inset p-4">
+      <div class="flex justify-center items-center py-16">
+        <div class="text-center space-y-2">
+          <%= icon "line-chart", size: "lg", class: "text-secondary mx-auto" %>
+          <p class="text-sm text-primary font-medium">No trend data</p>
+          <p class="text-sm text-secondary">Search for a ticker symbol to view its price history.</p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

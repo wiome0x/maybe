@@ -12,3 +12,8 @@ account:
   family: dylan_family
   type: AccountImport
   status: pending
+
+historical_data:
+  family: dylan_family
+  type: HistoricalDataImport
+  status: complete

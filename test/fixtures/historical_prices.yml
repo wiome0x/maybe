@@ -1,0 +1,35 @@
+aapl_jan:
+  family: dylan_family
+  security: aapl
+  date: "2024-01-02"
+  open: "185.0000"
+  high: "186.5000"
+  low: "184.0000"
+  close: "185.5000"
+  volume: "50000000.0000"
+  ticker: AAPL
+  currency: USD
+
+aapl_jan_next:
+  family: dylan_family
+  security: aapl
+  date: "2024-01-03"
+  open: "185.5000"
+  high: "187.0000"
+  low: "185.0000"
+  close: "186.0000"
+  volume: "48000000.0000"
+  ticker: AAPL
+  currency: USD
+
+msft_jan:
+  family: dylan_family
+  security: msft
+  date: "2024-01-02"
+  open: "375.0000"
+  high: "378.0000"
+  low: "374.0000"
+  close: "376.5000"
+  volume: "30000000.0000"
+  ticker: MSFT
+  currency: USD

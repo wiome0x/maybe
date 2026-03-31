@@ -1,0 +1,36 @@
+<div class="space-y-4 pb-20">
+  <header class="flex justify-between items-center">
+    <h1 class="text-xl font-medium text-primary">Data Tracking</h1>
+    <%= render DS::Link.new(
+      text: "Import CSV",
+      icon: "upload",
+      variant: "primary",
+      href: new_import_path(type: "HistoricalDataImport"),
+      frame: :modal
+    ) %>
+  </header>
+
+  <%# Import History %>
+  <section class="bg-container rounded-xl shadow-border-xs p-4">
+    <% if @imports.any? %>
+      <div class="bg-container-inset rounded-xl p-1">
+        <h2 class="uppercase px-4 py-2 text-secondary text-xs">Import History · <%= @imports.size %></h2>
+        <div class="bg-container rounded-lg shadow-border-xs">
+          <%= render "data_tracking/import_list" %>
+        </div>
+      </div>
+    <% else %>
+      <div class="flex justify-center items-center py-20">
+        <div class="text-center space-y-2">
+          <p class="text-sm text-primary font-medium">No imports yet</p>
+          <p class="text-sm text-secondary">Upload a CSV file with historical stock price data to get started.</p>
+        </div>
+      </div>
+    <% end %>
+  </section>
+
+  <%# Trend Visualization %>
+  <section class="bg-container rounded-xl shadow-border-xs p-4">
+    <%= render "data_tracking/trend_chart" %>
+  </section>
+</div>

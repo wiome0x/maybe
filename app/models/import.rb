@@ -1,7 +1,7 @@
 class Import < ApplicationRecord
   MaxRowCountExceededError = Class.new(StandardError)
 
-  TYPES = %w[TransactionImport TradeImport AccountImport MintImport IbkrImport].freeze
+  TYPES = %w[TransactionImport TradeImport AccountImport MintImport IbkrImport HistoricalDataImport].freeze
   SIGNAGE_CONVENTIONS = %w[inflows_positive inflows_negative]
   SEPARATORS = [ [ "Comma (,)", "," ], [ "Semicolon (;)", ";" ] ].freeze
 

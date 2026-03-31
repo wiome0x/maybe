@@ -79,6 +79,8 @@ Rails.application.routes.draw do
   get "markets/cryptos", to: "markets#cryptos", as: :market_cryptos
   get "markets/indices", to: "markets#indices", as: :market_indices
   get "news", to: "news#index", as: :news
+  get "data_tracking", to: "data_tracking#index", as: :data_tracking
+  get "data_tracking/trend", to: "data_tracking#trend", as: :data_tracking_trend
 
   resource :subscription, only: %i[new show create] do
     collection do
@@ -226,6 +228,7 @@ Rails.application.routes.draw do
       # Production API endpoints
       resources :accounts, only: [ :index ]
       resources :transactions, only: [ :index, :show, :create, :update, :destroy ]
+      resources :historical_prices, only: [ :index ]
       resource :usage, only: [ :show ], controller: "usage"
 
       resources :chats, only: [ :index, :show, :create, :update, :destroy ] do
