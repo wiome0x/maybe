@@ -21,6 +21,7 @@ en:
       missing_data: Missing historical data
       missing_data_description: Maybe uses Synth API to fetch historical exchange rates, security prices, and more. This data is required to calculate accurate historical account balances.
       add_synth_key: Add your Synth API key here.
+      new_item: "New %{type}"
     account:
       troubleshoot: Troubleshoot
     chart:

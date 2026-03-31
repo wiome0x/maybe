@@ -20,6 +20,7 @@ zh-CN:
       new_account: 新增账户
       missing_data: 缺少历史数据
       missing_data_description: Maybe 使用 Synth API 获取历史汇率、证券价格等数据。这些数据用于计算准确的历史账户余额。
+      new_item: "新增 %{type}"
       add_synth_key: 在此添加您的 Synth API 密钥。
     account:
       troubleshoot: 故障排查
