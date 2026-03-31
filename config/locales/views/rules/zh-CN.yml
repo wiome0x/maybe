@@ -42,7 +42,7 @@ zh-CN:
       starting_from: 从以下日期开始
     confirm:
       confirm_title: 确认更改
-      confirm_title_named: "确认对"%{name}"的更改"
+      confirm_title_named: "确认对\"%{name}\"的更改"
       confirm_body_html: "您即将对符合规则条件的 <span class=\"text-primary font-medium\">%{count} 条%{resource_type}</span> 应用此规则，请确认是否继续。"
       confirm_button: 确认更改
     category_rule_cta:
