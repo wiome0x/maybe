@@ -12,7 +12,7 @@
              data-market-chart-symbol-value="<%= quote.symbol %>"
              data-market-chart-name-value="<%= quote.symbol %> - <%= quote.name %>">
 
-          <div class="p-4 flex items-center gap-4 cursor-pointer" data-action="click->market-chart#toggle">
+          <div class="p-4 flex items-center gap-4">
             <%# Logo %>
             <div class="w-11 h-11 shrink-0 rounded-full bg-container-inset flex items-center justify-center overflow-hidden">
               <% if quote.logo_url.present? %>
@@ -24,20 +24,36 @@
             </div>
 
             <%# Name + Ticker %>
-            <div class="w-28 shrink-0">
-              <p class="font-medium text-primary text-base truncate"><%= quote.name %></p>
-              <p class="text-sm text-secondary"><%= quote.symbol %></p>
+            <div class="w-24 shrink-0">
+              <p class="font-medium text-primary text-sm truncate"><%= quote.name %></p>
+              <p class="text-xs text-secondary"><%= quote.symbol %></p>
             </div>
 
-            <%# Mini Chart %>
-            <div class="flex-1 h-14 min-w-0 hidden md:block">
-              <div class="tradingview-widget-container h-full w-full"
-                   data-controller="mini-chart"
-                   data-mini-chart-symbol-value="<%= quote.symbol %>">
+            <%# Data Grid - middle area %>
+            <div class="flex-1 min-w-0 hidden md:grid grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-1 text-xs">
+              <div>
+                <p class="text-secondary"><%= t(".change_label") %></p>
+                <p class="font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>"><%= quote.change_formatted %></p>
+              </div>
+              <div>
+                <p class="text-secondary"><%= t(".volume_label") %></p>
+                <p class="font-medium text-primary"><%= quote.volume_formatted %></p>
+              </div>
+              <div>
+                <p class="text-secondary"><%= t(".market_cap_label") %></p>
+                <p class="font-medium text-primary"><%= quote.market_cap_formatted %></p>
+              </div>
+              <div>
+                <p class="text-secondary"><%= t(".open_label") %></p>
+                <p class="font-medium text-primary">$<%= quote.open_formatted %></p>
+              </div>
+              <div>
+                <p class="text-secondary"><%= t(".high_low_label") %></p>
+                <p class="font-medium text-primary">$<%= quote.high_formatted %> / $<%= quote.low_formatted %></p>
               </div>
             </div>
 
-            <%# Price + Change %>
+            <%# Price + Change (always visible) %>
             <div class="text-right shrink-0">
               <p class="font-medium text-primary text-lg">$<%= quote.price_formatted %></p>
               <p class="text-sm font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>">
@@ -45,19 +61,13 @@
               </p>
             </div>
 
-            <%# Market Cap Badge %>
-            <div class="shrink-0 hidden md:block">
-              <span class="inline-block px-2.5 py-1 rounded-lg text-xs font-medium
-                    <%= quote.change_positive? ? 'bg-green-50 text-green-600 theme-dark:bg-green-500/10' : 'bg-red-50 text-red-600 theme-dark:bg-red-500/10' %>">
-                <%= quote.market_cap_formatted %>
-              </span>
-            </div>
-
             <%# Chart button %>
             <div class="shrink-0">
-              <span class="p-1.5 rounded-md text-secondary hover:text-primary">
+              <button type="button"
+                      class="p-1.5 rounded-md hover:bg-surface-hover text-secondary hover:text-primary"
+                      data-action="click->market-chart#toggle">
                 <%= icon "chart-candlestick", size: "sm" %>
-              </span>
+              </button>
             </div>
           </div>
 

@@ -7,8 +7,13 @@ en:
       name: Name
       price: Price
       change: Change
+      change_label: Change
       volume: Volume
+      volume_label: Volume
       market_cap: Market Cap
+      market_cap_label: Market Cap
+      open_label: Open
+      high_low_label: High / Low
       chart: Chart
       manage: Manage
       empty: No stocks in your watchlist
@@ -23,6 +28,7 @@ en:
       volume: Volume
       market_cap: Market Cap
       chart: Chart
+      manage: Manage
       empty: No cryptocurrencies in your watchlist
       empty_hint: Add cryptocurrencies in Settings → Watchlist to track them here.
       manage: Manage Watchlist

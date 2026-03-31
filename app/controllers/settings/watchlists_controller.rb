@@ -23,6 +23,14 @@ class Settings::WatchlistsController < ApplicationController
     redirect_to settings_watchlist_path, notice: "#{symbol} removed from watchlist."
   end
 
+  def reorder
+    ids = params[:item_ids] || []
+    ids.each_with_index do |id, index|
+      Current.family.watchlist_items.where(id: id).update_all(position: index)
+    end
+    head :ok
+  end
+
   private
     def watchlist_params
       params.require(:watchlist_item).permit(:symbol, :name, :item_type)

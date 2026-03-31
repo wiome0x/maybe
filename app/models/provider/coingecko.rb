@@ -39,7 +39,11 @@ class Provider::Coingecko < Provider
           volume: coin["total_volume"],
           market_cap: coin["market_cap"],
           logo_url: coin["image"],
-          item_type: "crypto"
+          item_type: "crypto",
+          open_price: nil,
+          prev_close: nil,
+          high: coin["high_24h"],
+          low: coin["low_24h"]
         )
       end
     end

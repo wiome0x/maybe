@@ -63,7 +63,9 @@ Rails.application.routes.draw do
     resource :billing, only: :show
     resource :security, only: :show
     resource :api_key, only: [ :show, :new, :create, :destroy ]
-    resource :watchlist, only: :show
+    resource :watchlist, only: :show do
+      post :reorder, on: :collection
+    end
     resources :watchlist_items, only: %i[create destroy], controller: "watchlists"
     resource :database, only: :show, controller: "databases" do
       collection do

@@ -23,7 +23,11 @@ class Provider::Finnhub < Provider
           volume: quote["v"],
           market_cap: profile["marketCapitalization"].present? ? (profile["marketCapitalization"].to_f * 1_000_000).round : nil,
           logo_url: profile["logo"].presence || "https://logo.synthfinance.com/ticker/#{symbol}",
-          item_type: "stock"
+          item_type: "stock",
+          open_price: quote["o"],
+          prev_close: prev_close,
+          high: quote["h"],
+          low: quote["l"]
         )
       end.compact
 

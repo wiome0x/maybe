@@ -6,7 +6,8 @@ class NewsController < ApplicationController
 
   private
     def fetch_news
-      url = "https://stock.eastmoney.com/a/cmgdd.html"
+      # Eastmoney news API - returns JSON, works from any IP
+      url = "https://newsapi.eastmoney.com/kuaixun/v1/getlist_102_ajaxResult_50_1_.html"
       uri = URI(url)
 
       http = Net::HTTP.new(uri.host, uri.port)
@@ -14,56 +15,41 @@ class NewsController < ApplicationController
       http.read_timeout = 10
 
       request = Net::HTTP::Get.new(uri)
-      request["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-      request["Accept"] = "text/html"
-      request["Accept-Encoding"] = "identity"
+      request["User-Agent"] = "Mozilla/5.0"
+      request["Referer"] = "https://kuaixun.eastmoney.com/"
 
       response = http.request(request)
       return [] unless response.is_a?(Net::HTTPSuccess)
 
-      # Try UTF-8 first, fall back to GBK
       body = response.body
-      body = if body.valid_encoding?
-               body.encode("UTF-8", invalid: :replace, undef: :replace)
-             else
-               body.force_encoding("GBK").encode("UTF-8", invalid: :replace, undef: :replace)
-             end
+      # Response is JSONP: var ajaxResult = {...}
+      json_str = body[/\{.*\}/m]
+      return [] if json_str.blank?
 
-      parse_news_html(body)
+      data = JSON.parse(json_str)
+      live_list = data.dig("LivesList") || []
+
+      live_list.first(30).map do |item|
+        {
+          title: item["Title"],
+          url: item["Url"].presence || item["DocUrl"].presence || "#",
+          time: format_news_time(item["ShowTime"]),
+          digest: item["Digest"]
+        }
+      end.select { |a| a[:title].present? }
     rescue => e
       Rails.logger.warn("Failed to fetch news: #{e.message}")
       []
     end
 
-    def parse_news_html(html)
-      articles = []
-
-      # Extract news list section
-      news_section = html[/<div[^>]*class="[^"]*newsList[^"]*"[^>]*>(.*?)<\/div>/m, 1]
-      news_section ||= html
-
-      # Extract list items
-      news_section.scan(/<li[^>]*>(.*?)<\/li>/m).each do |match|
-        li = match[0]
-
-        href = li[/href="([^"]*)"/, 1]
-        title = li[/title="([^"]*)"/, 1]
-        title ||= li[/<a[^>]*>([^<]+)<\/a>/, 1]
-        time = li[/<span[^>]*class="time"[^>]*>([^<]+)<\/span>/, 1]
-
-        next if title.blank? || href.blank?
-
-        # Clean title - strip any HTML tags
-        clean_title = title.gsub(/<[^>]+>/, "").strip
-        next if clean_title.blank?
-
-        # Make URL absolute
-        href = "https://stock.eastmoney.com#{href}" if href.start_with?("/")
-        href = "https:#{href}" if href.start_with?("//")
-
-        articles << { title: clean_title, url: href, time: time&.strip }
+    def format_news_time(time_str)
+      return nil if time_str.blank?
+      time = Time.parse(time_str) rescue nil
+      return nil unless time
+      if time.to_date == Date.current
+        time.strftime("%H:%M")
+      else
+        time.strftime("%m-%d %H:%M")
       end
-
-      articles.first(30)
     end
 end

@@ -6,7 +6,11 @@ MarketQuote = Data.define(
   :volume,
   :market_cap,
   :logo_url,
-  :item_type
+  :item_type,
+  :open_price,
+  :prev_close,
+  :high,
+  :low
 ) do
   def price_formatted
     return "N/A" if price.nil?
@@ -30,7 +34,28 @@ MarketQuote = Data.define(
     format_large_number(market_cap)
   end
 
+  def open_formatted
+    format_price(open_price)
+  end
+
+  def prev_close_formatted
+    format_price(prev_close)
+  end
+
+  def high_formatted
+    format_price(high)
+  end
+
+  def low_formatted
+    format_price(low)
+  end
+
   private
+    def format_price(val)
+      return "N/A" if val.nil?
+      val >= 1 ? sprintf("%.2f", val) : sprintf("%.4f", val)
+    end
+
     def format_large_number(num)
       return "N/A" if num.nil?
       if num >= 1_000_000_000_000

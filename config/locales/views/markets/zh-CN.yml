@@ -7,8 +7,13 @@ zh-CN:
       name: 名称
       price: 价格
       change: 涨跌幅
+      change_label: 涨跌幅
       volume: 成交量
+      volume_label: 成交量
       market_cap: 市值
+      market_cap_label: 市值
+      open_label: 开盘价
+      high_low_label: 最高 / 最低
       chart: 图表
       manage: 管理
       empty: 自选列表为空
@@ -23,6 +28,7 @@ zh-CN:
       volume: 成交量
       market_cap: 市值
       chart: 图表
+      manage: 管理
       empty: 自选列表为空
       empty_hint: 在设置 → 自选管理中添加加密货币。
       manage: 管理自选
