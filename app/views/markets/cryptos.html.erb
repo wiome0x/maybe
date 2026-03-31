@@ -1,0 +1,58 @@
+<div class="space-y-4 pb-20">
+  <header class="flex justify-between items-center">
+    <h1 class="text-xl font-medium text-primary"><%= t(".title") %></h1>
+  </header>
+
+  <div class="bg-container rounded-xl shadow-border-xs p-4">
+    <% if @quotes.any? %>
+      <div class="bg-container-inset rounded-xl p-1">
+        <div class="px-4 py-2 grid grid-cols-12 text-xs font-medium text-secondary uppercase">
+          <div class="col-span-3"><%= t(".name") %></div>
+          <div class="col-span-2 text-right"><%= t(".price") %></div>
+          <div class="col-span-2 text-right"><%= t(".change") %></div>
+          <div class="col-span-2 text-right"><%= t(".volume") %></div>
+          <div class="col-span-3 text-right"><%= t(".market_cap") %></div>
+        </div>
+
+        <div class="bg-container rounded-lg shadow-border-xs">
+          <% @quotes.each_with_index do |quote, idx| %>
+            <div class="px-4 py-3 grid grid-cols-12 items-center text-sm">
+              <div class="col-span-3 flex items-center gap-3">
+                <% if quote.logo_url.present? %>
+                  <%= image_tag quote.logo_url, class: "w-6 h-6 rounded-full", loading: "lazy", alt: quote.symbol %>
+                <% else %>
+                  <%= render DS::FilledIcon.new(variant: :text, text: quote.symbol, size: "sm", rounded: true) %>
+                <% end %>
+                <div>
+                  <p class="font-medium text-primary"><%= quote.symbol %></p>
+                  <p class="text-xs text-secondary truncate"><%= quote.name %></p>
+                </div>
+              </div>
+              <div class="col-span-2 text-right">
+                <p class="font-medium text-primary">$<%= quote.price_formatted %></p>
+              </div>
+              <div class="col-span-2 text-right">
+                <p class="font-medium <%= quote.change_positive? ? 'text-green-500' : 'text-red-500' %>">
+                  <%= quote.change_formatted %>
+                </p>
+              </div>
+              <div class="col-span-2 text-right text-secondary"><%= quote.volume_formatted %></div>
+              <div class="col-span-3 text-right text-secondary"><%= quote.market_cap_formatted %></div>
+            </div>
+            <% if idx < @quotes.size - 1 %>
+              <%= render "shared/ruler" %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="flex justify-center items-center py-20">
+        <div class="text-center space-y-2">
+          <p class="text-sm text-primary font-medium"><%= t(".empty") %></p>
+          <p class="text-sm text-secondary"><%= t(".empty_hint") %></p>
+          <%= render DS::Link.new(text: t(".manage"), href: settings_watchlist_path, variant: "primary") %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

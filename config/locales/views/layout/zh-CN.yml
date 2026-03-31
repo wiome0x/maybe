@@ -5,6 +5,8 @@ zh-CN:
       home: 首页
       transactions: 交易
       budgets: 预算
+      stocks: 美股
+      crypto: 加密货币
       assistant: 助手
     auth:
       existing_account: 已有账户？

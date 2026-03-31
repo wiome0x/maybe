@@ -1,0 +1,25 @@
+---
+en:
+  markets:
+    stocks:
+      home: Home
+      title: US Stocks
+      name: Name
+      price: Price
+      change: Change
+      volume: Volume
+      market_cap: Market Cap
+      empty: No stocks in your watchlist
+      empty_hint: Add stocks in Settings → Watchlist to track them here.
+      manage: Manage Watchlist
+    cryptos:
+      home: Home
+      title: Crypto
+      name: Name
+      price: Price
+      change: Change
+      volume: Volume
+      market_cap: Market Cap
+      empty: No cryptocurrencies in your watchlist
+      empty_hint: Add cryptocurrencies in Settings → Watchlist to track them here.
+      manage: Manage Watchlist

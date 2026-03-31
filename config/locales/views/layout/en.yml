@@ -5,6 +5,8 @@ en:
       home: Home
       transactions: Transactions
       budgets: Budgets
+      stocks: Stocks
+      crypto: Crypto
       assistant: Assistant
     auth:
       existing_account: Already have an account?

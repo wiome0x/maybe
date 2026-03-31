@@ -1,0 +1,25 @@
+---
+zh-CN:
+  markets:
+    stocks:
+      home: 首页
+      title: 美股行情
+      name: 名称
+      price: 价格
+      change: 涨跌幅
+      volume: 成交量
+      market_cap: 市值
+      empty: 自选列表为空
+      empty_hint: 在设置 → 自选管理中添加股票。
+      manage: 管理自选
+    cryptos:
+      home: 首页
+      title: 加密货币
+      name: 名称
+      price: 价格
+      change: 涨跌幅
+      volume: 成交量
+      market_cap: 市值
+      empty: 自选列表为空
+      empty_hint: 在设置 → 自选管理中添加加密货币。
+      manage: 管理自选

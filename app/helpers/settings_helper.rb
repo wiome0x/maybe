@@ -12,6 +12,7 @@ module SettingsHelper
     { name: "Categories", path: :categories_path },
     { name: "Rules", path: :rules_path },
     { name: "Merchants", path: :family_merchants_path },
+    { name: "Watchlist", path: :settings_watchlist_path },
     { name: "What's new", path: :changelog_path },
     { name: "Feedback", path: :feedback_path }
   ]

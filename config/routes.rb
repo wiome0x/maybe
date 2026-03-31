@@ -63,7 +63,12 @@ Rails.application.routes.draw do
     resource :billing, only: :show
     resource :security, only: :show
     resource :api_key, only: [ :show, :new, :create, :destroy ]
+    resource :watchlist, only: :show
+    resources :watchlist_items, only: %i[create destroy], controller: "watchlists"
   end
+
+  get "markets/stocks", to: "markets#stocks", as: :market_stocks
+  get "markets/cryptos", to: "markets#cryptos", as: :market_cryptos
 
   resource :subscription, only: %i[new show create] do
     collection do
