@@ -1,6 +1,11 @@
 ---
 en:
   layouts:
+    application:
+      home: Home
+      transactions: Transactions
+      budgets: Budgets
+      assistant: Assistant
     auth:
       existing_account: Already have an account?
       no_account: New to Maybe?

@@ -1,6 +1,11 @@
 ---
 zh-CN:
   layouts:
+    application:
+      home: 首页
+      transactions: 交易
+      budgets: 预算
+      assistant: 助手
     auth:
       existing_account: 已有账户？
       no_account: 初次使用 Maybe？

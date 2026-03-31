@@ -1,8 +1,8 @@
 <% mobile_nav_items = [
-  { name: "Home", path: root_path, icon: "pie-chart", icon_custom: false, active: page_active?(root_path) },
-  { name: "Transactions", path: transactions_path, icon: "credit-card", icon_custom: false, active: page_active?(transactions_path) },
-  { name: "Budgets", path: budgets_path, icon: "map", icon_custom: false, active: page_active?(budgets_path) },
-  { name: "Assistant", path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path), mobile_only: true }
+  { name: t("layouts.application.home"), path: root_path, icon: "pie-chart", icon_custom: false, active: page_active?(root_path) },
+  { name: t("layouts.application.transactions"), path: transactions_path, icon: "credit-card", icon_custom: false, active: page_active?(transactions_path) },
+  { name: t("layouts.application.budgets"), path: budgets_path, icon: "map", icon_custom: false, active: page_active?(budgets_path) },
+  { name: t("layouts.application.assistant"), path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path), mobile_only: true }
 ] %>
 
 <% desktop_nav_items = mobile_nav_items.reject { |item| item[:mobile_only] } %>
@@ -132,6 +132,7 @@
     <% end %>
 
     <%# DESKTOP - Right sidebar %>
+    <% if Current.user.ai_available? %>
     <%= tag.div class: class_names(
           "hidden lg:block h-full overflow-y-auto shrink-0 max-w-[400px] transition-all duration-300",
           Current.user.show_ai_sidebar? ? expanded_sidebar_class : collapsed_sidebar_class,
@@ -152,6 +153,7 @@
           </div>
         <% end %>
       <% end %>
+    <% end %>
     <% end %>
 
     <%# MOBILE - Bottom Nav %>
