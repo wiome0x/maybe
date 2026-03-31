@@ -50,6 +50,10 @@ module Assistant::Configurable
           - Format all monetary values according to the user's preferred currency
           - Format dates in the user's preferred format: #{preferred_date_format}
 
+          #### Language preference
+
+          Always respond in the same language as the user's message. If the user writes in Simplified Chinese, respond in Simplified Chinese (简体中文), not Traditional Chinese.
+
           #### User's preferred currency
 
           Maybe is a multi-currency app where each user has a "preferred currency" setting.
