@@ -73,8 +73,8 @@
 
     <%# DESKTOP - Left sidebar %>
     <%= tag.div class: class_names(
-        "hidden lg:block py-4 overflow-y-auto shrink-0 max-w-[320px] transition-all duration-300",
-        Current.user.show_sidebar? ? expanded_sidebar_class : collapsed_sidebar_class,
+        "hidden lg:block py-4 shrink-0 max-w-[320px] transition-all duration-300",
+        Current.user.show_sidebar? ? "#{expanded_sidebar_class} overflow-y-auto" : "#{collapsed_sidebar_class} overflow-hidden",
        ),
        data: { app_layout_target: "leftSidebar" } do %>
       <% if content_for?(:sidebar) %>
@@ -110,7 +110,7 @@
     <% end %>
 
     <%# SHARED - Main content %>
-    <%= tag.main class: class_names("grow overflow-y-auto px-3 lg:px-10 py-4 w-full", Current.user.ai_available? ? "max-w-5xl mx-auto" : ""), data: { app_layout_target: "content" } do %>
+    <%= tag.main class: class_names("grow overflow-y-auto px-3 lg:px-10 py-4 w-full max-w-5xl mx-auto"), data: { app_layout_target: "content" } do %>
       <div class="hidden lg:flex gap-2 items-center justify-between mb-6">
         <div class="flex items-center gap-2">
           <%= icon("panel-left", as_button: true, data: { action: "app-layout#toggleLeftSidebar" }) %>

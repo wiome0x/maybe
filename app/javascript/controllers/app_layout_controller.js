@@ -34,9 +34,13 @@ export default class extends Controller {
     if (isCurrentlyOpen) {
       el.classList.remove(...this.expandedSidebarClasses);
       el.classList.add(...this.collapsedSidebarClasses);
+      el.classList.remove("overflow-y-auto");
+      el.classList.add("overflow-hidden");
     } else {
       el.classList.add(...this.expandedSidebarClasses);
       el.classList.remove(...this.collapsedSidebarClasses);
+      el.classList.add("overflow-y-auto");
+      el.classList.remove("overflow-hidden");
     }
   }
 
