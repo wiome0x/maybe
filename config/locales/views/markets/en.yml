@@ -10,6 +10,7 @@ en:
       volume: Volume
       market_cap: Market Cap
       chart: Chart
+      manage: Manage
       empty: No stocks in your watchlist
       empty_hint: Add stocks in Settings → Watchlist to track them here.
       manage: Manage Watchlist

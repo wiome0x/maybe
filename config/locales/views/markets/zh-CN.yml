@@ -10,6 +10,7 @@ zh-CN:
       volume: 成交量
       market_cap: 市值
       chart: 图表
+      manage: 管理
       empty: 自选列表为空
       empty_hint: 在设置 → 自选管理中添加股票。
       manage: 管理自选

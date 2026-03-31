@@ -1,0 +1,16 @@
+---
+en:
+  balance_sheet:
+    classification:
+      asset: Assets
+      liability: Liabilities
+  accountable:
+    depository: Cash
+    investment: Investments
+    crypto: Crypto
+    property: Properties
+    vehicle: Vehicles
+    credit_card: Credit Cards
+    loan: Loans
+    other_asset: Other Assets
+    other_liability: Other Liabilities

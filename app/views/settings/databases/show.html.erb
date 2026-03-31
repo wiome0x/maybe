@@ -24,14 +24,14 @@
                 variant: "ghost",
                 icon: "eye",
                 size: :sm,
-                href: settings_database_table_path(table: table[:name])
+                href: table_settings_database_path(table: table[:name])
               ) %>
               <%= render DS::Link.new(
                 text: "CSV",
                 variant: "ghost",
                 icon: "download",
                 size: :sm,
-                href: settings_database_export_path(table: table[:name])
+                href: export_table_settings_database_path(table: table[:name])
               ) %>
             </div>
           </div>

@@ -13,7 +13,7 @@
         text: "Export CSV",
         icon: "download",
         variant: "secondary",
-        href: settings_database_export_path(table: @table_name)
+        href: export_table_settings_database_path(table: @table_name)
       ) %>
     </div>
 
@@ -48,11 +48,11 @@
     <% if @total_pages > 1 %>
       <div class="flex items-center justify-center gap-2">
         <% if @page > 1 %>
-          <%= render DS::Link.new(text: "Previous", variant: "ghost", href: settings_database_table_path(table: @table_name, page: @page - 1)) %>
+          <%= render DS::Link.new(text: "Previous", variant: "ghost", href: table_settings_database_path(table: @table_name, page: @page - 1)) %>
         <% end %>
         <span class="text-sm text-secondary"><%= @page %> / <%= @total_pages %></span>
         <% if @page < @total_pages %>
-          <%= render DS::Link.new(text: "Next", variant: "ghost", href: settings_database_table_path(table: @table_name, page: @page + 1)) %>
+          <%= render DS::Link.new(text: "Next", variant: "ghost", href: table_settings_database_path(table: @table_name, page: @page + 1)) %>
         <% end %>
       </div>
     <% end %>

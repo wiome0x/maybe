@@ -1,0 +1,16 @@
+---
+zh-CN:
+  balance_sheet:
+    classification:
+      asset: 资产
+      liability: 负债
+  accountable:
+    depository: 现金
+    investment: 投资
+    crypto: 加密货币
+    property: 房产
+    vehicle: 车辆
+    credit_card: 信用卡
+    loan: 贷款
+    other_asset: 其他资产
+    other_liability: 其他负债

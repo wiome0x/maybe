@@ -16,11 +16,19 @@ class NewsController < ApplicationController
       request = Net::HTTP::Get.new(uri)
       request["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
       request["Accept"] = "text/html"
+      request["Accept-Encoding"] = "identity"
 
       response = http.request(request)
       return [] unless response.is_a?(Net::HTTPSuccess)
 
-      body = response.body.force_encoding("GBK").encode("UTF-8", invalid: :replace, undef: :replace)
+      # Try UTF-8 first, fall back to GBK
+      body = response.body
+      body = if body.valid_encoding?
+               body.encode("UTF-8", invalid: :replace, undef: :replace)
+             else
+               body.force_encoding("GBK").encode("UTF-8", invalid: :replace, undef: :replace)
+             end
+
       parse_news_html(body)
     rescue => e
       Rails.logger.warn("Failed to fetch news: #{e.message}")
@@ -28,28 +36,32 @@ class NewsController < ApplicationController
     end
 
     def parse_news_html(html)
-      # Eastmoney news list items follow pattern:
-      # <div class="newsList">
-      #   <li>
-      #     <a href="..." title="...">title</a>
-      #     <span class="time">date</span>
-      #   </li>
-      # </div>
       articles = []
 
-      # Extract list items with regex (avoid adding nokogiri dependency)
-      html.scan(/<li[^>]*>.*?<\/li>/m).each do |li|
-        # Extract link and title
+      # Extract news list section
+      news_section = html[/<div[^>]*class="[^"]*newsList[^"]*"[^>]*>(.*?)<\/div>/m, 1]
+      news_section ||= html
+
+      # Extract list items
+      news_section.scan(/<li[^>]*>(.*?)<\/li>/m).each do |match|
+        li = match[0]
+
         href = li[/href="([^"]*)"/, 1]
-        title = li[/title="([^"]*)"/, 1] || li[/<a[^>]*>([^<]+)<\/a>/, 1]
+        title = li[/title="([^"]*)"/, 1]
+        title ||= li[/<a[^>]*>([^<]+)<\/a>/, 1]
         time = li[/<span[^>]*class="time"[^>]*>([^<]+)<\/span>/, 1]
 
         next if title.blank? || href.blank?
 
+        # Clean title - strip any HTML tags
+        clean_title = title.gsub(/<[^>]+>/, "").strip
+        next if clean_title.blank?
+
         # Make URL absolute
         href = "https://stock.eastmoney.com#{href}" if href.start_with?("/")
+        href = "https:#{href}" if href.start_with?("//")
 
-        articles << { title: title.strip, url: href, time: time&.strip }
+        articles << { title: clean_title, url: href, time: time&.strip }
       end
 
       articles.first(30)
