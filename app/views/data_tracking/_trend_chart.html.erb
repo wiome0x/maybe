@@ -1,7 +1,7 @@
 <div class="space-y-4">
   <h2 class="text-sm font-medium text-primary">Price Trends</h2>
 
-  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3" data-controller="ticker-search">
+  <div class="flex flex-col sm:flex-row items-end gap-3" data-controller="ticker-search">
     <div class="form-field w-full sm:w-auto sm:min-w-[200px]">
       <label class="form-field__label" for="ticker_search">Ticker</label>
       <input type="text"
@@ -9,8 +9,8 @@
              name="ticker"
              placeholder="e.g. AAPL"
              class="form-field__input"
-             data-ticker-search-target="input"
-             data-action="input->ticker-search#search" />
+             value="<%= params[:ticker] %>"
+             data-ticker-search-target="input" />
     </div>
 
     <div class="form-field w-full sm:w-auto">
@@ -19,8 +19,8 @@
              id="start_date"
              name="start_date"
              class="form-field__input"
-             data-ticker-search-target="startDate"
-             data-action="change->ticker-search#search" />
+             value="<%= params[:start_date] || 3.years.ago.to_date.iso8601 %>"
+             data-ticker-search-target="startDate" />
     </div>
 
     <div class="form-field w-full sm:w-auto">
@@ -29,9 +29,16 @@
              id="end_date"
              name="end_date"
              class="form-field__input"
-             data-ticker-search-target="endDate"
-             data-action="change->ticker-search#search" />
+             value="<%= params[:end_date] || Date.current.iso8601 %>"
+             data-ticker-search-target="endDate" />
     </div>
+
+    <button type="button"
+            class="inline-flex items-center gap-1 font-medium whitespace-nowrap rounded-lg px-3 py-2 text-sm text-inverse bg-inverse hover:bg-inverse-hover shrink-0"
+            data-action="click->ticker-search#search">
+      <%= icon "search", size: "sm", color: "white" %>
+      <span>Search</span>
+    </button>
   </div>
 
   <%= turbo_frame_tag "trend_chart" do %>
@@ -42,7 +49,7 @@
         <div class="text-center space-y-2">
           <%= icon "line-chart", size: "lg", class: "text-secondary mx-auto" %>
           <p class="text-sm text-primary font-medium">No trend data</p>
-          <p class="text-sm text-secondary">Search for a ticker symbol to view its price history.</p>
+          <p class="text-sm text-secondary">Enter a ticker symbol and click Search to view price history.</p>
         </div>
       </div>
     </div>

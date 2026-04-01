@@ -1,7 +1,11 @@
 <%# locals: (import:) %>
 
 <%= styled_form_with model: @import, url: import_configuration_path(@import), scope: :import, method: :patch, class: "space-y-4" do |form| %>
-  <%= form.select :date_col_label, import.csv_headers, { include_blank: "Select column", label: "Date" }, required: true %>
+  <div class="flex items-center gap-4">
+    <%= form.select :date_col_label, import.csv_headers, { include_blank: "Select column", label: "Date" }, required: true %>
+    <%= form.select :date_format, Family::DATE_FORMATS, { label: "Date Format" }, required: true %>
+  </div>
+
   <%= form.select :ticker_col_label, import.csv_headers, { include_blank: "Select column", label: "Ticker" }, required: true %>
   <%= form.select :currency_col_label, import.csv_headers, { include_blank: "Default (#{import.family.currency})", label: "Currency" } %>
 

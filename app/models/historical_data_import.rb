@@ -67,6 +67,7 @@ class HistoricalDataImport < Import
 
     def import!
       batch = []
+      imported_count = 0
 
       csv_rows.each do |row|
         date = parse_date(row[date_col_label])
@@ -96,11 +97,17 @@ class HistoricalDataImport < Import
 
         if batch.size >= 500
           HistoricalPrice.upsert_all(batch, unique_by: %i[family_id security_id date])
+          imported_count += batch.size
           batch = []
         end
       end
 
-      HistoricalPrice.upsert_all(batch, unique_by: %i[family_id security_id date]) if batch.any?
+      if batch.any?
+        HistoricalPrice.upsert_all(batch, unique_by: %i[family_id security_id date])
+        imported_count += batch.size
+      end
+
+      raise "No valid records found. Please check your date format and column mappings." if imported_count == 0
     end
 
     def find_or_create_security(ticker: nil)

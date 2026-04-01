@@ -1,21 +1,10 @@
 import { Controller } from "@hotwired/stimulus";
 
-// Debounced ticker search that loads trend chart data via Turbo Frame
+// Ticker search that loads trend chart data via Turbo Frame on button click
 export default class extends Controller {
   static targets = ["input", "startDate", "endDate"];
 
   search() {
-    clearTimeout(this.timeout);
-    this.timeout = setTimeout(() => {
-      this.#submitSearch();
-    }, 400);
-  }
-
-  disconnect() {
-    clearTimeout(this.timeout);
-  }
-
-  #submitSearch() {
     const ticker = this.inputTarget.value.trim().toUpperCase();
     if (!ticker) return;
 

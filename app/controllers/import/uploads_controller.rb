@@ -54,7 +54,7 @@ class Import::UploadsController < ApplicationController
       begin
         csv = Import.parse_csv_str(str, col_sep: upload_params[:col_sep])
         return false if csv.headers.empty?
-        return false if csv.count == 0
+        return false if csv.first.nil?
         true
       rescue CSV::MalformedCSVError
         false
