@@ -51,9 +51,17 @@ class Import::UploadsController < ApplicationController
     end
 
     def csv_valid?(str)
+      return false if str.blank?
+
+      # Only parse the first few lines for validation to avoid
+      # full parse of large files
+      lines = str.lines
+      return false if lines.size < 2 # need at least header + 1 data row
+
+      sample = lines.first(3).join
       begin
-        csv = Import.parse_csv_str(str, col_sep: upload_params[:col_sep])
-        return false if csv.headers.empty?
+        csv = Import.parse_csv_str(sample, col_sep: upload_params[:col_sep])
+        return false if csv.headers.compact.empty?
         return false if csv.first.nil?
         true
       rescue CSV::MalformedCSVError

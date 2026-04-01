@@ -33,8 +33,18 @@ export default class extends Controller {
 
   fileSelected() {
     if (this.hasInputTarget && this.inputTarget.files.length > 0) {
-      const fileName = this.inputTarget.files[0].name
-      
+      const file = this.inputTarget.files[0]
+      const fileName = file.name
+
+      // Reject files larger than 10MB
+      const maxSize = 10 * 1024 * 1024
+      if (file.size > maxSize) {
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
+        alert(`File is too large (${sizeMB}MB). Maximum allowed size is 10MB.`)
+        this.inputTarget.value = ""
+        return
+      }
+
       if (this.hasFileNameTarget) {
         // Find the paragraph element inside the fileName target
         const fileNameText = this.fileNameTarget.querySelector('p')

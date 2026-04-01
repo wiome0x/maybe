@@ -18,7 +18,7 @@
       <% end %>
 
       <% tabs.with_panel(tab_id: "csv-upload") do %>
-        <%= styled_form_with model: @import, scope: :import, url: import_upload_path(@import), multipart: true, class: "space-y-2" do |form| %>
+        <%= styled_form_with model: @import, scope: :import, url: import_upload_path(@import), multipart: true, class: "space-y-2", data: { turbo: false } do |form| %>
           <%= form.select :col_sep, Import::SEPARATORS, label: true %>
 
           <% if @import.type == "TransactionImport" || @import.type == "TradeImport" %>
@@ -32,6 +32,7 @@
                 <p class="mb-2 text-md text-gray text-center">
                   <span class="font-medium text-primary">Browse</span> to add your CSV file here
                 </p>
+                <p class="text-xs text-secondary">Maximum file size: 10MB</p>
               </div>
 
               <div class="flex flex-col gap-4 items-center hidden mb-2" data-file-upload-target="fileName">
@@ -41,7 +42,7 @@
                 <p class="text-md font-medium text-primary"></p>
               </div>
 
-              <%= form.file_field :csv_file, class: "hidden", "data-auto-submit-form-target": "auto", "data-file-upload-target": "input" %>
+              <%= form.file_field :csv_file, class: "hidden", "data-file-upload-target": "input" %>
             </div>
           </div>
 
