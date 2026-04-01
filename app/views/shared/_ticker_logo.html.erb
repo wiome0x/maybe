@@ -1,0 +1,25 @@
+<%# locals: (ticker:, size: "w-9 h-9") %>
+<%
+  local_path = "stocks/#{ticker.upcase}.png"
+  has_local = (Rails.application.assets_manifest.assets[local_path].present? rescue false)
+  initial = ticker.first&.upcase || "?"
+  colors = %w[#3B82F6 #10B981 #F59E0B #EF4444 #8B5CF6 #EC4899 #14B8A6 #F97316 #6366F1 #84CC16]
+  bg = colors[ticker.bytes.sum % colors.length]
+%>
+
+<% if has_local %>
+  <%= image_tag local_path, class: "#{size} rounded-full object-cover", loading: "lazy", alt: ticker %>
+<% else %>
+  <div class="<%= size %> rounded-full bg-container-inset flex items-center justify-center overflow-hidden" data-controller="img-fallback">
+    <img src="https://static2.finnhub.io/file/publicdatany/finnhubimage/stock_logo/<%= ticker.upcase %>.png"
+         class="w-full h-full object-cover"
+         loading="lazy"
+         alt="<%= ticker %>"
+         data-img-fallback-target="img"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <span class="w-full h-full rounded-full items-center justify-center text-white font-bold text-xs"
+          style="display:none;background-color:<%= bg %>">
+      <%= initial %>
+    </span>
+  </div>
+<% end %>

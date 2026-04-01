@@ -1,26 +1,21 @@
 <%# locals: (account:, size: "md", color: nil) %>
 
-<% size_classes = {
-  "sm" => "w-6 h-6 text-[10px]",
-  "md" => "w-9 h-9 text-xs",
-  "lg" => "w-10 h-10 text-sm",
-  "full" => "w-full h-full text-sm"
-} %>
-
-<% dim = size_classes[size].split.first(2).join(" ") %>
+<% sizes = { "sm" => "w-6 h-6", "md" => "w-9 h-9", "lg" => "w-10 h-10", "full" => "w-full h-full" } %>
+<% dim = sizes[size] %>
 <% bg_color = color || account.plaid_account&.plaid_item&.institution_color || account.accountable.color || "#6172F3" %>
 <% initial = account.name.first&.upcase || "?" %>
 
+<%
+  # Try local institution logo first
+  domain = account.institution_domain
+  local_logo = domain.present? ? "institutions/#{domain.gsub('.', '_')}.png" : nil
+  has_local = local_logo && Rails.application.assets_manifest.assets[local_logo].present? rescue false
+%>
+
 <% if account.logo.attached? %>
-  <%= image_tag account.logo, class: "shrink-0 rounded-full #{dim}" %>
-<% elsif account.plaid_account_id? && account.institution_domain.present? %>
-  <div class="shrink-0 rounded-full <%= dim %> flex items-center justify-center overflow-hidden">
-    <%= image_tag "https://logo.synthfinance.com/domain/#{account.institution_domain}",
-      class: "w-full h-full object-cover",
-      loading: "lazy",
-      alt: account.name,
-      onerror: "this.parentElement.innerHTML='<span class=\"w-full h-full rounded-full flex items-center justify-center text-white font-bold\" style=\"background-color:#{bg_color}\">#{initial}</span>'" %>
-  </div>
+  <%= image_tag account.logo, class: "shrink-0 rounded-full object-cover #{dim}" %>
+<% elsif has_local %>
+  <%= image_tag local_logo, class: "shrink-0 rounded-full object-cover #{dim}" %>
 <% else %>
   <%= render DS::FilledIcon.new(variant: :text, hex_color: bg_color, text: account.name, size: size, rounded: true) %>
 <% end %>

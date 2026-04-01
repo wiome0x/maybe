@@ -56,8 +56,16 @@ class AccountsController < ApplicationController
   def destroy
     if @account.linked?
       plaid_item = @account.plaid_account&.plaid_item
-      if plaid_item
-        Rails.logger.info("[AccountsController] Deleting linked account #{@account.id} via PlaidItem##{plaid_item.id}")
+
+      if plaid_item && plaid_item.accounts.count > 1
+        # Multiple accounts under this Plaid connection — only unlink and delete this one
+        Rails.logger.info("[AccountsController] Unlinking single account #{@account.id} from PlaidItem##{plaid_item.id}")
+        @account.update!(plaid_account_id: nil)
+        @account.destroy_later
+        redirect_to accounts_path, notice: "Account scheduled for deletion"
+      elsif plaid_item
+        # Last account under this Plaid connection — delete the entire connection
+        Rails.logger.info("[AccountsController] Deleting PlaidItem##{plaid_item.id} (last account #{@account.id})")
         plaid_item.destroy_later
         redirect_to accounts_path, notice: "Plaid connection and account scheduled for deletion"
       else

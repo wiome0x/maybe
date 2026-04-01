@@ -14,16 +14,22 @@
   <% end %>
 
   <% if account.linked? %>
+    <%
+      plaid_item = account.plaid_account&.plaid_item
+      is_last_account = plaid_item && plaid_item.accounts.count <= 1
+    %>
     <% menu.with_item(
       variant: "button",
-      text: "Delete connection",
+      text: is_last_account ? "Delete connection" : "Delete account",
       href: account_path(account),
       method: :delete,
-      icon: "unplug",
+      icon: is_last_account ? "unplug" : "trash-2",
       confirm: CustomConfirm.new(
-        title: "Delete Plaid connection?",
-        body: "This will remove the Plaid connection and delete this account along with all its data. You can re-link it later.",
-        btn_text: "Delete connection"
+        title: is_last_account ? "Delete Plaid connection?" : "Delete this account?",
+        body: is_last_account ?
+          "This will remove the Plaid connection and delete this account along with all its data." :
+          "This will delete this account and all its data. The Plaid connection will remain active for your other accounts.",
+        btn_text: is_last_account ? "Delete connection" : "Delete account"
       ),
       data: { turbo_frame: :_top }
     ) %>
