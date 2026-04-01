@@ -38,15 +38,49 @@
     <% if chart_holdings.any? %>
       <%
         cash_weight = @account.balance.zero? ? 0 : (@account.cash_balance / @account.balance * 100).round(1)
-        pie_data = []
-        pie_data << { label: "Cash", value: cash_weight } if cash_weight > 0
-        chart_holdings.each { |h| pie_data << { label: h.ticker, value: h.weight.round(1) } }
+        slices = []
+        slices << { label: "Cash", value: cash_weight } if cash_weight > 0
+        chart_holdings.each { |h| slices << { label: h.ticker, value: h.weight.round(1) } }
+        pie_colors = %w[#6B7280 #3B82F6 #10B981 #F59E0B #EF4444 #8B5CF6 #EC4899 #14B8A6 #F97316 #6366F1]
+        total = slices.sum { |s| s[:value] }
       %>
-      <div class="bg-container-inset rounded-xl p-4"
-           data-controller="holdings-pie"
-           data-holdings-pie-data-value="<%= pie_data.to_json %>">
+      <div class="bg-container-inset rounded-xl p-4">
         <h3 class="text-xs font-medium text-secondary uppercase mb-3">Portfolio Allocation</h3>
-        <div data-holdings-pie-target="canvas" class="flex items-center justify-center"></div>
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center">
+          <svg width="180" height="180" viewBox="0 0 180 180" style="flex-shrink:0">
+            <%
+              cx = 90; cy = 90; outer_r = 75; inner_r = 45
+              angle = -90.0
+              slices.each_with_index do |s, i|
+                pct = s[:value] / total
+                sweep = pct * 360.0
+                start_rad = angle * Math::PI / 180
+                end_rad = (angle + sweep) * Math::PI / 180
+                large = sweep > 180 ? 1 : 0
+                color = pie_colors[i % pie_colors.length]
+
+                ox1 = cx + outer_r * Math.cos(start_rad)
+                oy1 = cy + outer_r * Math.sin(start_rad)
+                ox2 = cx + outer_r * Math.cos(end_rad)
+                oy2 = cy + outer_r * Math.sin(end_rad)
+                ix1 = cx + inner_r * Math.cos(end_rad)
+                iy1 = cy + inner_r * Math.sin(end_rad)
+                ix2 = cx + inner_r * Math.cos(start_rad)
+                iy2 = cy + inner_r * Math.sin(start_rad)
+            %>
+              <path d="M<%= ox1 %> <%= oy1 %> A<%= outer_r %> <%= outer_r %> 0 <%= large %> 1 <%= ox2 %> <%= oy2 %> L<%= ix1 %> <%= iy1 %> A<%= inner_r %> <%= inner_r %> 0 <%= large %> 0 <%= ix2 %> <%= iy2 %> Z" fill="<%= color %>" stroke="white" stroke-width="2"/>
+            <% angle += sweep; end %>
+          </svg>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px">
+            <% slices.each_with_index do |s, i| %>
+              <div style="display:flex;align-items:center;gap:6px;padding:2px 0">
+                <span style="width:10px;height:10px;border-radius:2px;background:<%= pie_colors[i % pie_colors.length] %>;flex-shrink:0"></span>
+                <span class="text-xs text-secondary"><%= s[:label] %></span>
+                <span class="text-xs font-medium text-primary" style="margin-left:auto"><%= s[:value] %>%</span>
+              </div>
+            <% end %>
+          </div>
+        </div>
       </div>
     <% end %>
   </div>
