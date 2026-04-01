@@ -8,6 +8,7 @@ en:
       stocks: Stocks
       crypto: Crypto
       news: News
+      data_tracking: Data Tracking
       assistant: Assistant
     auth:
       existing_account: Already have an account?

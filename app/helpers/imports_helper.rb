@@ -35,7 +35,8 @@ module ImportsHelper
       deposits: DryRunResource.new(label: "Deposits & Withdrawals", icon: "arrow-down-up", text_class: "text-green-500", bg_class: "bg-green-500/5"),
       dividends: DryRunResource.new(label: "Dividends", icon: "coins", text_class: "text-emerald-500", bg_class: "bg-emerald-500/5"),
       grants: DryRunResource.new(label: "Stock Grants", icon: "gift", text_class: "text-pink-500", bg_class: "bg-pink-500/5"),
-      taxes: DryRunResource.new(label: "Withholding Tax", icon: "receipt", text_class: "text-red-500", bg_class: "bg-red-500/5")
+      taxes: DryRunResource.new(label: "Withholding Tax", icon: "receipt", text_class: "text-red-500", bg_class: "bg-red-500/5"),
+      records: DryRunResource.new(label: "Records", icon: "database", text_class: "text-gray-500", bg_class: "bg-gray-500/5")
     }
 
     map[key]
