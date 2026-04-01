@@ -206,7 +206,7 @@ class User < ApplicationRecord
     end
 
     def totp
-      ROTP::TOTP.new(otp_secret, issuer: "Maybe Finance")
+      ROTP::TOTP.new(otp_secret, issuer: ENV.fetch("APP_NAME", "Maybe Finance"))
     end
 
     def verify_totp_code?(code)

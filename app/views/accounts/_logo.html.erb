@@ -1,16 +1,25 @@
 <%# locals: (account:, size: "md", color: nil) %>
 
 <% size_classes = {
-  "sm" => "w-6 h-6",
-  "md" => "w-9 h-9",
-  "lg" => "w-10 h-10",
-  "full" => "w-full h-full"
+  "sm" => "w-6 h-6 text-[10px]",
+  "md" => "w-9 h-9 text-xs",
+  "lg" => "w-10 h-10 text-sm",
+  "full" => "w-full h-full text-sm"
 } %>
 
-<% if account.plaid_account_id? && account.institution_domain.present? %>
-  <%= image_tag "https://logo.clearbit.com/#{account.institution_domain}", class: "shrink-0 rounded-full object-cover #{size_classes[size]}", onerror: "this.onerror=null;this.src='https://www.google.com/s2/favicons?domain=#{account.institution_domain}&sz=128';" %>
-<% elsif account.logo.attached? %>
-  <%= image_tag account.logo, class: "shrink-0 rounded-full #{size_classes[size]}" %>
+<% bg_color = color || account.plaid_account&.plaid_item&.institution_color || account.accountable.color || "#6172F3" %>
+<% initial = account.name.first&.upcase || "?" %>
+
+<% if account.logo.attached? %>
+  <%= image_tag account.logo, class: "shrink-0 rounded-full #{size_classes[size].split.first(2).join(' ')}" %>
+<% elsif account.plaid_account_id? && account.institution_domain.present? %>
+  <div class="shrink-0 rounded-full <%= size_classes[size].split.first(2).join(' ') %> flex items-center justify-center overflow-hidden">
+    <%= image_tag "https://logo.clearbit.com/#{account.institution_domain}",
+      class: "w-full h-full object-cover",
+      loading: "lazy",
+      alt: account.name,
+      onerror: "this.parentElement.innerHTML='<span class=\"w-full h-full rounded-full flex items-center justify-center text-white font-bold #{size_classes[size].split.last}\" style=\"background-color:#{bg_color}\">#{initial}</span>'" %>
+  </div>
 <% else %>
-  <%= render DS::FilledIcon.new(variant: :text, hex_color: color || account.accountable.color, text: account.name, size: size, rounded: true) %>
+  <%= render DS::FilledIcon.new(variant: :text, hex_color: bg_color, text: account.name, size: size, rounded: true) %>
 <% end %>

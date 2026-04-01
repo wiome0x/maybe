@@ -12,6 +12,9 @@ module Syncable
   # Schedules a sync for syncable.  If there is an existing sync pending/syncing for this syncable,
   # we do not create a new sync, and attempt to expand the sync window if needed.
   def sync_later(parent_sync: nil, window_start_date: nil, window_end_date: nil)
+    # Don't sync items scheduled for deletion
+    return nil if respond_to?(:scheduled_for_deletion) && scheduled_for_deletion
+
     Sync.transaction do
       with_lock do
         sync = self.syncs.incomplete.first

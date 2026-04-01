@@ -235,7 +235,7 @@ class Provider::Openrouter < Provider
         f.headers["Authorization"] = "Bearer #{access_token}"
         f.headers["Content-Type"] = "application/json"
         f.headers["HTTP-Referer"] = "https://maybefinance.com"
-        f.headers["X-Title"] = "Maybe Finance"
+        f.headers["X-Title"] = ENV.fetch("APP_NAME", "Maybe Finance")
       end
     end
 end

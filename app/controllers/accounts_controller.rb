@@ -55,7 +55,16 @@ class AccountsController < ApplicationController
 
   def destroy
     if @account.linked?
-      redirect_to account_path(@account), alert: "Cannot delete a linked account"
+      # Destroy the entire Plaid connection (PlaidItem → PlaidAccount → Account cascade)
+      plaid_item = @account.plaid_account&.plaid_item
+      if plaid_item
+        plaid_item.destroy_later
+        redirect_to accounts_path, notice: "Plaid connection and account scheduled for deletion"
+      else
+        # Orphaned linked account — safe to delete directly
+        @account.destroy_later
+        redirect_to accounts_path, notice: "Account scheduled for deletion"
+      end
     else
       @account.destroy_later
       redirect_to accounts_path, notice: "Account scheduled for deletion"
