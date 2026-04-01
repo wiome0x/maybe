@@ -121,6 +121,9 @@ class User < ApplicationRecord
   end
 
   # MFA
+  MFA_MAX_ATTEMPTS = 5
+  MFA_LOCKOUT_DURATION = 15.minutes
+
   def setup_mfa!
     update!(
       otp_secret: ROTP::Base32.random(32),
@@ -130,24 +133,39 @@ class User < ApplicationRecord
   end
 
   def enable_mfa!
+    codes = generate_backup_codes
     update!(
       otp_required: true,
-      otp_backup_codes: generate_backup_codes
+      otp_backup_codes: codes.map { |c| BCrypt::Password.create(c) }
     )
+    codes # return plaintext codes for display only
   end
 
   def disable_mfa!
     update!(
       otp_secret: nil,
       otp_required: false,
-      otp_backup_codes: []
+      otp_backup_codes: [],
+      mfa_failed_attempts: 0,
+      mfa_locked_until: nil
     )
+  end
+
+  def mfa_locked?
+    mfa_locked_until.present? && mfa_locked_until > Time.current
   end
 
   def verify_otp?(code)
     return false if otp_secret.blank?
-    return true if verify_backup_code?(code)
-    totp.verify(code, drift_behind: 15)
+    return false if mfa_locked?
+
+    if verify_backup_code?(code) || verify_totp_code?(code)
+      reset_mfa_failed_attempts!
+      true
+    else
+      record_mfa_failed_attempt!
+      false
+    end
   end
 
   def provisioning_uri
@@ -191,10 +209,27 @@ class User < ApplicationRecord
       ROTP::TOTP.new(otp_secret, issuer: "Maybe Finance")
     end
 
+    def verify_totp_code?(code)
+      return false unless code.present? && code.match?(/\A\d{6}\z/)
+      totp.verify(code, drift_behind: 15, drift_ahead: 15).present?
+    end
+
     def verify_backup_code?(code)
       return false if otp_backup_codes.blank?
+      return false if code.blank?
 
-      # Find and remove the used backup code
+      otp_backup_codes.each_with_index do |hashed_code, index|
+        if BCrypt::Password.new(hashed_code) == code
+          remaining_codes = otp_backup_codes.dup
+          remaining_codes.delete_at(index)
+          update_column(:otp_backup_codes, remaining_codes)
+          return true
+        end
+      end
+
+      false
+    rescue BCrypt::Errors::InvalidHash
+      # Legacy plaintext codes fallback
       if (index = otp_backup_codes.index(code))
         remaining_codes = otp_backup_codes.dup
         remaining_codes.delete_at(index)
@@ -203,6 +238,17 @@ class User < ApplicationRecord
       else
         false
       end
+    end
+
+    def record_mfa_failed_attempt!
+      new_count = mfa_failed_attempts + 1
+      attrs = { mfa_failed_attempts: new_count }
+      attrs[:mfa_locked_until] = MFA_LOCKOUT_DURATION.from_now if new_count >= MFA_MAX_ATTEMPTS
+      update_columns(attrs)
+    end
+
+    def reset_mfa_failed_attempts!
+      update_columns(mfa_failed_attempts: 0, mfa_locked_until: nil) if mfa_failed_attempts > 0
     end
 
     def generate_backup_codes

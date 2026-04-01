@@ -12,7 +12,7 @@
     <p class="text-secondary text-sm mb-4">
       <%= t("rules.confirm.confirm_body_html",
             count: @rule.affected_resource_count,
-            resource_type: @rule.resource_type.pluralize).html_safe %>
+            resource_type: @rule.resource_type.pluralize) %>
     </p>
 
     <%= render DS::Button.new(

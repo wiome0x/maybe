@@ -11,6 +11,7 @@ class SessionsController < ApplicationController
     if user = User.authenticate_by(email: params[:email], password: params[:password])
       if user.otp_required?
         session[:mfa_user_id] = user.id
+        session[:mfa_user_id_at] = Time.current.iso8601
         redirect_to verify_mfa_path
       else
         @session = create_session_for(user)

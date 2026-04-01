@@ -67,6 +67,11 @@ module Api
         if user&.authenticate(params[:password])
           # Check MFA if enabled
           if user.otp_required?
+            if user.mfa_locked?
+              render json: { error: "Account temporarily locked due to too many failed attempts. Try again later." }, status: :forbidden
+              return
+            end
+
             unless params[:otp_code].present? && user.verify_otp?(params[:otp_code])
               render json: {
                 error: "Two-factor authentication required",
