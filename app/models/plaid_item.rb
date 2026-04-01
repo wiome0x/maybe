@@ -105,9 +105,13 @@ class PlaidItem < ApplicationRecord
       Rails.logger.info("[PlaidItem] Successfully removed Plaid item #{plaid_id}")
     rescue Plaid::ApiError => e
       json_response = JSON.parse(e.response_body)
-      Rails.logger.warn("[PlaidItem] Plaid API error removing item #{plaid_id}: #{json_response['error_code']} - #{json_response['error_message']}")
+      error_code = json_response["error_code"]
+      Rails.logger.warn("[PlaidItem] Plaid API error removing item #{plaid_id}: #{error_code} - #{json_response['error_message']}")
 
-      unless json_response["error_code"] == "ITEM_NOT_FOUND"
+      # Allow deletion to proceed for non-recoverable Plaid errors:
+      # - ITEM_NOT_FOUND: already deleted on Plaid side
+      # - INVALID_ACCESS_TOKEN: token from a different environment (e.g. sandbox vs production)
+      unless %w[ITEM_NOT_FOUND INVALID_ACCESS_TOKEN].include?(error_code)
         raise e
       end
     rescue => e
