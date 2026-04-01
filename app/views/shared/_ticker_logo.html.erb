@@ -10,13 +10,7 @@
 <% if has_local %>
   <%= image_tag local_path, class: "#{size} rounded-full object-cover", loading: "lazy", alt: ticker %>
 <% else %>
-  <div class="<%= size %> rounded-full flex items-center justify-center overflow-hidden" style="background-color: <%= bg %>">
-    <img src="https://static2.finnhub.io/file/publicdatany/finnhubimage/stock_logo/<%= ticker.upcase %>.png"
-         class="w-full h-full object-cover"
-         loading="lazy"
-         alt="<%= ticker %>"
-         onload="this.parentElement.style.backgroundColor='transparent'"
-         onerror="this.remove()">
+  <div class="<%= size %> rounded-full flex items-center justify-center" style="background-color:<%= bg %>;position:relative;overflow:hidden">
     <span class="text-white font-bold text-xs"><%= initial %></span>
   </div>
 <% end %>
