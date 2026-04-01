@@ -8,7 +8,7 @@ export default class extends Controller {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       this.#submitSearch();
-    }, 300);
+    }, 400);
   }
 
   disconnect() {
@@ -16,7 +16,7 @@ export default class extends Controller {
   }
 
   #submitSearch() {
-    const ticker = this.inputTarget.value.trim();
+    const ticker = this.inputTarget.value.trim().toUpperCase();
     if (!ticker) return;
 
     const url = new URL("/data_tracking/trend", window.location.origin);
@@ -30,6 +30,9 @@ export default class extends Controller {
       url.searchParams.set("end_date", this.endDateTarget.value);
     }
 
-    Turbo.visit(url.toString(), { frame: "trend_chart" });
+    const frame = document.getElementById("trend_chart");
+    if (frame) {
+      frame.src = url.toString();
+    }
   }
 }

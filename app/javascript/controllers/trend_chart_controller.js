@@ -13,7 +13,8 @@ export default class extends Controller {
   }
 
   #render() {
-    const prices = this.pricesValue;
+    // Downsample to max 500 points for rendering performance
+    const prices = this.#downsample(this.pricesValue, 500);
     if (prices.length === 0) return;
 
     const isDark = document.documentElement.dataset.theme === "dark";
@@ -71,5 +72,49 @@ export default class extends Controller {
     `;
 
     this.canvasTarget.innerHTML = svg;
+  }
+
+  // Largest-Triangle-Three-Buckets downsampling to keep chart shape accurate
+  #downsample(data, threshold) {
+    if (data.length <= threshold) return data;
+
+    const sampled = [data[0]];
+    const bucketSize = (data.length - 2) / (threshold - 2);
+
+    let prevIndex = 0;
+
+    for (let i = 1; i < threshold - 1; i++) {
+      const avgStart = Math.floor((i + 0) * bucketSize) + 1;
+      const avgEnd = Math.min(Math.floor((i + 1) * bucketSize) + 1, data.length);
+
+      let avgClose = 0;
+      for (let j = avgStart; j < avgEnd; j++) {
+        avgClose += data[j].close;
+      }
+      avgClose /= (avgEnd - avgStart);
+
+      const rangeStart = Math.floor((i - 1) * bucketSize) + 1;
+      const rangeEnd = Math.min(Math.floor(i * bucketSize) + 1, data.length);
+
+      let maxArea = -1;
+      let maxIndex = rangeStart;
+
+      for (let j = rangeStart; j < rangeEnd; j++) {
+        const area = Math.abs(
+          (prevIndex - (avgEnd - 1)) * (data[j].close - data[prevIndex].close) -
+          (prevIndex - j) * (avgClose - data[prevIndex].close)
+        );
+        if (area > maxArea) {
+          maxArea = area;
+          maxIndex = j;
+        }
+      }
+
+      sampled.push(data[maxIndex]);
+      prevIndex = maxIndex;
+    }
+
+    sampled.push(data[data.length - 1]);
+    return sampled;
   }
 }

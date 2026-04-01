@@ -54,43 +54,53 @@ class HistoricalDataImport < Import
   end
 
   def publishable?
-    cleaned?
+    cleaned? && !row_count_exceeded?
   end
 
   private
 
+    # Override: HistoricalDataImport doesn't use the rows table,
+    # so check csv_rows directly instead of rows.count
+    def row_count_exceeded?
+      csv_rows.count > max_row_count
+    end
+
     def import!
-      transaction do
-        csv_rows.each do |row|
-          date = parse_date(row[date_col_label])
-          close = parse_number(row[close_col_label])
+      batch = []
 
-          next if date.nil? || close.nil?
+      csv_rows.each do |row|
+        date = parse_date(row[date_col_label])
+        close = parse_number(row[close_col_label])
 
-          ticker_value = row[ticker_col_label].to_s.strip
-          next if ticker_value.blank?
+        next if date.nil? || close.nil?
 
-          security = find_or_create_security(ticker: ticker_value)
-          next unless security
+        ticker_value = row[ticker_col_label].to_s.strip
+        next if ticker_value.blank?
 
-          HistoricalPrice.upsert(
-            {
-              family_id: family_id,
-              security_id: security.id,
-              import_id: id,
-              date: date,
-              open: parse_number(row[open_col_label]),
-              high: parse_number(row[high_col_label]),
-              low: parse_number(row[low_col_label]),
-              close: close,
-              volume: parse_number(row[volume_col_label]),
-              ticker: ticker_value.upcase,
-              currency: row[currency_col_label].presence || family.currency
-            },
-            unique_by: %i[family_id security_id date]
-          )
+        security = find_or_create_security(ticker: ticker_value)
+        next unless security
+
+        batch << {
+          family_id: family_id,
+          security_id: security.id,
+          import_id: id,
+          date: date,
+          open: parse_number(row[open_col_label]),
+          high: parse_number(row[high_col_label]),
+          low: parse_number(row[low_col_label]),
+          close: close,
+          volume: parse_number(row[volume_col_label]),
+          ticker: ticker_value.upcase,
+          currency: row[currency_col_label].presence || family.currency
+        }
+
+        if batch.size >= 500
+          HistoricalPrice.upsert_all(batch, unique_by: %i[family_id security_id date])
+          batch = []
         end
       end
+
+      HistoricalPrice.upsert_all(batch, unique_by: %i[family_id security_id date]) if batch.any?
     end
 
     def find_or_create_security(ticker: nil)
