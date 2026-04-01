@@ -63,11 +63,11 @@ class Provider::Openrouter < Provider
         # Add the tool call that triggered this result
         messages << {
           role: "assistant",
-          tool_calls: [{
+          tool_calls: [ {
             id: fn_result[:call_id],
             type: "function",
             function: { name: fn_result[:name] || "function", arguments: "{}" }
-          }]
+          } ]
         }
         messages << {
           role: "tool",

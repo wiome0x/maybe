@@ -33,52 +33,46 @@ export default class extends Controller {
 
   fileSelected() {
     if (this.hasInputTarget && this.inputTarget.files.length > 0) {
-      const file = this.inputTarget.files[0]
-      const fileName = file.name
+      const file = this.inputTarget.files[0];
 
       // Reject files larger than 10MB
-      const maxSize = 10 * 1024 * 1024
+      const maxSize = 10 * 1024 * 1024;
       if (file.size > maxSize) {
-        const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
-        alert(`File is too large (${sizeMB}MB). Maximum allowed size is 10MB.`)
-        this.inputTarget.value = ""
-        return
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+        alert(`File is too large (${sizeMB}MB). Maximum allowed size is 10MB.`);
+        this.inputTarget.value = "";
+        return;
       }
 
       if (this.hasFileNameTarget) {
-        // Find the paragraph element inside the fileName target
-        const fileNameText = this.fileNameTarget.querySelector('p')
+        const fileNameText = this.fileNameTarget.querySelector("p");
         if (fileNameText) {
-          fileNameText.textContent = fileName
+          fileNameText.textContent = file.name;
         }
-        
-        this.fileNameTarget.classList.remove("hidden")
+        this.fileNameTarget.classList.remove("hidden");
       }
-      
+
       if (this.hasUploadTextTarget) {
-        this.uploadTextTarget.classList.add("hidden")
+        this.uploadTextTarget.classList.add("hidden");
       }
-      
-    
     }
   }
   
   formSubmitting() {
     if (this.hasFileNameTarget && this.hasInputTarget && this.inputTarget.files.length > 0) {
-      const fileNameText = this.fileNameTarget.querySelector('p')
+      const fileNameText = this.fileNameTarget.querySelector("p");
       if (fileNameText) {
-        fileNameText.textContent = `Uploading ${this.inputTarget.files[0].name}...`
+        fileNameText.textContent = `Uploading ${this.inputTarget.files[0].name}...`;
       }
-      
-      // Change the icon to a loader
-      const iconContainer = this.fileNameTarget.querySelector('.lucide-file-text')
+
+      const iconContainer = this.fileNameTarget.querySelector(".lucide-file-text");
       if (iconContainer) {
-        iconContainer.classList.add('animate-pulse')
+        iconContainer.classList.add("animate-pulse");
       }
     }
-    
+
     if (this.hasUploadAreaTarget) {
-      this.uploadAreaTarget.classList.add("opacity-70")
+      this.uploadAreaTarget.classList.add("opacity-70");
     }
   }
 } 

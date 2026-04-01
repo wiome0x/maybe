@@ -84,7 +84,7 @@ export default class extends Controller {
     let prevIndex = 0;
 
     for (let i = 1; i < threshold - 1; i++) {
-      const avgStart = Math.floor((i + 0) * bucketSize) + 1;
+      const avgStart = Math.floor(i * bucketSize) + 1;
       const avgEnd = Math.min(Math.floor((i + 1) * bucketSize) + 1, data.length);
 
       let avgClose = 0;

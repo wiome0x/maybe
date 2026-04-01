@@ -153,15 +153,15 @@ class IbkrImport < Import
         # Deposits are inflows (negative in Maybe convention), withdrawals/taxes are outflows
         amount = row.amount.to_d
         signed = case row.entity_type
-                 when ENTITY_DEPOSIT
-                   amount.negative? ? amount : -amount.abs  # deposits = inflow = negative
-                 when ENTITY_DIVIDEND, ENTITY_GRANT
-                   -amount.abs  # income = inflow = negative
-                 when ENTITY_TAX
-                   amount.abs   # tax = outflow = positive
-                 else
-                   amount
-                 end
+        when ENTITY_DEPOSIT
+          amount.negative? ? amount : -amount.abs  # deposits = inflow = negative
+        when ENTITY_DIVIDEND, ENTITY_GRANT
+          -amount.abs  # income = inflow = negative
+        when ENTITY_TAX
+          amount.abs   # tax = outflow = positive
+        else
+          amount
+        end
 
         Transaction.new(
           entry: Entry.new(

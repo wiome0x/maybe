@@ -1,7 +1,7 @@
 class DataTrackingController < ApplicationController
   def index
     @imports = Current.family.imports.where(type: "HistoricalDataImport").ordered
-    @breadcrumbs = [["Home", root_path], ["Data Tracking", nil]]
+    @breadcrumbs = [ [ "Home", root_path ], [ "Data Tracking", nil ] ]
   end
 
   def trend
