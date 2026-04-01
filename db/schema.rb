@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_01_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -268,6 +268,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
     t.boolean "auto_sync_on_login", default: true, null: false
     t.datetime "latest_sync_activity_at", default: -> { "CURRENT_TIMESTAMP" }
     t.datetime "latest_sync_completed_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.string "trend_color_preference", default: "green_up", null: false
   end
 
   create_table "family_exports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -291,6 +292,28 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
     t.index ["account_id", "security_id", "date", "currency"], name: "idx_on_account_id_security_id_date_currency_5323e39f8b", unique: true
     t.index ["account_id"], name: "index_holdings_on_account_id"
     t.index ["security_id"], name: "index_holdings_on_security_id"
+  end
+
+  create_table "historical_prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "family_id", null: false
+    t.uuid "security_id", null: false
+    t.uuid "import_id"
+    t.date "date", null: false
+    t.decimal "open", precision: 19, scale: 4
+    t.decimal "high", precision: 19, scale: 4
+    t.decimal "low", precision: 19, scale: 4
+    t.decimal "close", precision: 19, scale: 4, null: false
+    t.decimal "volume", precision: 19, scale: 4
+    t.string "ticker", null: false
+    t.string "currency", default: "USD", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["family_id", "security_id", "date"], name: "idx_hist_prices_family_security_date", unique: true
+    t.index ["family_id", "ticker", "date"], name: "index_historical_prices_on_family_id_and_ticker_and_date"
+    t.index ["family_id", "ticker"], name: "index_historical_prices_on_family_id_and_ticker"
+    t.index ["family_id"], name: "index_historical_prices_on_family_id"
+    t.index ["import_id"], name: "index_historical_prices_on_import_id"
+    t.index ["security_id"], name: "index_historical_prices_on_security_id"
   end
 
   create_table "impersonation_session_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -800,6 +823,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
     t.text "goals", default: [], array: true
     t.datetime "set_onboarding_preferences_at"
     t.datetime "set_onboarding_goals_at"
+    t.integer "mfa_failed_attempts", default: 0, null: false
+    t.datetime "mfa_locked_until"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["family_id"], name: "index_users_on_family_id"
     t.index ["last_viewed_chat_id"], name: "index_users_on_last_viewed_chat_id"
@@ -824,6 +849,19 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
     t.jsonb "locked_attributes", default: {}
   end
 
+  create_table "watchlist_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "family_id", null: false
+    t.string "symbol", null: false
+    t.string "name"
+    t.string "item_type", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["family_id", "item_type", "position"], name: "index_watchlist_items_on_family_id_and_item_type_and_position"
+    t.index ["family_id", "symbol", "item_type"], name: "index_watchlist_items_on_family_id_and_symbol_and_item_type", unique: true
+    t.index ["family_id"], name: "index_watchlist_items_on_family_id"
+  end
+
   add_foreign_key "accounts", "families"
   add_foreign_key "accounts", "imports"
   add_foreign_key "accounts", "plaid_accounts"
@@ -841,6 +879,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
   add_foreign_key "family_exports", "families"
   add_foreign_key "holdings", "accounts"
   add_foreign_key "holdings", "securities"
+  add_foreign_key "historical_prices", "families"
+  add_foreign_key "historical_prices", "imports"
+  add_foreign_key "historical_prices", "securities"
   add_foreign_key "impersonation_session_logs", "impersonation_sessions"
   add_foreign_key "impersonation_sessions", "users", column: "impersonated_id"
   add_foreign_key "impersonation_sessions", "users", column: "impersonator_id"
@@ -876,4 +917,5 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
   add_foreign_key "transfers", "transactions", column: "outflow_transaction_id", on_delete: :cascade
   add_foreign_key "users", "chats", column: "last_viewed_chat_id"
   add_foreign_key "users", "families"
+  add_foreign_key "watchlist_items", "families"
 end

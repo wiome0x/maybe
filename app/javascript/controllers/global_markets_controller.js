@@ -66,8 +66,8 @@ export default class extends Controller {
       }).formatToParts(now);
 
       const weekday = parts.find(p => p.type === "weekday")?.value;
-      const hour = parseInt(parts.find(p => p.type === "hour")?.value || "0");
-      const minute = parseInt(parts.find(p => p.type === "minute")?.value || "0");
+      const hour = Number.parseInt(parts.find(p => p.type === "hour")?.value || "0");
+      const minute = Number.parseInt(parts.find(p => p.type === "minute")?.value || "0");
       const current = hour * 60 + minute;
 
       const [oh, om] = ex.open.split(":").map(Number);

@@ -25,7 +25,11 @@ class Settings::DatabasesController < ApplicationController
 
     quoted = ActiveRecord::Base.connection.quote_table_name(table_name)
     @total = ActiveRecord::Base.connection.execute("SELECT COUNT(*) FROM #{quoted}").first["count"]
-    @rows = ActiveRecord::Base.connection.execute("SELECT * FROM #{quoted} ORDER BY 1 DESC LIMIT #{per_page} OFFSET #{offset}").to_a
+    @rows = ActiveRecord::Base.connection.exec_query(
+      "SELECT * FROM #{quoted} ORDER BY 1 DESC LIMIT $1 OFFSET $2",
+      "SQL",
+      [ per_page, offset ]
+    ).to_a
     @page = page
     @total_pages = (@total.to_f / per_page).ceil
   end

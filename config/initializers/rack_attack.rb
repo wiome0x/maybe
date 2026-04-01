@@ -9,6 +9,28 @@ class Rack::Attack
     request.ip if request.path == "/oauth/token"
   end
 
+  # Throttle login attempts by IP
+  throttle("logins/ip", limit: 10, period: 1.minute) do |request|
+    request.ip if request.path == "/sessions" && request.post?
+  end
+
+  # Throttle login attempts by email
+  throttle("logins/email", limit: 10, period: 10.minutes) do |request|
+    if request.path == "/sessions" && request.post?
+      request.params.dig("email").to_s.strip.downcase.presence
+    end
+  end
+
+  # Throttle password reset requests
+  throttle("password_resets/ip", limit: 5, period: 10.minutes) do |request|
+    request.ip if request.path == "/password_resets" && request.post?
+  end
+
+  # Throttle API login attempts
+  throttle("api/login", limit: 10, period: 1.minute) do |request|
+    request.ip if request.path == "/api/v1/auth/login" && request.post?
+  end
+
   # Determine limits based on self-hosted mode
   self_hosted = Rails.application.config.app_mode.self_hosted?
 

@@ -46,8 +46,8 @@ class PagesController < ApplicationController
     end
 
     def fetch_git_commits(limit: 30)
-      safe_limit = Integer(limit).clamp(1, 100)
-      log = `git log --pretty=format:"%H|%h|%s|%an|%ae|%ai" -n #{safe_limit} 2>/dev/null`
+      safe_limit = Integer(limit).clamp(1, 100).to_s
+      log = IO.popen([ "git", "log", "--pretty=format:%H|%h|%s|%an|%ae|%ai", "-n", safe_limit ], err: File::NULL, &:read)
       return [] if log.blank?
 
       log.lines.map do |line|
