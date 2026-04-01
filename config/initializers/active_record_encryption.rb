@@ -12,6 +12,17 @@ if Rails.application.config.app_mode.self_hosted? && !Rails.application.credenti
     # This ensures keys are consistent across container restarts
     secret_base = Rails.application.secret_key_base
 
+    # Warn if SECRET_KEY_BASE appears to be a default/weak value
+    if secret_base.length < 64 || secret_base == "secret-value"
+      Rails.logger.warn(
+        "[SECURITY WARNING] SECRET_KEY_BASE appears to be a default or weak value. " \
+        "Encryption keys derived from it are NOT secure. " \
+        "Set ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY, ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY, " \
+        "and ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT environment variables, " \
+        "or generate a strong SECRET_KEY_BASE with: openssl rand -hex 64"
+      )
+    end
+
     # Generate deterministic keys from the secret base
     primary_key = Digest::SHA256.hexdigest("#{secret_base}:primary_key")[0..63]
     deterministic_key = Digest::SHA256.hexdigest("#{secret_base}:deterministic_key")[0..63]

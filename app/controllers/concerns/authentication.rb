@@ -38,6 +38,7 @@ module Authentication
     end
 
     def create_session_for(user)
+      reset_session
       session = user.sessions.create!
       cookies.signed[:session_token] = {
         value: session.id,

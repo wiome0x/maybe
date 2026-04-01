@@ -303,8 +303,8 @@ Doorkeeper.configure do
   # #call can be used in order to allow conditional checks (to allow non-SSL
   # redirects to localhost for example).
   #
-  # Allow custom URL schemes for mobile apps
-  force_ssl_in_redirect_uri false
+  # Allow custom URL schemes for mobile apps, but require HTTPS for web redirects in production
+  force_ssl_in_redirect_uri !Rails.env.development?
 
   # Specify what redirect URI's you want to block during Application creation.
   # Any redirect URI is allowed by default.

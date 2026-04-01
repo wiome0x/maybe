@@ -62,17 +62,18 @@ module Api
       end
 
       def login
-        user = User.find_by(email: params[:email])
+        # Use authenticate_by for constant-time comparison to prevent user enumeration
+        authenticated_user = User.authenticate_by(email: params[:email], password: params[:password])
 
-        if user&.authenticate(params[:password])
+        if authenticated_user
           # Check MFA if enabled
-          if user.otp_required?
-            if user.mfa_locked?
+          if authenticated_user.otp_required?
+            if authenticated_user.mfa_locked?
               render json: { error: "Account temporarily locked due to too many failed attempts. Try again later." }, status: :forbidden
               return
             end
 
-            unless params[:otp_code].present? && user.verify_otp?(params[:otp_code])
+            unless params[:otp_code].present? && authenticated_user.verify_otp?(params[:otp_code])
               render json: {
                 error: "Two-factor authentication required",
                 mfa_required: true
@@ -88,15 +89,15 @@ module Api
           end
 
           # Create device and OAuth token
-          device = create_or_update_device(user)
-          token_response = create_oauth_token_for_device(user, device)
+          device = create_or_update_device(authenticated_user)
+          token_response = create_oauth_token_for_device(authenticated_user, device)
 
           render json: token_response.merge(
             user: {
-              id: user.id,
-              email: user.email,
-              first_name: user.first_name,
-              last_name: user.last_name
+              id: authenticated_user.id,
+              email: authenticated_user.email,
+              first_name: authenticated_user.first_name,
+              last_name: authenticated_user.last_name
             }
           )
         else

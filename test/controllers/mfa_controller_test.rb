@@ -80,17 +80,15 @@ class MfaControllerTest < ActionDispatch::IntegrationTest
 
   test "verify_code authenticates with valid backup code" do
     @user.setup_mfa!
-    @user.enable_mfa!
+    plaintext_codes = @user.enable_mfa!
     sign_out
 
     post sessions_path, params: { email: @user.email, password: user_password_test }
-    backup_code = @user.otp_backup_codes.first
 
-    post verify_mfa_path, params: { code: backup_code }
+    post verify_mfa_path, params: { code: plaintext_codes.first }
 
     assert_redirected_to root_path
     assert Session.exists?(user_id: @user.id)
-    assert_not @user.reload.otp_backup_codes.include?(backup_code)
   end
 
   test "verify_code rejects invalid codes" do
@@ -109,7 +107,7 @@ class MfaControllerTest < ActionDispatch::IntegrationTest
     @user.setup_mfa!
     @user.enable_mfa!
 
-    delete disable_mfa_path
+    delete disable_mfa_path, params: { password: user_password_test }
 
     assert_redirected_to settings_security_path
     assert_not @user.reload.otp_required?

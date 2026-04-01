@@ -84,11 +84,14 @@ class UserTest < ActiveSupport::TestCase
   test "enable_mfa! enables MFA and generates backup codes" do
     user = users(:family_member)
     user.setup_mfa!
-    user.enable_mfa!
+    plaintext_codes = user.enable_mfa!
 
     assert user.otp_required?
+    assert_equal 8, plaintext_codes.length
+    assert plaintext_codes.all? { |code| code.length == 8 }
+    # Stored codes should be BCrypt hashes, not plaintext
     assert_equal 8, user.otp_backup_codes.length
-    assert user.otp_backup_codes.all? { |code| code.length == 8 }
+    assert user.otp_backup_codes.all? { |code| code.start_with?("$2a$") }
   end
 
   test "disable_mfa! removes all MFA data" do
@@ -117,13 +120,13 @@ class UserTest < ActiveSupport::TestCase
   test "verify_otp? accepts backup codes" do
     user = users(:family_member)
     user.setup_mfa!
-    user.enable_mfa!
+    plaintext_codes = user.enable_mfa!
 
-    backup_code = user.otp_backup_codes.first
+    # Use the plaintext code returned by enable_mfa!, not the stored hash
+    backup_code = plaintext_codes.first
     assert user.verify_otp?(backup_code)
 
-    # Backup code should be consumed
-    assert_not user.otp_backup_codes.include?(backup_code)
+    # Backup code should be consumed (one less stored hash)
     assert_equal 7, user.otp_backup_codes.length
 
     # Used backup code should not work again
