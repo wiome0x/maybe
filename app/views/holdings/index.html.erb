@@ -13,12 +13,7 @@
       <% end %>
     </div>
 
-    <%
-      # Separate real holdings from forex positions (e.g. USD.HKD)
-      all_holdings = @account.current_holdings
-      stock_holdings = all_holdings.select { |h| !h.ticker.include?(".") }
-      forex_holdings = all_holdings.select { |h| h.ticker.include?(".") }
-    %>
+    <% stock_holdings = @account.current_holdings.reject { |h| h.ticker.include?(".") } %>
 
     <div class="bg-container-inset rounded-xl p-1">
       <div class="grid grid-cols-12 items-center uppercase text-xs font-medium text-secondary px-4 py-2">
@@ -36,33 +31,22 @@
         <% if stock_holdings.any? %>
           <%= render partial: "holdings/holding", collection: stock_holdings, spacer_template: "shared/ruler" %>
         <% end %>
-
-        <% if forex_holdings.any? %>
-          <%= render "shared/ruler" %>
-          <div class="px-4 py-2">
-            <p class="text-xs text-secondary uppercase font-medium">Currency Positions</p>
-          </div>
-          <%= render partial: "holdings/holding", collection: forex_holdings, spacer_template: "shared/ruler" %>
-        <% end %>
       </div>
     </div>
 
-    <%# Pie chart for portfolio allocation %>
     <% chart_holdings = stock_holdings.select { |h| h.weight.present? && h.weight > 0 } %>
     <% if chart_holdings.any? %>
       <%
         cash_weight = @account.balance.zero? ? 0 : (@account.cash_balance / @account.balance * 100).round(1)
         pie_data = []
-        pie_data << { label: "Cash", value: cash_weight, color: "#6B7280" } if cash_weight > 0
-        chart_holdings.each do |h|
-          pie_data << { label: h.ticker, value: h.weight.round(1), color: nil }
-        end
+        pie_data << { label: "Cash", value: cash_weight } if cash_weight > 0
+        chart_holdings.each { |h| pie_data << { label: h.ticker, value: h.weight.round(1) } }
       %>
       <div class="bg-container-inset rounded-xl p-4"
            data-controller="holdings-pie"
            data-holdings-pie-data-value="<%= pie_data.to_json %>">
         <h3 class="text-xs font-medium text-secondary uppercase mb-3">Portfolio Allocation</h3>
-        <div data-holdings-pie-target="canvas" class="h-64 flex items-center justify-center"></div>
+        <div data-holdings-pie-target="canvas" class="flex items-center justify-center"></div>
       </div>
     <% end %>
   </div>

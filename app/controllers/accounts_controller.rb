@@ -55,20 +55,24 @@ class AccountsController < ApplicationController
 
   def destroy
     if @account.linked?
-      # Destroy the entire Plaid connection (PlaidItem → PlaidAccount → Account cascade)
       plaid_item = @account.plaid_account&.plaid_item
       if plaid_item
+        Rails.logger.info("[AccountsController] Deleting linked account #{@account.id} via PlaidItem##{plaid_item.id}")
         plaid_item.destroy_later
         redirect_to accounts_path, notice: "Plaid connection and account scheduled for deletion"
       else
-        # Orphaned linked account — safe to delete directly
+        Rails.logger.info("[AccountsController] Deleting orphaned linked account #{@account.id}")
         @account.destroy_later
         redirect_to accounts_path, notice: "Account scheduled for deletion"
       end
     else
+      Rails.logger.info("[AccountsController] Deleting manual account #{@account.id}")
       @account.destroy_later
       redirect_to accounts_path, notice: "Account scheduled for deletion"
     end
+  rescue => e
+    Rails.logger.error("[AccountsController] Failed to schedule deletion for account #{@account.id}: #{e.class} - #{e.message}")
+    redirect_to account_path(@account), alert: "Failed to delete account: #{e.message}"
   end
 
   private

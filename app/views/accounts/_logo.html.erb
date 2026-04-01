@@ -7,18 +7,19 @@
   "full" => "w-full h-full text-sm"
 } %>
 
+<% dim = size_classes[size].split.first(2).join(" ") %>
 <% bg_color = color || account.plaid_account&.plaid_item&.institution_color || account.accountable.color || "#6172F3" %>
 <% initial = account.name.first&.upcase || "?" %>
 
 <% if account.logo.attached? %>
-  <%= image_tag account.logo, class: "shrink-0 rounded-full #{size_classes[size].split.first(2).join(' ')}" %>
+  <%= image_tag account.logo, class: "shrink-0 rounded-full #{dim}" %>
 <% elsif account.plaid_account_id? && account.institution_domain.present? %>
-  <div class="shrink-0 rounded-full <%= size_classes[size].split.first(2).join(' ') %> flex items-center justify-center overflow-hidden">
-    <%= image_tag "https://logo.clearbit.com/#{account.institution_domain}",
+  <div class="shrink-0 rounded-full <%= dim %> flex items-center justify-center overflow-hidden">
+    <%= image_tag "https://logo.synthfinance.com/domain/#{account.institution_domain}",
       class: "w-full h-full object-cover",
       loading: "lazy",
       alt: account.name,
-      onerror: "this.parentElement.innerHTML='<span class=\"w-full h-full rounded-full flex items-center justify-center text-white font-bold #{size_classes[size].split.last}\" style=\"background-color:#{bg_color}\">#{initial}</span>'" %>
+      onerror: "this.parentElement.innerHTML='<span class=\"w-full h-full rounded-full flex items-center justify-center text-white font-bold\" style=\"background-color:#{bg_color}\">#{initial}</span>'" %>
   </div>
 <% else %>
   <%= render DS::FilledIcon.new(variant: :text, hex_color: bg_color, text: account.name, size: size, rounded: true) %>

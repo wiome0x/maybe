@@ -42,6 +42,7 @@ class PlaidItem < ApplicationRecord
   end
 
   def destroy_later
+    Rails.logger.info("[PlaidItem] Scheduling deletion for PlaidItem##{id} (#{name})")
     update!(scheduled_for_deletion: true)
     DestroyJob.perform_later(self)
   end
@@ -99,16 +100,19 @@ class PlaidItem < ApplicationRecord
 
   private
     def remove_plaid_item
+      Rails.logger.info("[PlaidItem] Removing Plaid item #{plaid_id} via API")
       plaid_provider.remove_item(access_token)
+      Rails.logger.info("[PlaidItem] Successfully removed Plaid item #{plaid_id}")
     rescue Plaid::ApiError => e
       json_response = JSON.parse(e.response_body)
+      Rails.logger.warn("[PlaidItem] Plaid API error removing item #{plaid_id}: #{json_response['error_code']} - #{json_response['error_message']}")
 
-      # If the item is not found, that means it was already deleted by the user on their
-      # Plaid portal OR by Plaid support.  Either way, we're not being billed, so continue
-      # with the deletion of our internal record.
       unless json_response["error_code"] == "ITEM_NOT_FOUND"
         raise e
       end
+    rescue => e
+      Rails.logger.error("[PlaidItem] Unexpected error removing Plaid item #{plaid_id}: #{e.class} - #{e.message}")
+      raise e
     end
 
     # Plaid returns mutually exclusive arrays here.  If the item has made a request for a product,
