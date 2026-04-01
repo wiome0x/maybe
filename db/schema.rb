@@ -881,7 +881,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_01_030000) do
   add_foreign_key "holdings", "securities"
   add_foreign_key "historical_prices", "families"
   add_foreign_key "historical_prices", "imports"
-  add_foreign_key "historical_prices", "securities"
+  add_foreign_key "historical_prices", "securities", on_delete: :cascade
   add_foreign_key "impersonation_session_logs", "impersonation_sessions"
   add_foreign_key "impersonation_sessions", "users", column: "impersonated_id"
   add_foreign_key "impersonation_sessions", "users", column: "impersonator_id"

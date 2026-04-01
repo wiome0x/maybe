@@ -2,7 +2,7 @@ class CreateHistoricalPrices < ActiveRecord::Migration[7.2]
   def change
     create_table :historical_prices, id: :uuid do |t|
       t.references :family, null: false, foreign_key: true, type: :uuid
-      t.references :security, null: false, foreign_key: true, type: :uuid
+      t.references :security, null: false, foreign_key: { on_delete: :cascade }, type: :uuid
       t.references :import, foreign_key: true, type: :uuid
       t.date :date, null: false
       t.decimal :open, precision: 19, scale: 4
