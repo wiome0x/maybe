@@ -30,25 +30,36 @@ export default class extends Controller {
 
   loadWidget() {
     const containerId = `tv-chart-${this.symbolValue.replace(/[^a-zA-Z0-9]/g, "")}`;
-    this.chartTarget.innerHTML = `<div id="${containerId}" class="h-full w-full rounded-lg overflow-hidden"></div>`;
+    this.chartTarget.innerHTML = `<div id="${containerId}" class="h-full w-full rounded-lg overflow-hidden flex items-center justify-center"><p class="text-secondary text-sm">Loading chart...</p></div>`;
 
     const doInit = () => {
-      new TradingView.widget({
-        container_id: containerId,
-        autosize: true,
-        symbol: this.symbolValue,
-        interval: "D",
-        timezone: "Etc/UTC",
-        theme: document.documentElement.dataset.theme === "dark" ? "dark" : "light",
-        style: "1",
-        locale: document.documentElement.lang === "zh-CN" ? "zh_CN" : "en",
-        toolbar_bg: "transparent",
-        enable_publishing: false,
-        hide_top_toolbar: false,
-        hide_legend: false,
-        save_image: false,
-        studies: ["MASimple@tv-basicstudies"],
-      });
+      try {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = "";
+
+        new TradingView.widget({
+          container_id: containerId,
+          autosize: true,
+          symbol: this.symbolValue,
+          interval: "D",
+          timezone: "Etc/UTC",
+          theme: document.documentElement.dataset.theme === "dark" ? "dark" : "light",
+          style: "1",
+          locale: document.documentElement.lang === "zh-CN" ? "zh_CN" : "en",
+          toolbar_bg: "transparent",
+          enable_publishing: false,
+          hide_top_toolbar: false,
+          hide_legend: false,
+          save_image: false,
+          studies: ["MASimple@tv-basicstudies"],
+        });
+      } catch (e) {
+        const container = document.getElementById(containerId);
+        if (container) {
+          container.innerHTML = `<div class="flex items-center justify-center h-full"><p class="text-secondary text-sm">Chart unavailable: ${e.message}</p></div>`;
+        }
+      }
     };
 
     if (typeof TradingView !== "undefined") {
@@ -57,6 +68,12 @@ export default class extends Controller {
       const script = document.createElement("script");
       script.src = "https://s3.tradingview.com/tv.js";
       script.onload = doInit;
+      script.onerror = () => {
+        const container = document.getElementById(containerId);
+        if (container) {
+          container.innerHTML = `<div class="flex items-center justify-center h-full"><p class="text-secondary text-sm">Unable to load TradingView. Check network connectivity.</p></div>`;
+        }
+      };
       document.head.appendChild(script);
     }
   }
