@@ -1,0 +1,15 @@
+---
+en:
+  notification_mailer:
+    export_completed:
+      subject: "Maybe: Your data export is ready"
+      greeting: Your export is ready
+      body: Your Maybe data export has been completed and is ready for download.
+      cta: Download Export
+      footer: This download link will expire. Please download your export soon.
+    sync_failure:
+      subject: "Maybe: Account sync failed for %{account}"
+      greeting: Account sync failed
+      body: "The sync for your account %{account} has failed with the following error: %{error}"
+      cta: View Account
+      footer: You may want to retry the sync or check your account connection settings.

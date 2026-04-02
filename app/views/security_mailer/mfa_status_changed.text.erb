@@ -1,0 +1,13 @@
+<%= t(".greeting") %>
+
+<% if @enabled %>
+<%= t(".enabled_body") %>
+<% else %>
+<%= t(".disabled_body") %>
+<% end %>
+
+<%= t(".action_needed") %>
+
+<%= t(".cta") %>: <%= settings_security_url %>
+
+<%= t(".ignore_if_recognized") %>

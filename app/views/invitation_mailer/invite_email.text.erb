@@ -1,0 +1,9 @@
+<%= t(".greeting") %>
+
+<%= t(".body",
+  inviter: @invitation.inviter.display_name,
+  family: @invitation.family.name) %>
+
+<%= t(".accept_button") %>: <%= @accept_url %>
+
+<%= t(".expiry_notice", days: 3) %>

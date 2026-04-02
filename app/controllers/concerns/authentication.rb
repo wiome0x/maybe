@@ -46,7 +46,22 @@ module Authentication
         secure: Rails.env.production?,
         expires: 7.days.from_now
       }
+      notify_new_device_login(user, session)
       session
+    end
+
+    def detect_new_device?(user, session)
+      return false unless user.sessions.count > 1
+      !user.sessions
+        .where.not(id: session.id)
+        .where(ip_address: session.ip_address)
+        .exists?
+    end
+
+    def notify_new_device_login(user, session)
+      return unless should_send_email?
+      return unless detect_new_device?(user, session)
+      SecurityMailer.new_device_login(user, session).deliver_later
     end
 
     def self_hosted_first_login?

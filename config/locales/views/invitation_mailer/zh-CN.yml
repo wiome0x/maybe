@@ -6,3 +6,4 @@ zh-CN:
       body: "%{inviter} 邀请您加入 %{family} 家庭的 Maybe 账户！"
       expiry_notice: 此邀请将在 %{days} 天后过期
       greeting: 欢迎来到 Maybe！
+      subject: "%{inviter} 邀请您加入 Maybe"

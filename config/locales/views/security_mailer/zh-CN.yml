@@ -1,0 +1,30 @@
+---
+zh-CN:
+  security_mailer:
+    new_device_login:
+      subject: "Maybe：您的账户有新的登录"
+      greeting: 检测到新的登录
+      body: 我们检测到您的 Maybe 账户从一个未识别的设备或位置登录。
+      ip_address: IP 地址
+      user_agent: 设备 / 浏览器
+      login_time: 登录时间
+      action_needed: 如果这不是您本人操作，我们建议您立即更改密码并启用双重身份验证。
+      cta: 查看安全设置
+      ignore_if_recognized: 如果您确认是本人操作，可以安全地忽略此邮件。
+    password_changed:
+      subject: "Maybe：您的密码已更改"
+      greeting: 密码已更改
+      body: 您的 Maybe 账户密码最近已被更改。
+      changed_at: 更改时间
+      action_needed: 如果这不是您本人操作，请立即联系支持团队并保护您的账户安全。
+      cta: 查看安全设置
+      ignore_if_recognized: 如果您确认是本人操作，可以安全地忽略此邮件。
+    mfa_status_changed:
+      enabled_subject: "Maybe：双重身份验证已启用"
+      disabled_subject: "Maybe：双重身份验证已禁用"
+      greeting: 双重身份验证已更新
+      enabled_body: 您的 Maybe 账户已启用双重身份验证。
+      disabled_body: 您的 Maybe 账户已禁用双重身份验证。
+      action_needed: 如果这不是您本人操作，请立即重置密码并启用双重身份验证以保护您的账户安全。
+      cta: 查看安全设置
+      ignore_if_recognized: 如果您确认是本人操作，可以安全地忽略此邮件。

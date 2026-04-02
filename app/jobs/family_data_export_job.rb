@@ -14,6 +14,7 @@ class FamilyDataExportJob < ApplicationJob
     )
 
     family_export.update!(status: :completed)
+    NotificationMailer.export_completed(family_export).deliver_later
   rescue => e
     Rails.logger.error "Family export failed: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")

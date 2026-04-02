@@ -1,0 +1,15 @@
+---
+zh-CN:
+  notification_mailer:
+    export_completed:
+      subject: "Maybe：您的数据导出已准备就绪"
+      greeting: 您的导出已准备就绪
+      body: 您的 Maybe 数据导出已完成，可以下载。
+      cta: 下载导出
+      footer: 此下载链接将会过期，请尽快下载您的导出文件。
+    sync_failure:
+      subject: "Maybe：账户 %{account} 同步失败"
+      greeting: 账户同步失败
+      body: "您的账户 %{account} 同步失败，错误信息如下：%{error}"
+      cta: 查看账户
+      footer: 您可以尝试重新同步或检查账户连接设置。

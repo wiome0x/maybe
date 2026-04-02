@@ -6,3 +6,4 @@ en:
       body: "%{inviter} has invited you to join the %{family} family on Maybe!"
       expiry_notice: This invitation will expire in %{days} days
       greeting: Welcome to Maybe!
+      subject: "%{inviter} invited you to join Maybe"

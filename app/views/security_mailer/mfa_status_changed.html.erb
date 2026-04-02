@@ -1,0 +1,13 @@
+<h1><%= t(".greeting") %></h1>
+
+<% if @enabled %>
+  <p><%= t(".enabled_body") %></p>
+<% else %>
+  <p><%= t(".disabled_body") %></p>
+<% end %>
+
+<p><%= t(".action_needed") %></p>
+
+<%= link_to t(".cta"), settings_security_url, class: "button" %>
+
+<p class="footer"><%= t(".ignore_if_recognized") %></p>

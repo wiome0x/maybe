@@ -2,7 +2,7 @@ module SelfHostable
   extend ActiveSupport::Concern
 
   included do
-    helper_method :self_hosted?, :self_hosted_first_login?
+    helper_method :self_hosted?, :self_hosted_first_login?, :should_send_email?
 
     prepend_before_action :verify_self_host_config
   end
@@ -14,6 +14,18 @@ module SelfHostable
 
     def self_hosted_first_login?
       self_hosted? && User.count.zero?
+    end
+
+    def smtp_configured?
+      ENV["SMTP_ADDRESS"].present? && ENV["EMAIL_SENDER"].present?
+    end
+
+    def should_send_email?
+      if self_hosted?
+        smtp_configured?
+      else
+        true
+      end
     end
 
     def verify_self_host_config

@@ -1,0 +1,7 @@
+<h1><%= t(".greeting") %></h1>
+
+<p><%= t(".body", account: @account_name, error: @error_message) %></p>
+
+<%= link_to t(".cta"), account_url(@sync.syncable), class: "button" if @sync.syncable.is_a?(Account) %>
+
+<p class="footer"><%= t(".footer") %></p>

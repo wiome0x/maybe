@@ -12,6 +12,7 @@ class MfaController < ApplicationController
   def create
     if Current.user.verify_otp?(params[:code])
       @backup_codes = Current.user.enable_mfa!
+      SecurityMailer.mfa_status_changed(Current.user, enabled: true).deliver_later
       render :backup_codes
     else
       Current.user.disable_mfa!
@@ -63,6 +64,7 @@ class MfaController < ApplicationController
     end
 
     Current.user.disable_mfa!
+    SecurityMailer.mfa_status_changed(Current.user, enabled: false).deliver_later
     redirect_to settings_security_path, notice: t(".success")
   end
 

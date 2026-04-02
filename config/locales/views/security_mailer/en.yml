@@ -1,0 +1,30 @@
+---
+en:
+  security_mailer:
+    new_device_login:
+      subject: "Maybe: New sign-in to your account"
+      greeting: New sign-in detected
+      body: We noticed a new sign-in to your Maybe account from an unrecognized device or location.
+      ip_address: IP Address
+      user_agent: Device / Browser
+      login_time: Sign-in Time
+      action_needed: If this wasn't you, we recommend changing your password and enabling two-factor authentication immediately.
+      cta: Review Security Settings
+      ignore_if_recognized: If you recognize this activity, you can safely ignore this email.
+    password_changed:
+      subject: "Maybe: Your password was changed"
+      greeting: Password changed
+      body: The password for your Maybe account was recently changed.
+      changed_at: Changed at
+      action_needed: If you did not make this change, please contact support immediately and secure your account.
+      cta: Review Security Settings
+      ignore_if_recognized: If you made this change, you can safely ignore this email.
+    mfa_status_changed:
+      enabled_subject: "Maybe: Two-factor authentication enabled"
+      disabled_subject: "Maybe: Two-factor authentication disabled"
+      greeting: Two-factor authentication updated
+      enabled_body: Two-factor authentication has been enabled on your Maybe account.
+      disabled_body: Two-factor authentication has been disabled on your Maybe account.
+      action_needed: If you did not make this change, please secure your account immediately by resetting your password and enabling two-factor authentication.
+      cta: Review Security Settings
+      ignore_if_recognized: If you made this change, you can safely ignore this email.

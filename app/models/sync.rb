@@ -143,6 +143,10 @@ class Sync < ApplicationRecord
       Rails.logger.info("Performing post-sync for #{syncable_type} (#{syncable.id})")
       syncable.perform_post_sync
       syncable.broadcast_sync_complete
+
+      if failed?
+        NotificationMailer.sync_failure(self).deliver_later
+      end
     rescue => e
       Rails.logger.error("Error performing post-sync for #{syncable_type} (#{syncable.id}): #{e.message}")
       report_error(e)

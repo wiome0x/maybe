@@ -1,0 +1,9 @@
+<%= t(".greeting") %>
+
+<%= t(".body", account: @account_name, error: @error_message) %>
+
+<% if @sync.syncable.is_a?(Account) %>
+<%= t(".cta") %>: <%= account_url(@sync.syncable) %>
+<% end %>
+
+<%= t(".footer") %>

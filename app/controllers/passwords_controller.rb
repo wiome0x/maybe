@@ -4,6 +4,7 @@ class PasswordsController < ApplicationController
 
   def update
     if Current.user.update(password_params)
+      SecurityMailer.password_changed(Current.user).deliver_later
       redirect_to root_path, notice: t(".success")
     else
       render :edit, status: :unprocessable_entity
