@@ -1,10 +1,11 @@
 class AccountsController < ApplicationController
-  before_action :set_account, only: %i[sync sparkline toggle_active show destroy]
+  before_action :set_account, only: %i[sync sparkline toggle_active show destroy hide unhide]
   include Periodable
 
   def index
-    @manual_accounts = family.accounts.manual.alphabetically
+    @manual_accounts = family.accounts.manual.visible.alphabetically
     @plaid_items = family.plaid_items.ordered
+    @hidden_accounts = family.accounts.hidden.alphabetically
 
     render layout: "settings"
   end
@@ -51,6 +52,16 @@ class AccountsController < ApplicationController
       @account.enable!
     end
     redirect_to accounts_path
+  end
+
+  def hide
+    @account.hide!
+    redirect_to accounts_path, notice: "Account hidden"
+  end
+
+  def unhide
+    @account.unhide_and_sync!
+    redirect_to accounts_path, notice: "Account restored"
   end
 
   def destroy

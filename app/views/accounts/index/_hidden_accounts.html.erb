@@ -1,0 +1,46 @@
+<%# locals: (accounts:) %>
+
+<% if accounts.any? %>
+  <details class="group bg-container-inset p-4 rounded-xl">
+    <summary class="flex items-center gap-2 cursor-pointer focus-visible:outline-hidden">
+      <%= icon("chevron-right", class: "group-open:transform group-open:rotate-90") %>
+
+      <div class="flex items-center justify-center h-8 w-8 rounded-full bg-black/5">
+        <%= icon("eye-off") %>
+      </div>
+
+      <span class="text-sm font-medium text-secondary">
+        Hidden accounts (<%= accounts.size %>)
+      </span>
+    </summary>
+
+    <div class="space-y-1 mt-4">
+      <div class="bg-container rounded-lg shadow-border-xs">
+        <% accounts.each_with_index do |account, index| %>
+          <div class="p-4 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <%= render "accounts/logo", account: account, size: "md" %>
+
+              <div>
+                <p class="text-sm font-medium text-subdued"><%= account.name %></p>
+                <p class="text-xs text-secondary"><%= account.accountable.display_name %></p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <p class="text-sm font-medium text-subdued">
+                <%= format_money account.balance_money %>
+              </p>
+
+              <%= button_to "Restore", unhide_account_path(account), method: :post, class: "text-sm font-medium text-link hover:underline cursor-pointer" %>
+            </div>
+          </div>
+
+          <% unless index == accounts.size - 1 %>
+            <%= render "shared/ruler" %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </details>
+<% end %>

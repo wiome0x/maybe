@@ -179,6 +179,8 @@ Rails.application.routes.draw do
       post :sync
       get :sparkline
       patch :toggle_active
+      post :hide
+      post :unhide
     end
 
     collection do

@@ -19,6 +19,7 @@ class Account < ApplicationRecord
   enum :classification, { asset: "asset", liability: "liability" }, validate: { allow_nil: true }
 
   scope :visible, -> { where(status: [ "draft", "active" ]) }
+  scope :hidden, -> { where(status: "hidden") }
   scope :assets, -> { where(classification: "asset") }
   scope :liabilities, -> { where(classification: "liability") }
   scope :alphabetically, -> { order(:name) }
@@ -51,6 +52,16 @@ class Account < ApplicationRecord
 
     event :mark_for_deletion do
       transitions from: [ :draft, :active, :disabled ], to: :pending_deletion
+    end
+
+    state :hidden
+
+    event :hide do
+      transitions from: [ :draft, :active, :disabled ], to: :hidden
+    end
+
+    event :unhide do
+      transitions from: :hidden, to: :active
     end
   end
 
@@ -91,6 +102,11 @@ class Account < ApplicationRecord
   def destroy_later
     mark_for_deletion!
     DestroyJob.perform_later(self)
+  end
+
+  def unhide_and_sync!
+    unhide!
+    sync_later
   end
 
   # Override destroy to handle error recovery for accounts

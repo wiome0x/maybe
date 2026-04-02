@@ -57,6 +57,13 @@
           ) %>
         <% end %>
       <% end %>
+
+      <% if account.may_hide? %>
+        <%= button_to hide_account_path(account), method: :post, data: { turbo_frame: "_top" }, class: "flex items-center gap-1 text-sm text-secondary hover:text-primary cursor-pointer" do %>
+          <%= icon("eye-off", size: "sm") %>
+          <span>Hide</span>
+        <% end %>
+      <% end %>
     </div>
   </div>
 <% end %>
