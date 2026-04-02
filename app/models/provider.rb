@@ -55,5 +55,5 @@ class Provider
       end
     end
 
-  include Provider::Auditable
+  prepend Provider::Auditable
 end

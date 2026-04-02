@@ -78,8 +78,36 @@ zh-CN:
     securities:
       show:
         page_title: 安全
+    api_audits:
+      show:
+        page_title: API 审计
+        overview_title: 概览
+        overview_subtitle: 所选时段内的 API 请求统计
+        period_7d: 7 天
+        period_30d: 30 天
+        period_90d: 90 天
+        total_requests: 总请求数
+        total_errors: 错误数
+        error_rate: 错误率
+        avg_response_time: 平均响应时间
+        trends_title: 请求趋势
+        trends_subtitle: 每日请求量变化
+        provider_title: 按提供商统计
+        provider_subtitle: 各提供商的请求总数与错误数
+        logs_title: 请求日志
+        logs_subtitle: 最近的 API 请求详情
+        filter_all: 全部
+        col_provider: 提供商
+        col_endpoint: 接口
+        col_method: 方法
+        col_status: 状态
+        col_code: 状态码
+        col_response_time: 响应时间
+        col_requested_at: 请求时间
+        no_logs: 暂无日志
     settings_nav:
       accounts_label: 账户
+      api_audit_label: API 审计
       api_key_label: API 密钥
       back: 返回
       billing_label: 账单

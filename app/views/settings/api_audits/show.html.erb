@@ -1,10 +1,10 @@
-<%= content_for :page_title, "API Audit" %>
+<%= content_for :page_title, t(".page_title") %>
 
 <%# Task 7.1: Time range filter + Summary metric cards %>
-<%= settings_section title: "Overview", subtitle: "API request statistics for the selected period" do %>
+<%= settings_section title: t(".overview_title"), subtitle: t(".overview_subtitle") do %>
   <div class="space-y-4">
     <nav class="flex items-center gap-2" aria-label="Time range filter">
-      <% [["7d", "7 Days"], ["30d", "30 Days"], ["90d", "90 Days"]].each do |period_key, label| %>
+      <% [["7d", t(".period_7d")], ["30d", t(".period_30d")], ["90d", t(".period_90d")]].each do |period_key, label| %>
         <% active = (@period_days == 7 && period_key == "7d") || (@period_days == 30 && period_key == "30d") || (@period_days == 90 && period_key == "90d") %>
         <%= link_to label, settings_api_audit_path(period: period_key),
           class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{active ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
@@ -13,19 +13,19 @@
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="bg-container-inset rounded-lg p-4">
-        <p class="text-xs text-secondary uppercase font-medium">Total Requests</p>
+        <p class="text-xs text-secondary uppercase font-medium"><%= t(".total_requests") %></p>
         <p class="text-xl font-semibold text-primary mt-1"><%= number_with_delimiter(@stats[:total_requests]) %></p>
       </div>
       <div class="bg-container-inset rounded-lg p-4">
-        <p class="text-xs text-secondary uppercase font-medium">Total Errors</p>
+        <p class="text-xs text-secondary uppercase font-medium"><%= t(".total_errors") %></p>
         <p class="text-xl font-semibold text-destructive mt-1"><%= number_with_delimiter(@stats[:total_errors]) %></p>
       </div>
       <div class="bg-container-inset rounded-lg p-4">
-        <p class="text-xs text-secondary uppercase font-medium">Error Rate</p>
+        <p class="text-xs text-secondary uppercase font-medium"><%= t(".error_rate") %></p>
         <p class="text-xl font-semibold text-primary mt-1"><%= @stats[:error_rate] %>%</p>
       </div>
       <div class="bg-container-inset rounded-lg p-4">
-        <p class="text-xs text-secondary uppercase font-medium">Avg Response Time</p>
+        <p class="text-xs text-secondary uppercase font-medium"><%= t(".avg_response_time") %></p>
         <p class="text-xl font-semibold text-primary mt-1"><%= @stats[:avg_response_time_ms] %> ms</p>
       </div>
     </div>
@@ -33,7 +33,7 @@
 <% end %>
 
 <%# Task 7.2: Trend line chart area %>
-<%= settings_section title: "Request Trends", subtitle: "Daily request volume over time" do %>
+<%= settings_section title: t(".trends_title"), subtitle: t(".trends_subtitle") do %>
   <div data-controller="audit-line-chart"
        data-audit-line-chart-data-value="<%= @daily_totals.map { |d| { date: d.date.to_s, total: d.total, success_count: d.success_count, error_count: d.error_count } }.to_json %>"
        class="w-full h-64">
@@ -41,7 +41,7 @@
 <% end %>
 
 <%# Task 7.3: Provider bar chart area %>
-<%= settings_section title: "Requests by Provider", subtitle: "Total requests and errors per provider" do %>
+<%= settings_section title: t(".provider_title"), subtitle: t(".provider_subtitle") do %>
   <div data-controller="audit-bar-chart"
        data-audit-bar-chart-data-value="<%= @provider_summary.map { |p| { provider_name: p.provider_name, total: p.total, error_count: p.error_count } }.to_json %>"
        class="w-full h-64">
@@ -49,10 +49,10 @@
 <% end %>
 
 <%# Task 7.4: Log list area %>
-<%= settings_section title: "Request Logs", subtitle: "Recent API request details" do %>
+<%= settings_section title: t(".logs_title"), subtitle: t(".logs_subtitle") do %>
   <div class="space-y-4">
     <nav class="flex items-center gap-2 flex-wrap" aria-label="Provider filter">
-      <%= link_to "All", settings_api_audit_path(period: params[:period]),
+      <%= link_to t(".filter_all"), settings_api_audit_path(period: params[:period]),
         class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{params[:provider].blank? ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
       <% @provider_summary.each do |provider| %>
         <%= link_to provider.provider_name, settings_api_audit_path(provider: provider.provider_name, period: params[:period]),
@@ -63,13 +63,13 @@
     <% if @logs.any? %>
       <div class="bg-container-inset rounded-xl p-1">
         <div class="px-4 py-2 grid grid-cols-12 text-xs font-medium text-secondary uppercase hidden md:grid">
-          <div class="col-span-2">Provider</div>
-          <div class="col-span-3">Endpoint</div>
-          <div class="col-span-1">Method</div>
-          <div class="col-span-1">Status</div>
-          <div class="col-span-1 text-right">Code</div>
-          <div class="col-span-2 text-right">Response Time</div>
-          <div class="col-span-2 text-right">Requested At</div>
+          <div class="col-span-2"><%= t(".col_provider") %></div>
+          <div class="col-span-3"><%= t(".col_endpoint") %></div>
+          <div class="col-span-1"><%= t(".col_method") %></div>
+          <div class="col-span-1"><%= t(".col_status") %></div>
+          <div class="col-span-1 text-right"><%= t(".col_code") %></div>
+          <div class="col-span-2 text-right"><%= t(".col_response_time") %></div>
+          <div class="col-span-2 text-right"><%= t(".col_requested_at") %></div>
         </div>
 
         <div class="bg-container rounded-lg shadow-border-xs">
@@ -99,7 +99,7 @@
       </div>
     <% else %>
       <div class="text-center py-8">
-        <p class="text-secondary text-sm">No logs found</p>
+        <p class="text-secondary text-sm"><%= t(".no_logs") %></p>
       </div>
     <% end %>
   </div>
