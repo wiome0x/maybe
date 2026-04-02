@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+synth_success:
+  provider_name: "synth"
+  endpoint: "fetch_exchange_rate"
+  http_method: "POST"
+  request_status: "success"
+  response_code: 200
+  response_time_ms: 142.5
+  error_message:
+  requested_at: <%= 2.hours.ago %>
+
+plaid_error:
+  provider_name: "plaid_us"
+  endpoint: "fetch_accounts"
+  http_method: "POST"
+  request_status: "error"
+  response_code: 401
+  response_time_ms: 89.3
+  error_message: "INVALID_ACCESS_TOKEN: the access token is not valid"
+  requested_at: <%= 1.hour.ago %>
+
+stripe_success:
+  provider_name: "stripe"
+  endpoint: "create_subscription"
+  http_method: "POST"
+  request_status: "success"
+  response_code: 200
+  response_time_ms: 210.7
+  error_message:
+  requested_at: <%= 30.minutes.ago %>

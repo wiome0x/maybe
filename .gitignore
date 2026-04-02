@@ -111,3 +111,4 @@ scripts/
 *.csv
 !app/**/*.csv
 .kiro/specs/
+docs/

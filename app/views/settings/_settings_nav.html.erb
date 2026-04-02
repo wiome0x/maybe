@@ -11,7 +11,8 @@ nav_sections = [
       { label: t(".billing_label"), path: settings_billing_path, icon: "circle-dollar-sign", if: !self_hosted? },
       { label: t(".accounts_label"), path: accounts_path, icon: "layers" },
       { label: t(".imports_label"), path: imports_path, icon: "download" },
-      { label: t(".database_label"), path: settings_database_path, icon: "database", if: Current.user&.admin? }
+      { label: t(".database_label"), path: settings_database_path, icon: "database", if: Current.user&.admin? },
+      { label: "API Audit", path: settings_api_audit_path, icon: "shield-alert", if: Current.user&.admin? }
     ]
   },
   {

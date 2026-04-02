@@ -18,3 +18,9 @@ run_security_health_checks:
   class: "SecurityHealthCheckJob"
   queue: "scheduled"
   description: "Runs security health checks to detect issues with security data"
+
+clean_api_request_logs:
+  cron: "0 3 * * *"
+  class: "ApiRequestLogCleanupJob"
+  queue: "scheduled"
+  description: "Cleans up API request logs older than 90 days"

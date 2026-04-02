@@ -54,4 +54,6 @@ class Provider
         self.class::Error.new(error.message)
       end
     end
+
+  include Provider::Auditable
 end
