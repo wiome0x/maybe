@@ -30,6 +30,12 @@ class PlaidAccount::Investments::TransactionsProcessor
     def find_or_create_trade_entry(transaction)
       resolved_security_result = security_resolver.resolve(plaid_security_id: transaction["security_id"])
 
+      # Skip forex/cash-equivalent securities — these are currency conversions, not investable trades
+      if resolved_security_result.cash_equivalent?
+        find_or_create_cash_entry(transaction)
+        return
+      end
+
       unless resolved_security_result.security.present?
         Sentry.capture_exception(SecurityNotFoundError.new("Could not find security for plaid trade")) do |scope|
           scope.set_tags(plaid_account_id: plaid_account.id)

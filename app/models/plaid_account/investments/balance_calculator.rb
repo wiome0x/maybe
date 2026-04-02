@@ -61,9 +61,10 @@ class PlaidAccount::Investments::BalanceCalculator
     # Plaid holdings summed up, LESS "brokerage cash" holdings (that we've manually identified)
     def true_holdings_value
       # True holdings are holdings *less* Plaid's "pseudo-securities" (e.g. `CUR:USD` brokerage cash "holding")
+      # and forex pairs (e.g. `USD.HKD` currency conversion "holdings")
       true_holdings = holdings.reject do |h|
         security = security_resolver.resolve(plaid_security_id: h["security_id"])
-        security.brokerage_cash?
+        security.brokerage_cash? || security.cash_equivalent?
       end
 
       true_holdings.sum { |h| h["quantity"] * h["institution_price"] }

@@ -8,7 +8,9 @@ class PlaidAccount::Investments::HoldingsProcessor
     holdings.each do |plaid_holding|
       resolved_security_result = security_resolver.resolve(plaid_security_id: plaid_holding["security_id"])
 
+      # Skip brokerage cash and forex/cash-equivalent holdings
       next unless resolved_security_result.security.present?
+      next if resolved_security_result.cash_equivalent?
 
       security = resolved_security_result.security
       holding_date = plaid_holding["institution_price_as_of"] || Date.current

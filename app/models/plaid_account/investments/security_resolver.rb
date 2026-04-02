@@ -86,8 +86,18 @@ class PlaidAccount::Investments::SecurityResolver
       known_plaid_brokerage_cash_tickers.include?(plaid_security["ticker_symbol"])
     end
 
+    # Plaid reports forex pairs (e.g. CUR:USD, USD.HKD) as securities with type "cash"
+    # or with ticker patterns like "CUR:XXX" or "XXX.YYY" where both parts are 3-letter currency codes.
+    # These should not be treated as investable securities.
+    def forex_pair?(plaid_security)
+      ticker = plaid_security["ticker_symbol"].to_s
+      return true if ticker.match?(/\ACUR:/i)
+      return true if ticker.match?(/\A[A-Z]{3}\.[A-Z]{3}\z/i)
+      false
+    end
+
     def cash_equivalent?(plaid_security)
       return false unless plaid_security["type"].present?
-      plaid_security["type"] == "cash" || plaid_security["is_cash_equivalent"] == true
+      plaid_security["type"] == "cash" || plaid_security["is_cash_equivalent"] == true || forex_pair?(plaid_security)
     end
 end
