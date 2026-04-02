@@ -5,6 +5,8 @@ en:
       title: What's new
     dashboard:
       welcome: "Welcome back, %{name}"
+      last_login: "Last login: %{time} ago from IP %{ip}"
+      unknown: "unknown"
       subtitle: "Here's what's happening with your finances"
       new_button: "New"
       balance_sheet:

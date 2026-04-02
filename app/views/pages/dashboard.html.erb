@@ -17,6 +17,12 @@
 
     <div class="space-y-1">
       <h1 class="text-xl lg:text-3xl font-medium text-primary"><%= t(".welcome", name: Current.user.first_name) %></h1>
+      <% if @previous_session %>
+        <p class="text-xs text-secondary flex items-center gap-1">
+          <%= icon "log-in", size: "sm" %>
+          <%= t(".last_login", time: time_ago_in_words(@previous_session.created_at), ip: @previous_session.ip_address || t(".unknown")) %>
+        </p>
+      <% end %>
     </div>
 
     <%= render DS::Link.new(

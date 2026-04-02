@@ -6,6 +6,7 @@ class PagesController < ApplicationController
   def dashboard
     @balance_sheet = Current.family.balance_sheet
     @accounts = Current.family.accounts.visible.with_attached_logo
+    @previous_session = Current.user.previous_session
 
     period_param = params[:cashflow_period]
     @cashflow_period = if period_param.present?

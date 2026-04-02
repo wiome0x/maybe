@@ -5,6 +5,8 @@ zh-CN:
       title: 最新动态
     dashboard:
       welcome: "欢迎回来，%{name}"
+      last_login: "上次登录：%{time}前，IP 地址 %{ip}"
+      unknown: "未知"
       subtitle: "以下是您的财务概况"
       new_button: "新建"
       balance_sheet:

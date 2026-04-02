@@ -66,6 +66,10 @@ class User < ApplicationRecord
     super_admin? || role == "admin"
   end
 
+  def previous_session
+    sessions.where.not(id: Current.session&.id).order(created_at: :desc).first
+  end
+
   def display_name
     [ first_name, last_name ].compact.join(" ").presence || email
   end
