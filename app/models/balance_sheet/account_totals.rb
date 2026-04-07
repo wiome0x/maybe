@@ -48,9 +48,19 @@ class BalanceSheet::AccountTotals
       @query ||= Rails.cache.fetch(cache_key) do
         visible_accounts
           .joins(ActiveRecord::Base.sanitize_sql_array([
-            "LEFT JOIN exchange_rates ON exchange_rates.date = ? AND accounts.currency = exchange_rates.from_currency AND exchange_rates.to_currency = ?",
-            Date.current,
-            family.currency
+            <<~SQL.squish,
+              LEFT JOIN LATERAL (
+                SELECT exchange_rates.rate
+                FROM exchange_rates
+                WHERE exchange_rates.from_currency = accounts.currency
+                  AND exchange_rates.to_currency = ?
+                  AND exchange_rates.date <= ?
+                ORDER BY exchange_rates.date DESC
+                LIMIT 1
+              ) exchange_rates ON TRUE
+            SQL
+            family.currency,
+            Date.current
           ]))
           .select(
             "accounts.*",

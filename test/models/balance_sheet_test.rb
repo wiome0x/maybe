@@ -34,6 +34,20 @@ class BalanceSheetTest < ActiveSupport::TestCase
     assert_equal 50000 - 1000, BalanceSheet.new(@family).net_worth
   end
 
+  test "uses latest available exchange rate for converted account totals" do
+    @family.update!(currency: "EUR")
+    create_account(balance: 1000, currency: "USD", accountable: Depository.new)
+
+    ExchangeRate.create!(
+      from_currency: "USD",
+      to_currency: "EUR",
+      rate: 2,
+      date: 1.day.ago.to_date
+    )
+
+    assert_equal 2000, BalanceSheet.new(@family).assets.total
+  end
+
   test "disabled accounts do not affect totals" do
     create_account(balance: 1000, accountable: CreditCard.new)
     create_account(balance: 10000, accountable: Depository.new)

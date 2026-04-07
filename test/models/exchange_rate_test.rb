@@ -22,6 +22,18 @@ class ExchangeRateTest < ActiveSupport::TestCase
                                             )
   end
 
+  test "finds latest available rate on or before requested date" do
+    existing_rate = exchange_rates(:two)
+
+    @provider.expects(:fetch_exchange_rate).never
+
+    assert_equal existing_rate, ExchangeRate.find_or_fetch_rate(
+                                  from: existing_rate.from_currency,
+                                  to: existing_rate.to_currency,
+                                  date: Date.current
+                                )
+  end
+
   test "fetches rate from provider without cache" do
     ExchangeRate.delete_all
 

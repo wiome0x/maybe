@@ -60,7 +60,17 @@ module Accountable
       family.accounts
             .active
             .joins(sanitize_sql_array([
-              "LEFT JOIN exchange_rates ON exchange_rates.date = :current_date AND accounts.currency = exchange_rates.from_currency AND exchange_rates.to_currency = :family_currency",
+              <<~SQL.squish,
+                LEFT JOIN LATERAL (
+                  SELECT exchange_rates.rate
+                  FROM exchange_rates
+                  WHERE exchange_rates.from_currency = accounts.currency
+                    AND exchange_rates.to_currency = :family_currency
+                    AND exchange_rates.date <= :current_date
+                  ORDER BY exchange_rates.date DESC
+                  LIMIT 1
+                ) exchange_rates ON TRUE
+              SQL
               { current_date: Date.current.to_s, family_currency: family.currency }
             ]))
             .where(accountable_type: self.name)

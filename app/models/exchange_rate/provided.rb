@@ -14,7 +14,10 @@ module ExchangeRate::Provided
     end
 
     def find_or_fetch_rate(from:, to:, date: Date.current, cache: true)
-      rate = find_by(from_currency: from, to_currency: to, date: date)
+      rate = where(from_currency: from, to_currency: to)
+        .where("date <= ?", date)
+        .order(date: :desc)
+        .first
       return rate if rate.present?
 
       return nil unless provider.present? # No provider configured (some self-hosted apps)

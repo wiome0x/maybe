@@ -7,10 +7,12 @@ class PlaidAccount < ApplicationRecord
   validate :has_balance
 
   def upsert_plaid_snapshot!(account_snapshot)
+    account_currency = account_snapshot.balances.iso_currency_code || account_snapshot.balances.unofficial_currency_code
+
     assign_attributes(
       current_balance: account_snapshot.balances.current,
       available_balance: account_snapshot.balances.available,
-      currency: account_snapshot.balances.iso_currency_code,
+      currency: account_currency,
       plaid_type: account_snapshot.type,
       plaid_subtype: account_snapshot.subtype,
       name: account_snapshot.name,

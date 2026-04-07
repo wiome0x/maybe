@@ -88,4 +88,45 @@ class PlaidEntry::ProcessorTest < ActiveSupport::TestCase
     assert_equal "Amazon", entry.name
     assert_equal categories(:food_and_drink).id, entry.transaction.category_id
   end
+
+  test "uses unofficial currency code when iso currency code is missing" do
+    plaid_transaction = {
+      "transaction_id" => "tx_unofficial_currency",
+      "merchant_name" => "Amazon",
+      "amount" => 50,
+      "date" => Date.current,
+      "unofficial_currency_code" => "BTC"
+    }
+
+    processor = PlaidEntry::Processor.new(
+      plaid_transaction,
+      plaid_account: @plaid_account,
+      category_matcher: @category_matcher
+    )
+
+    processor.process
+
+    entry = Entry.find_by!(plaid_id: "tx_unofficial_currency")
+    assert_equal "BTC", entry.currency
+  end
+
+  test "falls back to account currency when plaid transaction has no currency fields" do
+    plaid_transaction = {
+      "transaction_id" => "tx_missing_currency",
+      "merchant_name" => "Amazon",
+      "amount" => 25,
+      "date" => Date.current
+    }
+
+    processor = PlaidEntry::Processor.new(
+      plaid_transaction,
+      plaid_account: @plaid_account,
+      category_matcher: @category_matcher
+    )
+
+    processor.process
+
+    entry = Entry.find_by!(plaid_id: "tx_missing_currency")
+    assert_equal @plaid_account.account.currency, entry.currency
+  end
 end
