@@ -110,6 +110,11 @@ class Category < ApplicationRecord
     parent.present?
   end
 
+  # UI-facing translated name for built-in categories while preserving DB name.
+  def display_name(locale: I18n.locale)
+    I18n.t("categories.names.#{name_i18n_key}", locale: locale, default: name)
+  end
+
   private
     def category_level_limit
       if (subcategory? && parent.subcategory?) || (parent? && subcategory?)
@@ -125,5 +130,13 @@ class Category < ApplicationRecord
 
     def monetizable_currency
       family.currency
+    end
+
+    def name_i18n_key
+      name.to_s
+        .downcase
+        .gsub("&", "and")
+        .gsub(/[^a-z0-9]+/, "_")
+        .gsub(/\A_+|_+\z/, "")
     end
 end

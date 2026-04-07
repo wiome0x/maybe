@@ -1,0 +1,22 @@
+---
+zh-CN:
+  categories:
+    names:
+      uncategorized: 未分类
+      income: 收入
+      loan_payments: 贷款还款
+      fees: 费用
+      entertainment: 娱乐
+      food_and_drink: 餐饮
+      shopping: 购物
+      home_improvement: 家居装修
+      healthcare: 医疗健康
+      personal_care: 个人护理
+      services: 服务
+      gifts_and_donations: 礼物与捐赠
+      transportation: 交通出行
+      travel: 旅行
+      rent_and_utilities: 房租与水电
+      dividends: 股息
+      withholding_tax: 预提税
+      internal_transfer: 内部转账
