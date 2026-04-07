@@ -66,6 +66,21 @@
         <%= render DS::Menu.new do |menu| %>
           <% menu.with_item(
             variant: "button",
+            text: t(".reset_and_resync"),
+            icon: "rotate-ccw",
+            href: authoritative_rebuild_plaid_item_path(plaid_item),
+            method: :post,
+            confirm: CustomConfirm.new(
+              title: t(".reset_confirm_title", institution: plaid_item.name),
+              body: t(".reset_confirm_body"),
+              btn_text: t(".reset_confirm_button"),
+              destructive: true,
+              high_severity: true
+            )
+          ) %>
+
+          <% menu.with_item(
+            variant: "button",
             text: t(".delete"),
             icon: "trash-2",
             href: plaid_item_path(plaid_item),

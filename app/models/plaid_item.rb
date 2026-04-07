@@ -60,6 +60,34 @@ class PlaidItem < ApplicationRecord
     end
   end
 
+  # Rebuilds this Plaid item from source-of-truth data:
+  # 1) Remove imported entries (plaid-backed only)
+  # 2) Remove derived holdings and balances
+  # 3) Reset transaction cursor and trigger a fresh sync
+  #
+  # Returns a hash of deleted row counts + sync metadata.
+  def authoritative_rebuild_and_sync_later
+    deleted = {
+      imported_entries: 0,
+      holdings: 0,
+      balances: 0
+    }
+
+    ActiveRecord::Base.transaction do
+      accounts.find_each do |account|
+        deleted[:imported_entries] += account.entries.where.not(plaid_id: nil).delete_all
+        deleted[:holdings] += account.holdings.delete_all
+        deleted[:balances] += account.balances.delete_all
+      end
+
+      update!(next_cursor: nil)
+    end
+
+    sync = sync_later
+
+    deleted.merge(sync_id: sync&.id, sync_status: sync&.status)
+  end
+
   # Once all the data is fetched, we can schedule account syncs to calculate historical balances
   def schedule_account_syncs(parent_sync: nil, window_start_date: nil, window_end_date: nil)
     accounts.each do |account|

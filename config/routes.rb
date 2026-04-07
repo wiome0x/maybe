@@ -269,6 +269,7 @@ Rails.application.routes.draw do
   resources :plaid_items, only: %i[new edit create destroy] do
     member do
       post :sync
+      post :authoritative_rebuild
     end
   end
 

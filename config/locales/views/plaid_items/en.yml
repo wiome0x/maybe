@@ -5,6 +5,9 @@ en:
       success: Account linked successfully.  Please wait for accounts to sync.
     destroy:
       success: Accounts scheduled for deletion.
+    authoritative_rebuild:
+      success: Rebuild started. Cleared %{entries} imported entries, %{holdings} holdings, and %{balances} balances.
+      error: Could not rebuild this connection. Please try again.
     plaid_item:
       add_new: Add new connection
       confirm_accept: Delete institution
@@ -23,4 +26,8 @@ en:
       status: Last synced %{timestamp} ago
       status_never: Requires data sync
       syncing: Syncing...
+      reset_and_resync: Reset and resync
+      reset_confirm_title: Reset %{institution}?
+      reset_confirm_body: This clears Plaid-imported entries and recalculated balances/holdings for this connection, then runs a full resync.
+      reset_confirm_button: Reset and resync
       update: Update connection

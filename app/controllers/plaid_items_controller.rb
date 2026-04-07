@@ -1,5 +1,5 @@
 class PlaidItemsController < ApplicationController
-  before_action :set_plaid_item, only: %i[edit destroy sync]
+  before_action :set_plaid_item, only: %i[edit destroy sync authoritative_rebuild]
 
   def new
     region = params[:region] == "eu" ? :eu : :us
@@ -46,6 +46,23 @@ class PlaidItemsController < ApplicationController
       format.html { redirect_back_or_to accounts_path }
       format.json { head :ok }
     end
+  end
+
+  def authoritative_rebuild
+    result = @plaid_item.authoritative_rebuild_and_sync_later
+
+    redirect_back_or_to(
+      accounts_path,
+      notice: t(
+        ".success",
+        entries: result[:imported_entries],
+        holdings: result[:holdings],
+        balances: result[:balances]
+      )
+    )
+  rescue => e
+    Rails.logger.error("[PlaidItemsController] authoritative_rebuild failed for PlaidItem##{@plaid_item.id}: #{e.class} - #{e.message}")
+    redirect_back_or_to(accounts_path, alert: t(".error"))
   end
 
   private

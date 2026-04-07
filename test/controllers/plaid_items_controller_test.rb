@@ -46,4 +46,31 @@ class PlaidItemsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to accounts_path
   end
+
+  test "authoritative_rebuild" do
+    plaid_item = plaid_items(:one)
+
+    PlaidItem.any_instance.expects(:authoritative_rebuild_and_sync_later).once.returns(
+      imported_entries: 27,
+      holdings: 132,
+      balances: 47,
+      sync_id: "sync-123",
+      sync_status: "pending"
+    )
+
+    post authoritative_rebuild_plaid_item_url(plaid_item)
+
+    assert_redirected_to accounts_path
+    assert_equal "Rebuild started. Cleared 27 imported entries, 132 holdings, and 47 balances.", flash[:notice]
+  end
+
+  test "authoritative_rebuild handles errors" do
+    plaid_item = plaid_items(:one)
+    PlaidItem.any_instance.expects(:authoritative_rebuild_and_sync_later).raises(StandardError.new("boom"))
+
+    post authoritative_rebuild_plaid_item_url(plaid_item)
+
+    assert_redirected_to accounts_path
+    assert_equal "Could not rebuild this connection. Please try again.", flash[:alert]
+  end
 end
