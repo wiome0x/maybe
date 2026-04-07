@@ -8,12 +8,26 @@ Rails.application.configure do
     policy.object_src  :none
     policy.script_src  :self
     policy.style_src   :self, "'unsafe-inline'"
-    # Allow Plaid Link and TradingView scripts
-    policy.script_src  :self, "https://cdn.plaid.com", "https://s3.tradingview.com"
+    # Allow Plaid Link, TradingView, and Intercom scripts
+    policy.script_src  :self,
+                       "https://cdn.plaid.com",
+                       "https://s3.tradingview.com",
+                       "https://widget.intercom.io",
+                       "https://js.intercomcdn.com"
 
-    # TradingView widget loads iframes and connects to its own domains
-    policy.frame_src   :self, "https://cdn.plaid.com", "https://*.tradingview.com"
-    policy.connect_src :self, "wss://#{ENV['APP_DOMAIN']}", "ws://localhost:*", "https://*.tradingview.com"
+    # TradingView and Intercom load iframes and connect to their own domains
+    policy.frame_src   :self,
+                       "https://cdn.plaid.com",
+                       "https://*.tradingview.com",
+                       "https://widget.intercom.io",
+                       "https://*.intercom.io"
+    policy.connect_src :self,
+                       "wss://#{ENV['APP_DOMAIN']}",
+                       "ws://localhost:*",
+                       "https://*.tradingview.com",
+                       "https://*.intercom.io",
+                       "https://*.intercomcdn.com",
+                       "wss://*.intercom.io"
   end
 
   # Generate session nonces for permitted importmap and inline scripts
