@@ -12,7 +12,7 @@
 
         <%= render DS::Disclosure.new(title: t(".transactions"), open: true) do %>
           <div class="space-y-2">
-            <%= form.collection_select :category_id, Current.family.categories.alphabetically, :id, :name, { prompt: t(".select_category"), label: t(".category"), class: "text-subdued" } %>
+            <%= form.collection_select :category_id, Current.family.categories.alphabetically, :id, :display_name, { prompt: t(".select_category"), label: t(".category"), class: "text-subdued" } %>
             <%= form.collection_select :merchant_id, Current.family.merchants.alphabetically, :id, :name, { prompt: t(".select_merchant"), label: t(".merchant"), class: "text-subdued" } %>
             <%= form.select :tag_ids, Current.family.tags.alphabetically.pluck(:name, :id), { include_blank: t(".none"), multiple: true, label: t(".tags"), container_class: "h-40" } %>
             <%= form.text_area :notes, label: t(".notes"), placeholder: t(".notes_placeholder"), rows: 5 %>

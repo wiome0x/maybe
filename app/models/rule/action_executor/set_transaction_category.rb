@@ -4,7 +4,7 @@ class Rule::ActionExecutor::SetTransactionCategory < Rule::ActionExecutor
   end
 
   def options
-    family.categories.pluck(:name, :id)
+    family.categories.map { |category| [ category.display_name, category.id ] }
   end
 
   def execute(transaction_scope, value: nil, ignore_attribute_locks: false)

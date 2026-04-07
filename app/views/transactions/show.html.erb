@@ -40,7 +40,7 @@
             <%= f.fields_for :entryable do |ef| %>
               <%= ef.collection_select :category_id,
                       Current.family.categories.alphabetically,
-                    :id, :name,
+                    :id, :display_name,
                     { label: t(".category_label"),
                       class: "text-subdued", include_blank: t(".uncategorized") },
                     "data-auto-submit-form-target": "auto" %>
