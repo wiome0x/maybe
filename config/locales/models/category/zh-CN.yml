@@ -2,21 +2,24 @@
 zh-CN:
   categories:
     names:
-      uncategorized: 未分类
-      income: 收入
-      loan_payments: 贷款还款
-      fees: 费用
-      entertainment: 娱乐
-      food_and_drink: 餐饮
-      shopping: 购物
-      home_improvement: 家居装修
-      healthcare: 医疗健康
-      personal_care: 个人护理
-      services: 服务
-      gifts_and_donations: 礼物与捐赠
-      transportation: 交通出行
-      travel: 旅行
-      rent_and_utilities: 房租与水电
-      dividends: 股息
-      withholding_tax: 预提税
-      internal_transfer: 内部转账
+      uncategorized: "\u672A\u5206\u7C7B"
+      income: "\u6536\u5165"
+      loan_payments: "\u8D37\u6B3E\u8FD8\u6B3E"
+      fees: "\u624B\u7EED\u8D39"
+      entertainment: "\u5A31\u4E50"
+      food_and_drink: "\u9910\u996E"
+      shopping: "\u8D2D\u7269"
+      home_improvement: "\u5BB6\u5C45\u6539\u9020"
+      healthcare: "\u533B\u7597\u5065\u5EB7"
+      personal_care: "\u4E2A\u4EBA\u62A4\u7406"
+      services: "\u670D\u52A1"
+      gifts_and_donations: "\u793C\u7269\u4E0E\u6350\u8D60"
+      transportation: "\u4EA4\u901A\u51FA\u884C"
+      travel: "\u65C5\u884C"
+      rent_and_utilities: "\u79DF\u91D1\u4E0E\u6C34\u7535\u8D39"
+      transfer: "\u8F6C\u8D26"
+      payment: "\u8FD8\u6B3E"
+      trade: "\u4EA4\u6613"
+      dividends: "\u80A1\u606F"
+      withholding_tax: "\u9884\u6263\u7A0E"
+      internal_transfer: "\u5185\u90E8\u8F6C\u8D26"

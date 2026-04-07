@@ -1,4 +1,4 @@
-<%# locals: (entry:, balance_trend: nil, view_ctx: "global") %>
+﻿<%# locals: (entry:, balance_trend: nil, view_ctx: "global") %>
 
 <% transaction = entry.entryable %>
 
@@ -74,7 +74,7 @@
                 <div class="text-secondary text-xs font-normal hidden lg:block">
                   <% if transaction.transfer? %>
                     <span class="text-secondary">
-                      <%= transaction.loan_payment? ? "Loan Payment" : "Transfer" %> • <%= entry.account.name %>
+                      <%= transaction.loan_payment? ? t("transactions.list_item.loan_payment") : t("transactions.list_item.transfer") %> - <%= entry.account.name %>
                     </span>
                   <% else %>
                     <%= link_to entry.account.name,
@@ -101,3 +101,4 @@
     </div>
   <% end %>
 <% end %>
+

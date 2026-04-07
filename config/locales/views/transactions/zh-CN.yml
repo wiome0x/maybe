@@ -1,127 +1,137 @@
----
+﻿---
 zh-CN:
   transactions:
+    list_item:
+      transfer: "\u8F6C\u8D26"
+      loan_payment: "\u8FD8\u6B3E"
+    transfer_match:
+      payment_confirmed: "\u8FD8\u6B3E\u5DF2\u786E\u8BA4"
+      transfer_confirmed: "\u8F6C\u8D26\u5DF2\u786E\u8BA4"
+      auto_matched: "\u81EA\u52A8\u5339\u914D"
+      confirm_match: "\u786E\u8BA4\u5339\u914D"
+      reject_match: "\u62D2\u7EDD\u5339\u914D"
     form:
-      account: 账户
-      account_prompt: 选择账户
-      amount: 金额
-      category: 分类
-      category_prompt: 选择分类
-      date: 日期
-      description: 描述
-      description_placeholder: 描述交易
-      expense: 支出
-      income: 收入
-      none: （无）
-      note_label: 备注
-      note_placeholder: 输入备注
-      submit: 添加交易
-      tags_label: 标签
-      transfer: 转账
+      account: 璐︽埛
+      account_prompt: 閫夋嫨璐︽埛
+      amount: 閲戦
+      category: 鍒嗙被
+      category_prompt: 閫夋嫨鍒嗙被
+      date: 鏃ユ湡
+      description: 鎻忚堪
+      description_placeholder: 鎻忚堪浜ゆ槗
+      expense: 鏀嚭
+      income: 鏀跺叆
+      none: 锛堟棤锛?
+      note_label: 澶囨敞
+      note_placeholder: 杈撳叆澶囨敞
+      submit: 娣诲姞浜ゆ槗
+      tags_label: 鏍囩
+      transfer: 杞处
     new:
-      new_transaction: 新交易
+      new_transaction: 鏂颁氦鏄?
     show:
-      account_label: 账户
-      amount: 金额
-      category_label: 分类
-      date_label: 日期
-      delete: 删除
-      delete_subtitle: 此操作将永久删除该交易，影响您的历史余额，且无法撤销。
-      delete_title: 删除交易
-      details: 详情
-      merchant_label: 交易方
-      name_label: 名称
-      nature: 类型
-      none: "（无）"
-      note_label: 备注
-      note_placeholder: 输入备注
-      overview: 概览
-      settings: 设置
-      tags_label: 标签
-      uncategorized: "（未分类）"
-      exclude_title: 排除
-      exclude_description: 被排除的交易将不纳入预算计算和报表。
-      one_time_title: "一次性%{type}"
-      income: 收入
-      expense: 支出
-      one_time_description: 一次性交易将从部分预算计算和报表中排除，帮助您关注真正重要的内容。
-      transfer_title: 转账或还款？
-      transfer_description: 转账和还款是特殊类型的交易，表示两个账户之间的资金流动。
-      open_matcher: 打开匹配器
+      account_label: 璐︽埛
+      amount: 閲戦
+      category_label: 鍒嗙被
+      date_label: 鏃ユ湡
+      delete: 鍒犻櫎
+      delete_subtitle: 姝ゆ搷浣滃皢姘镐箙鍒犻櫎璇ヤ氦鏄擄紝褰卞搷鎮ㄧ殑鍘嗗彶浣欓锛屼笖鏃犳硶鎾ら攢銆?
+      delete_title: 鍒犻櫎浜ゆ槗
+      details: 璇︽儏
+      merchant_label: 浜ゆ槗鏂?
+      name_label: 鍚嶇О
+      nature: 绫诲瀷
+      none: "\uFF08\u65E0\uFF09"
+      note_label: 澶囨敞
+      note_placeholder: 杈撳叆澶囨敞
+      overview: 姒傝
+      settings: 璁剧疆
+      tags_label: 鏍囩
+      uncategorized: "\uFF08\u672A\u5206\u7C7B\uFF09"
+      exclude_title: 鎺掗櫎
+      exclude_description: 琚帓闄ょ殑浜ゆ槗灏嗕笉绾冲叆棰勭畻璁＄畻鍜屾姤琛ㄣ€?
+      one_time_title: "\u4E00\u6B21\u6027%{type}"
+      income: 鏀跺叆
+      expense: 鏀嚭
+      one_time_description: 涓€娆℃€т氦鏄撳皢浠庨儴鍒嗛绠楄绠楀拰鎶ヨ〃涓帓闄わ紝甯姪鎮ㄥ叧娉ㄧ湡姝ｉ噸瑕佺殑鍐呭銆?
+      transfer_title: 杞处鎴栬繕娆撅紵
+      transfer_description: 杞处鍜岃繕娆炬槸鐗规畩绫诲瀷鐨勪氦鏄擄紝琛ㄧず涓や釜璐︽埛涔嬮棿鐨勮祫閲戞祦鍔ㄣ€?
+      open_matcher: 鎵撳紑鍖归厤鍣?
     header:
-      edit_categories: 编辑分类
-      edit_imports: 编辑导入
-      edit_merchants: 编辑交易方
-      edit_tags: 编辑标签
-      import: 导入
-      new_rule: 新建规则
-      edit_rules: 编辑规则
+      edit_categories: 缂栬緫鍒嗙被
+      edit_imports: 缂栬緫瀵煎叆
+      edit_merchants: 缂栬緫浜ゆ槗鏂?
+      edit_tags: 缂栬緫鏍囩
+      import: 瀵煎叆
+      new_rule: 鏂板缓瑙勫垯
+      edit_rules: 缂栬緫瑙勫垯
     index:
-      title: 交易
-      new_rule: 新建规则
-      edit_rules: 编辑规则
-      edit_categories: 编辑分类
-      edit_tags: 编辑标签
-      edit_merchants: 编辑交易方
-      edit_imports: 编辑导入
-      import: 导入
-      new_transaction: 新交易
-      transaction_label: 交易
-      category_label: 分类
-      amount_label: 金额
-      transaction: 笔交易
-      transactions: 笔交易
+      title: 浜ゆ槗
+      new_rule: 鏂板缓瑙勫垯
+      edit_rules: 缂栬緫瑙勫垯
+      edit_categories: 缂栬緫鍒嗙被
+      edit_tags: 缂栬緫鏍囩
+      edit_merchants: 缂栬緫浜ゆ槗鏂?
+      edit_imports: 缂栬緫瀵煎叆
+      import: 瀵煎叆
+      new_transaction: 鏂颁氦鏄?
+      transaction_label: 浜ゆ槗
+      category_label: 鍒嗙被
+      amount_label: 閲戦
+      transaction: 绗斾氦鏄?
+      transactions: 绗斾氦鏄?
     summary:
-      total_transactions: 交易总数
-      income: 收入
-      expenses: 支出
+      total_transactions: 浜ゆ槗鎬绘暟
+      income: 鏀跺叆
+      expenses: 鏀嚭
     bulk_updates:
       new:
-        title: 编辑交易
-        overview: 概览
-        date: 日期
-        transactions: 交易
-        select_category: 选择分类
-        category: 分类
-        select_merchant: 选择交易方
-        merchant: 交易方
-        none: 无
-        tags: 标签
-        notes: 备注
-        notes_placeholder: 输入将应用于所选交易的备注
-        cancel: 取消
-        save: 保存
+        title: 缂栬緫浜ゆ槗
+        overview: 姒傝
+        date: 鏃ユ湡
+        transactions: 浜ゆ槗
+        select_category: 閫夋嫨鍒嗙被
+        category: 鍒嗙被
+        select_merchant: 閫夋嫨浜ゆ槗鏂?
+        merchant: 浜ゆ槗鏂?
+        none: 鏃?
+        tags: 鏍囩
+        notes: 澶囨敞
+        notes_placeholder: 杈撳叆灏嗗簲鐢ㄤ簬鎵€閫変氦鏄撶殑澶囨敞
+        cancel: 鍙栨秷
+        save: 淇濆瓨
     searches:
       filters:
         amount_filter:
-          equal_to: 等于
-          greater_than: 大于
-          less_than: 小于
+          equal_to: 绛変簬
+          greater_than: 澶т簬
+          less_than: 灏忎簬
           placeholder: '0'
         badge:
-          expense: 支出
-          income: 收入
-          on_or_after: "%{date} 及之后"
-          on_or_before: "%{date} 及之前"
-          transfer: 转账
+          expense: 鏀嚭
+          income: 鏀跺叆
+          on_or_after: "%{date} \u53CA\u4E4B\u540E"
+          on_or_before: "%{date} \u53CA\u4E4B\u524D"
+          transfer: 杞处
         type_filter:
-          expense: 支出
-          income: 收入
-          transfer: 转账
+          expense: 鏀嚭
+          income: 鏀跺叆
+          transfer: 杞处
       menu:
-        account_filter: 账户
-        amount_filter: 金额
-        apply: 应用
-        cancel: 取消
-        category_filter: 分类
-        clear_filters: 清除筛选
-        date_filter: 日期
-        merchant_filter: 交易方
-        tag_filter: 标签
-        type_filter: 类型
+        account_filter: 璐︽埛
+        amount_filter: 閲戦
+        apply: 搴旂敤
+        cancel: 鍙栨秷
+        category_filter: 鍒嗙被
+        clear_filters: 娓呴櫎绛涢€?
+        date_filter: 鏃ユ湡
+        merchant_filter: 浜ゆ槗鏂?
+        tag_filter: 鏍囩
+        type_filter: 绫诲瀷
       search:
-        equal_to: 等于
-        greater_than: 大于
-        less_than: 小于
-        placeholder: 搜索交易...
-        filter: 筛选
+        equal_to: 绛変簬
+        greater_than: 澶т簬
+        less_than: 灏忎簬
+        placeholder: 鎼滅储浜ゆ槗...
+        filter: 绛涢€?
+
