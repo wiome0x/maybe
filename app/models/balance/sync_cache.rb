@@ -12,7 +12,7 @@ class Balance::SyncCache
   end
 
   def get_entries(date)
-    converted_entries.select { |e| e.date == date && (e.transaction? || e.trade?) }
+    converted_entries.select { |e| e.date == date && !e.excluded? && (e.transaction? || e.trade?) }
   end
 
   private
