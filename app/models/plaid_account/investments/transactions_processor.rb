@@ -1,5 +1,8 @@
 class PlaidAccount::Investments::TransactionsProcessor
   SecurityNotFoundError = Class.new(StandardError)
+  CASH_INFLOW_NAME_PATTERNS = [
+    /\ACASH RECEIPTS \/ ELECTRONIC FUND TRANSFERS\z/i
+  ].freeze
 
   def initialize(plaid_account, security_resolver:)
     @plaid_account = plaid_account
@@ -79,7 +82,7 @@ class PlaidAccount::Investments::TransactionsProcessor
       end
 
       entry.assign_attributes(
-        amount: transaction["amount"],
+        amount: normalized_cash_amount(transaction),
         currency: transaction["iso_currency_code"],
         date: transaction["date"]
       )
@@ -91,6 +94,30 @@ class PlaidAccount::Investments::TransactionsProcessor
       )
 
       entry.save!
+    end
+
+    # Internal balance calculators interpret signs with account-flow semantics:
+    # - negative amount => inflow to asset account
+    # - positive amount => outflow from asset account
+    #
+    # Some institutions classify incoming cash receipts with subtype "withdrawal"
+    # while keeping a positive amount. We normalize known misclassified cases here.
+    def normalized_cash_amount(transaction)
+      raw_amount = transaction["amount"].to_d
+      return raw_amount if raw_amount.zero?
+
+      if cash_receipt_inflow?(transaction)
+        -raw_amount.abs
+      else
+        raw_amount
+      end
+    end
+
+    def cash_receipt_inflow?(transaction)
+      name = transaction["name"].to_s.strip
+      subtype = transaction["subtype"].to_s.downcase
+
+      subtype == "withdrawal" && CASH_INFLOW_NAME_PATTERNS.any? { |pattern| pattern.match?(name) }
     end
 
     def transactions

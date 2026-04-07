@@ -76,6 +76,38 @@ class PlaidAccount::Investments::TransactionsProcessorTest < ActiveSupport::Test
     assert_equal "Withdrawal", entry.name
   end
 
+  test "normalizes cash receipts marked as withdrawal to inflow sign" do
+    test_investments_payload = {
+      transactions: [
+        {
+          "investment_transaction_id" => "cash-receipt-1",
+          "type" => "cash",
+          "subtype" => "withdrawal",
+          "amount" => 10_000.0,
+          "iso_currency_code" => "HKD",
+          "date" => Date.current,
+          "name" => "CASH RECEIPTS / ELECTRONIC FUND TRANSFERS"
+        }
+      ]
+    }
+
+    @plaid_account.update!(raw_investments_payload: test_investments_payload)
+
+    @security_resolver.expects(:resolve).never
+
+    processor = PlaidAccount::Investments::TransactionsProcessor.new(@plaid_account, security_resolver: @security_resolver)
+
+    assert_difference [ "Entry.count", "Transaction.count" ], 1 do
+      processor.process
+    end
+
+    entry = Entry.order(created_at: :desc).first
+
+    assert_equal(-10_000.0, entry.amount.to_f)
+    assert_equal "HKD", entry.currency
+    assert_equal "CASH RECEIPTS / ELECTRONIC FUND TRANSFERS", entry.name
+  end
+
   test "creates fee transactions" do
     test_investments_payload = {
       transactions: [
