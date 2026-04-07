@@ -32,7 +32,10 @@ class PlaidAccount::Investments::TransactionsProcessor
 
       # Skip forex/cash-equivalent securities — these are currency conversions, not investable trades
       if resolved_security_result.cash_equivalent?
-        find_or_create_cash_entry(transaction)
+        # Brokerage cash (for example CUR:USD) should behave like cash balance flows.
+        # FX pair trades (for example USD.HKD) are internal currency conversions and
+        # should not be treated as external account inflow/outflow entries.
+        find_or_create_cash_entry(transaction) if resolved_security_result.brokerage_cash?
         return
       end
 

@@ -180,4 +180,64 @@ class PlaidAccount::Investments::TransactionsProcessorTest < ActiveSupport::Test
     assert_equal "Bank Transfer", entry.name
     assert_instance_of Transaction, entry.entryable
   end
+
+  test "does not create entries for forex cash-equivalent conversion trades" do
+    test_investments_payload = {
+      transactions: [
+        {
+          "investment_transaction_id" => "fx-1",
+          "security_id" => "forex-security",
+          "type" => "buy",
+          "amount" => 30_000.0,
+          "iso_currency_code" => "HKD",
+          "date" => Date.current,
+          "name" => "USD.HKD"
+        }
+      ]
+    }
+
+    @plaid_account.update!(raw_investments_payload: test_investments_payload)
+
+    @security_resolver.expects(:resolve).returns(OpenStruct.new(
+      security: nil,
+      cash_equivalent?: true,
+      brokerage_cash?: false
+    ))
+
+    processor = PlaidAccount::Investments::TransactionsProcessor.new(@plaid_account, security_resolver: @security_resolver)
+
+    assert_no_difference [ "Entry.count", "Transaction.count", "Trade.count" ] do
+      processor.process
+    end
+  end
+
+  test "creates cash entries for brokerage cash-equivalent transactions" do
+    test_investments_payload = {
+      transactions: [
+        {
+          "investment_transaction_id" => "cash-1",
+          "security_id" => "brokerage-cash-security",
+          "type" => "buy",
+          "amount" => 100.0,
+          "iso_currency_code" => "USD",
+          "date" => Date.current,
+          "name" => "CUR:USD"
+        }
+      ]
+    }
+
+    @plaid_account.update!(raw_investments_payload: test_investments_payload)
+
+    @security_resolver.expects(:resolve).returns(OpenStruct.new(
+      security: nil,
+      cash_equivalent?: true,
+      brokerage_cash?: true
+    ))
+
+    processor = PlaidAccount::Investments::TransactionsProcessor.new(@plaid_account, security_resolver: @security_resolver)
+
+    assert_difference [ "Entry.count", "Transaction.count" ], 1 do
+      processor.process
+    end
+  end
 end
