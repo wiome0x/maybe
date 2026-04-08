@@ -1,12 +1,23 @@
 <%= content_for :page_title, t(".page_title") %>
 
+<div class="mb-4">
+  <nav class="flex items-center gap-2" aria-label="Audit mode filter">
+    <%= link_to "API",
+      settings_api_audit_path(audit_mode: "api", period: params[:period]),
+      class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{@audit_mode == 'api' ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
+    <%= link_to "Plaid",
+      settings_api_audit_path(audit_mode: "plaid", period: params[:period]),
+      class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{@audit_mode == 'plaid' ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
+  </nav>
+</div>
+
 <%# Task 7.1: Time range filter + Summary metric cards %>
 <%= settings_section title: t(".overview_title"), subtitle: t(".overview_subtitle") do %>
   <div class="space-y-4">
     <nav class="flex items-center gap-2" aria-label="Time range filter">
       <% [["7d", t(".period_7d")], ["30d", t(".period_30d")], ["90d", t(".period_90d")]].each do |period_key, label| %>
         <% active = (@period_days == 7 && period_key == "7d") || (@period_days == 30 && period_key == "30d") || (@period_days == 90 && period_key == "90d") %>
-        <%= link_to label, settings_api_audit_path(period: period_key),
+        <%= link_to label, settings_api_audit_path(period: period_key, audit_mode: @audit_mode),
           class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{active ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
       <% end %>
     </nav>
@@ -52,10 +63,10 @@
 <%= settings_section title: t(".logs_title"), subtitle: t(".logs_subtitle") do %>
   <div class="space-y-4">
     <nav class="flex items-center gap-2 flex-wrap" aria-label="Provider filter">
-      <%= link_to t(".filter_all"), settings_api_audit_path(period: params[:period]),
+      <%= link_to t(".filter_all"), settings_api_audit_path(period: params[:period], audit_mode: @audit_mode),
         class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{params[:provider].blank? ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
       <% @provider_summary.each do |provider| %>
-        <%= link_to provider.provider_name, settings_api_audit_path(provider: provider.provider_name, period: params[:period]),
+        <%= link_to provider.provider_name, settings_api_audit_path(provider: provider.provider_name, period: params[:period], audit_mode: @audit_mode),
           class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{params[:provider] == provider.provider_name ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
       <% end %>
     </nav>
@@ -74,17 +85,35 @@
 
         <div class="bg-container rounded-lg shadow-border-xs">
           <% @logs.each_with_index do |log, idx| %>
-            <div class="px-4 py-3 grid grid-cols-12 items-center text-sm <%= log.request_status == 'error' ? 'text-destructive' : 'text-primary' %>">
-              <div class="col-span-2 font-medium truncate"><%= log.provider_name %></div>
-              <div class="col-span-3 truncate font-mono text-xs"><%= log.endpoint %></div>
-              <div class="col-span-1"><%= log.http_method %></div>
+            <% status = @audit_mode == "plaid" ? (log.success ? "success" : "error") : log.request_status %>
+            <div class="px-4 py-3 grid grid-cols-12 items-center text-sm <%= status == 'error' ? 'text-destructive' : 'text-primary' %>">
+              <div class="col-span-2 font-medium truncate">
+                <% if @audit_mode == "plaid" %>
+                  <%= "plaid/#{log.region}" %>
+                <% else %>
+                  <%= log.provider_name %>
+                <% end %>
+              </div>
+              <div class="col-span-3 font-mono text-xs">
+                <div class="truncate"><%= log.endpoint %></div>
+                <% if @audit_mode == "plaid" %>
+                  <div class="text-[11px] text-secondary truncate">
+                    <% details = [] %>
+                    <% details << "request_id=#{log.plaid_request_id}" if log.plaid_request_id.present? %>
+                    <% details << "webhook=#{log.webhook_type}/#{log.webhook_code}" if log.webhook_type.present? || log.webhook_code.present? %>
+                    <% details << "error=#{log.error_payload['message']}" if log.error_payload.is_a?(Hash) && log.error_payload["message"].present? %>
+                    <%= details.join(" | ") %>
+                  </div>
+                <% end %>
+              </div>
+              <div class="col-span-1"><%= @audit_mode == "plaid" ? log.source : log.http_method %></div>
               <div class="col-span-1">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= log.request_status == 'success' ? 'text-success' : 'text-destructive' %>">
-                  <%= log.request_status %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= status == 'success' ? 'text-success' : 'text-destructive' %>">
+                  <%= status %>
                 </span>
               </div>
-              <div class="col-span-1 text-right"><%= log.response_code %></div>
-              <div class="col-span-2 text-right"><%= log.response_time_ms&.round(1) %> ms</div>
+              <div class="col-span-1 text-right"><%= @audit_mode == "plaid" ? log.http_status : log.response_code %></div>
+              <div class="col-span-2 text-right"><%= @audit_mode == "plaid" ? log.duration_ms&.round(1) : log.response_time_ms&.round(1) %> ms</div>
               <div class="col-span-2 text-right text-secondary"><%= log.requested_at.strftime("%Y-%m-%d %H:%M") %></div>
             </div>
             <% if idx < @logs.size - 1 %>
