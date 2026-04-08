@@ -42,15 +42,26 @@ Rails.application.configure do
   # Set Active Storage URL expiration time to 7 days
   config.active_storage.urls_expire_in = 7.days
 
-  # Don't care if the mailer can't send.
+  # Development mailer:
+  # - Use SMTP when env vars are provided (for end-to-end testing)
+  # - Fallback to letter_opener for local preview-only workflow
   config.action_mailer.raise_delivery_errors = false
-  config.action_mailer.delivery_method = :letter_opener
-
   config.action_mailer.perform_caching = false
-
   config.action_mailer.perform_deliveries = true
+  config.action_mailer.default_url_options = { host: ENV.fetch("APP_DOMAIN", "localhost"), port: ENV.fetch("PORT") { 3000 } }
 
-  config.action_mailer.default_url_options = { host: "localhost", port: ENV.fetch("PORT") { 3000 } }
+  smtp_enabled = ENV["SMTP_ADDRESS"].present? && ENV["EMAIL_SENDER"].present?
+  config.action_mailer.delivery_method = smtp_enabled ? :smtp : :letter_opener
+
+  if smtp_enabled
+    config.action_mailer.smtp_settings = {
+      address: ENV["SMTP_ADDRESS"],
+      port: ENV["SMTP_PORT"],
+      user_name: ENV["SMTP_USERNAME"],
+      password: ENV["SMTP_PASSWORD"],
+      tls: ENV["SMTP_TLS_ENABLED"] == "true"
+    }
+  end
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
