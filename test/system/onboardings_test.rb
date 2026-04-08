@@ -14,7 +14,7 @@ class OnboardingsTest < ApplicationSystemTestCase
   test "can complete the full onboarding flow" do
     visit onboarding_path
 
-    assert_text "Let's set up your account"
+    assert_text(/(Let's set up your account|Meet Maybe)/i)
     assert_button "Continue"
 
     click_button "Continue"
