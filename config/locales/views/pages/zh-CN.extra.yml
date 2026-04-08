@@ -1,0 +1,19 @@
+zh-CN:
+  pages:
+    feedback:
+      page_title: 反馈
+      title: 提交反馈
+      subtitle: 如果你有任何具体建议，请告诉我们。也欢迎附上视频或截图链接。
+      feature_request: 提交功能建议
+      bug_report: 提交 Bug 报告
+      community: 与社区讨论 Maybe
+    redis_configuration_error:
+      page_title: 需要配置 Redis - Maybe
+      title: 需要配置 Redis
+      subtitle: 你的自托管 Maybe 实例需要正确配置 Redis 才能继续使用。
+      why_title: 为什么需要 Redis？
+      why_body: Maybe 使用 Redis 来支持 Sidekiq 后台任务，例如账户同步、导入处理等，确保你的财务数据能持续更新。
+      view_setup_guide: 查看安装指南
+      guide_hint: 按照完整 Docker 指南配置 Redis
+      refresh_hint: 配置完成后，请刷新此页面继续。
+      refresh_page: 刷新页面

@@ -1,0 +1,6 @@
+zh-CN:
+  imports:
+    revert_failure:
+      title: 回滚导入失败
+      description: 请重试，或联系支持团队。
+      try_again: 重试

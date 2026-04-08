@@ -1,0 +1,19 @@
+en:
+  pages:
+    feedback:
+      page_title: Feedback
+      title: Leave feedback
+      subtitle: Let us know if you have any specific feedback. Feel free to include links to videos or screenshots.
+      feature_request: Write a feature request
+      bug_report: File a bug report
+      community: Discuss Maybe with others
+    redis_configuration_error:
+      page_title: Redis Configuration Required - Maybe
+      title: Redis Configuration Required
+      subtitle: Your self-hosted Maybe installation needs Redis to be properly configured.
+      why_title: Why is Redis required?
+      why_body: Maybe uses Redis to power Sidekiq background jobs for tasks like syncing account data, processing imports, and other background operations that keep your financial data up to date.
+      view_setup_guide: View Setup Guide
+      guide_hint: Follow our complete Docker setup guide to configure Redis
+      refresh_hint: Once you've configured Redis, refresh this page to continue.
+      refresh_page: Refresh Page

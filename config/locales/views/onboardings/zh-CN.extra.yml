@@ -1,0 +1,46 @@
+zh-CN:
+  onboardings:
+    show:
+      title: 开始设置您的账户
+      subtitle: 先完成基础资料设置。
+      first_name: 名
+      last_name: 姓
+      household_name: 家庭名称
+      country: 国家
+      submit: 继续
+    goals:
+      title: 您希望 Maybe 帮您实现什么？
+      subtitle: 请选择一个或多个使用目标。
+      goal_unified_accounts: 在一个地方查看所有账户
+      goal_cashflow: 了解现金流和支出
+      goal_budgeting: 管理预算与财务计划
+      goal_partner: 与伴侣共同管理财务
+      goal_investments: 跟踪投资表现
+      goal_ai_insights: 让 AI 帮我理解财务状况
+      goal_optimization: 分析并优化账户结构
+      goal_reduce_stress: 缓解财务压力或焦虑
+      next: 下一步
+    trial:
+      hero_title: 免费试用 Maybe 14 天
+      hero_subtitle: 无需信用卡
+      hero_description: 开启试用后即可激活您的 Maybe 账户，无需填写支付信息。
+      start_trial: 立即开始 14 天试用
+      continue_trial: 继续试用
+      upgrade: 升级
+      how_it_works_title: 试用流程说明
+      today_title: 今天
+      today_body: 您将立即获得 14 天免费访问权限
+      in_13_days_title: 13 天后（%{date}）
+      in_13_days_body: 我们会提醒您试用即将结束。
+      in_14_days_title: 14 天后（%{date}）
+      in_14_days_body: 试用结束，订阅后可继续使用 Maybe
+      included_title: 试用包含以下内容
+      included_1: 可连接超过 10,000 家金融机构
+      included_2: 支持无限账户与账户类型
+      included_3: 提供组合层面的收益与表现分析
+      included_4: 完整的交易记录追踪体验
+      included_5: 无限使用 Maybe AI 与对话
+      included_6: 高可用的手动账户记账能力
+      included_7: 多币种支持与接近全球覆盖
+      included_8: 优先体验新发布功能
+      included_9: 团队优先人工支持

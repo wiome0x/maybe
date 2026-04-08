@@ -1,0 +1,46 @@
+en:
+  onboardings:
+    show:
+      title: Let's set up your account
+      subtitle: First things first, let's get your profile set up.
+      first_name: First name
+      last_name: Last name
+      household_name: Household name
+      country: Country
+      submit: Continue
+    goals:
+      title: What brings you to Maybe?
+      subtitle: Select one or more goals that you have with using Maybe as your personal finance tool.
+      goal_unified_accounts: See all my accounts in one place
+      goal_cashflow: Understand cashflow and expenses
+      goal_budgeting: Manage financial plans and budgeting
+      goal_partner: Manage finances with a partner
+      goal_investments: Track investments
+      goal_ai_insights: Let AI help me understand my finances
+      goal_optimization: Analyze and optimize accounts
+      goal_reduce_stress: Reduce financial stress or anxiety
+      next: Next
+    trial:
+      hero_title: Try Maybe for 14 days.
+      hero_subtitle: No credit card required
+      hero_description: Starting the trial activates your account for Maybe. You won't need to enter payment details.
+      start_trial: Try Maybe for 14 days
+      continue_trial: Continue trial
+      upgrade: Upgrade
+      how_it_works_title: How your trial will work
+      today_title: Today
+      today_body: You'll get free access to Maybe for 14 days
+      in_13_days_title: In 13 days (%{date})
+      in_13_days_body: We'll notify you to remind you when your trial will end.
+      in_14_days_title: In 14 days (%{date})
+      in_14_days_body: Your trial ends - subscribe to continue using Maybe
+      included_title: Here's what's included
+      included_1: More than 10,000 institutions to connect to
+      included_2: Connect unlimited accounts and account types
+      included_3: Performance and investment returns across portfolio
+      included_4: Comprehensive transaction tracking experience
+      included_5: Unlimited access and chats with Maybe AI
+      included_6: Manual account tracking that works well
+      included_7: Multiple currencies and near global coverage
+      included_8: Early access to newly released features
+      included_9: Priority human support from team

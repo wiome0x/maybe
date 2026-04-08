@@ -1,0 +1,82 @@
+en:
+  settings:
+    api_keys:
+      shared:
+        scopes:
+          read: Read Only
+          read_write: Read/Write
+          read_accounts: View Accounts
+          read_transactions: View Transactions
+          read_balances: View Balances
+          write_transactions: Create Transactions
+      show:
+        page_title: API Key
+        shared:
+          your_api_key: Your API Key
+          copy_hint: Copy and store this key securely. You'll need it to authenticate your API requests.
+          copy_api_key: Copy API Key
+          usage_title: How to use your API key
+          usage_hint: Include your API key in the X-Api-Key header when making requests:
+        newly_created:
+          section_title: API Key Created Successfully
+          section_subtitle: Your new API key has been generated successfully.
+          success_title: API Key Created Successfully!
+          success_body: Your new API key "%{key_name}" has been created and is ready to use.
+          continue: Continue to API Key Settings
+        current:
+          section_title: Your API Key
+          section_subtitle: Manage your API key for programmatic access to your Maybe data.
+          created_ago: Created %{time_ago} ago
+          last_used_ago: " · Last used %{time_ago} ago"
+          never_used: " · Never used"
+          active: Active
+          permissions: Permissions
+          create_new_key: Create New Key
+          revoke_key: Revoke Key
+          revoke_confirm: Are you sure you want to revoke this API key?
+        empty:
+          section_title: Create Your API Key
+          section_subtitle: Get programmatic access to your Maybe data
+          card_title: Access your account data programmatically
+          card_body: Generate an API key to integrate with your applications and access your financial data securely.
+          features_title: "What you can do with API keys:"
+          feature_1: Access your accounts and balances
+          feature_2: View transaction history
+          feature_3: Create new transactions
+          feature_4: Integrate with third-party applications
+          create_api_key: Create API Key
+      new:
+        page_title: Create New API Key
+        section_title: Create New API Key
+        section_subtitle: Generate a new API key to access your Maybe data programmatically.
+        name_label: API Key Name
+        name_placeholder: "e.g., My Budget App, Portfolio Tracker"
+        name_help: Choose a descriptive name to help you identify this key later.
+        permissions_label: Permissions
+        permissions_help: Select the permissions this API key should have:
+        scope_read_label: Read Only
+        scope_read_desc: View your accounts, transactions, and balances
+        scope_read_write_label: Read/Write
+        scope_read_write_desc: View your data and create new transactions
+        security_warning_title: Security Warning
+        security_warning: Your API key will be displayed only once after creation. Make sure to copy and store it securely. Anyone with access to this key can access your data according to the permissions you select.
+        cancel: Cancel
+        create_key: Create API Key
+      created:
+        page_title: API Key Created
+        section_title: API Key Created Successfully
+        section_subtitle: Your new API key has been generated successfully.
+        success_title: API Key Created Successfully!
+        success_body: Your new API key "%{key_name}" has been created and is ready to use.
+        your_api_key: Your API Key
+        copy_hint: Copy and store this key securely. You'll need it to authenticate your API requests.
+        copy_key: Copy API Key
+        key_details: Key Details
+        name_label: "Name:"
+        permissions_label: "Permissions:"
+        created_label: "Created:"
+        important_security_note: Important Security Note
+        important_security_body: This is the only time your API key will be displayed. Make sure to copy it now and store it securely. If you lose this key, you'll need to generate a new one.
+        usage_title: How to use your API key
+        usage_hint: Include your API key in the X-Api-Key header when making requests:
+        continue: Continue to API Key Settings

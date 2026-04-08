@@ -1,0 +1,6 @@
+zh-CN:
+  layouts:
+    application:
+      free_trial: 免费试用
+      days_remaining: "还剩 %{days} 天"
+      upgrade: 升级

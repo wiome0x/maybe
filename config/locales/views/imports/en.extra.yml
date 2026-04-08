@@ -1,0 +1,6 @@
+en:
+  imports:
+    revert_failure:
+      title: Reverting import failed
+      description: Please try again or contact support.
+      try_again: Try again

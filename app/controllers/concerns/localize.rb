@@ -8,7 +8,8 @@ module Localize
 
   private
     def switch_locale(&action)
-      locale = Current.family.try(:locale) || browser_locale || I18n.default_locale
+      locale = resolved_locale
+      session[:locale] = locale.to_s if locale.present?
       I18n.with_locale(locale, &action)
     end
 
@@ -21,5 +22,17 @@ module Localize
       request.compatible_language_from(I18n.available_locales)
     rescue StandardError
       nil
+    end
+
+    def resolved_locale
+      requested = params[:locale].presence
+      requested = requested&.to_s
+
+      return requested if requested.present? && I18n.available_locales.map(&:to_s).include?(requested)
+
+      stored = session[:locale].presence
+      return stored if stored.present? && I18n.available_locales.map(&:to_s).include?(stored)
+
+      Current.family.try(:locale) || browser_locale || I18n.default_locale
     end
 end

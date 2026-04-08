@@ -1,0 +1,15 @@
+zh-CN:
+  family_exports:
+    new:
+      title: 导出数据
+      subtitle: 下载你的全部财务数据
+      included_title: 导出内容包括：
+      included_1: 所有账户与余额
+      included_2: 交易历史
+      included_3: 投资交易记录
+      included_4: 分类与标签
+      note_title: 注意：
+      note_body: 本次导出包含你的全部数据，但其中只有部分数据可通过 CSV 功能重新导入 Maybe。目前支持账户、交易（含分类和标签）及投资交易导入，其它账户相关数据仅用于备份留存。
+      cancel: 取消
+      submit: 导出数据
+      submitting: 导出中...

@@ -39,13 +39,13 @@
       <%
         cash_weight = @account.balance.zero? ? 0 : (@account.cash_balance / @account.balance * 100).round(1)
         slices = []
-        slices << { label: "Cash", value: cash_weight } if cash_weight > 0
+        slices << { label: t(".cash"), value: cash_weight } if cash_weight > 0
         chart_holdings.each { |h| slices << { label: h.ticker, value: h.weight.round(1) } }
         pie_colors = %w[#6B7280 #3B82F6 #10B981 #F59E0B #EF4444 #8B5CF6 #EC4899 #14B8A6 #F97316 #6366F1]
         total = slices.sum { |s| s[:value] }
       %>
       <div class="bg-container-inset rounded-xl p-4">
-        <h3 class="text-xs font-medium text-secondary uppercase mb-3">Portfolio Allocation</h3>
+        <h3 class="text-xs font-medium text-secondary uppercase mb-3"><%= t(".portfolio_allocation") %></h3>
         <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center">
           <svg width="180" height="180" viewBox="0 0 180 180" style="flex-shrink:0">
             <%

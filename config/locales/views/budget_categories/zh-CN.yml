@@ -1,0 +1,23 @@
+zh-CN:
+  budget_categories:
+    index:
+      title: 编辑分类预算
+      subtitle: 调整各分类预算以设置支出上限。未分配资金将自动归入“未分类”。
+    no_categories:
+      title: 暂无分类
+      description: 你还没有创建分类，或还未将任何交易分配到支出分类。
+      use_defaults: 使用默认分类（推荐）
+      new_category: 新建分类
+    show:
+      category: 分类
+      period_spending: "%{period} 支出"
+      overview: 概览
+      status: 状态
+      overspent: 超支
+      left: 剩余
+      budgeted: 预算金额
+      monthly_average_spending: 月均支出
+      monthly_median_spending: 月度中位支出
+      recent_transactions: 最近交易
+      view_all_category_transactions: 查看该分类全部交易
+      no_transactions_found: 当前预算周期未找到交易记录。

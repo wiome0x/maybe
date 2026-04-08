@@ -1,20 +1,20 @@
 <div class="space-y-4">
-  <h2 class="text-sm font-medium text-primary">Price Trends</h2>
+  <h2 class="text-sm font-medium text-primary"><%= t(".title") %></h2>
 
   <div class="flex flex-col sm:flex-row items-end gap-3" data-controller="ticker-search">
     <div class="form-field w-full sm:w-auto sm:min-w-[200px]">
-      <label class="form-field__label" for="ticker_search">Ticker</label>
+      <label class="form-field__label" for="ticker_search"><%= t(".ticker") %></label>
       <input type="text"
              id="ticker_search"
              name="ticker"
-             placeholder="e.g. AAPL"
+             placeholder="<%= t(".ticker_placeholder") %>"
              class="form-field__input"
              value="<%= params[:ticker] %>"
              data-ticker-search-target="input" />
     </div>
 
     <div class="form-field w-full sm:w-auto">
-      <label class="form-field__label" for="start_date">Start Date</label>
+      <label class="form-field__label" for="start_date"><%= t(".start_date") %></label>
       <input type="date"
              id="start_date"
              name="start_date"
@@ -24,7 +24,7 @@
     </div>
 
     <div class="form-field w-full sm:w-auto">
-      <label class="form-field__label" for="end_date">End Date</label>
+      <label class="form-field__label" for="end_date"><%= t(".end_date") %></label>
       <input type="date"
              id="end_date"
              name="end_date"
@@ -37,7 +37,7 @@
             class="inline-flex items-center gap-1 font-medium whitespace-nowrap rounded-lg px-3 py-2 text-sm text-inverse bg-inverse hover:bg-inverse-hover shrink-0"
             data-action="click->ticker-search#search">
       <%= icon "search", size: "sm", color: "white" %>
-      <span>Search</span>
+      <span><%= t(".search") %></span>
     </button>
   </div>
 
@@ -48,8 +48,8 @@
       <div class="flex justify-center items-center py-16">
         <div class="text-center space-y-2">
           <%= icon "line-chart", size: "lg", class: "text-secondary mx-auto" %>
-          <p class="text-sm text-primary font-medium">No trend data</p>
-          <p class="text-sm text-secondary">Enter a ticker symbol and click Search to view price history.</p>
+          <p class="text-sm text-primary font-medium"><%= t(".empty_title") %></p>
+          <p class="text-sm text-secondary"><%= t(".empty_subtitle") %></p>
         </div>
       </div>
     </div>

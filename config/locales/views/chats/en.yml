@@ -1,0 +1,11 @@
+en:
+  chats:
+    index:
+      title: Chats
+      new_chat: New chat
+    ai_consent:
+      title: Enable Maybe AI
+      available_body: Maybe AI can answer financial questions and provide insights based on your data. To use this feature you'll need to explicitly enable it.
+      token_required_html: To use the AI assistant, you need to set the <code class="bg-surface-inset px-1 py-0.5 rounded font-mono text-xs">OPENAI_ACCESS_TOKEN</code> environment variable in your self-hosted instance.
+      enable_button: Enable Maybe AI
+      footer: Disable anytime. All data sent to our LLM providers is anonymized.
