@@ -119,8 +119,7 @@ jobs:
 
       - name: DB setup and smoke test
         run: |
-          bin/rails db:create
-          bin/rails db:schema:load
+          bin/rails db:prepare
           bin/rails db:seed
 
       - name: Unit and integration tests
