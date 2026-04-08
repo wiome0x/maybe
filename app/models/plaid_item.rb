@@ -17,6 +17,7 @@ class PlaidItem < ApplicationRecord
 
   has_many :plaid_accounts, dependent: :destroy
   has_many :accounts, through: :plaid_accounts
+  has_many :plaid_api_logs, dependent: :nullify
 
   scope :active, -> { where(scheduled_for_deletion: false) }
   scope :ordered, -> { order(created_at: :desc) }
