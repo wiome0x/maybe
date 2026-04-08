@@ -140,7 +140,7 @@ oc:
         one: a pas la bona longor (un caractèr solament)
         other: a pas la bona longor (%{count} caractèrs exactament)
     template:
-      body: I a agut de problèmas amb los camps seguents : 
+      body: "I a agut de problèmas amb los camps seguents : "
       header:
         one: Impossible d’enregistrar aqueste/a %{model} perque i a %{count} error
         other: Impossible d’enregistrar aqueste/a %{model} perque i a %{count} errors

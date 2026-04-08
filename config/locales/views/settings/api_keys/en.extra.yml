@@ -16,7 +16,7 @@ en:
           copy_hint: Copy and store this key securely. You'll need it to authenticate your API requests.
           copy_api_key: Copy API Key
           usage_title: How to use your API key
-          usage_hint: Include your API key in the X-Api-Key header when making requests:
+          usage_hint: "Include your API key in the X-Api-Key header when making requests:"
         newly_created:
           section_title: API Key Created Successfully
           section_subtitle: Your new API key has been generated successfully.
@@ -53,7 +53,7 @@ en:
         name_placeholder: "e.g., My Budget App, Portfolio Tracker"
         name_help: Choose a descriptive name to help you identify this key later.
         permissions_label: Permissions
-        permissions_help: Select the permissions this API key should have:
+        permissions_help: "Select the permissions this API key should have:"
         scope_read_label: Read Only
         scope_read_desc: View your accounts, transactions, and balances
         scope_read_write_label: Read/Write
@@ -78,5 +78,5 @@ en:
         important_security_note: Important Security Note
         important_security_body: This is the only time your API key will be displayed. Make sure to copy it now and store it securely. If you lose this key, you'll need to generate a new one.
         usage_title: How to use your API key
-        usage_hint: Include your API key in the X-Api-Key header when making requests:
+        usage_hint: "Include your API key in the X-Api-Key header when making requests:"
         continue: Continue to API Key Settings

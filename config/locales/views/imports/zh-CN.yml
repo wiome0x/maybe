@@ -57,6 +57,8 @@ zh-CN:
       back_to_dashboard: 返回仪表盘
     ready:
       publish: 发布导入
+      description: 以下是发布此导入后将添加到您账户的新项目摘要。
+      title: 确认导入数据
     importing:
       title: 导入进行中
       description: 导入正在进行中。您可以在导入菜单中查看状态更新，或点击"查看状态"刷新页面。您可以继续使用应用。
@@ -85,6 +87,3 @@ zh-CN:
       resume: 继续 %{type}
       sources: 数据来源
       title: 新建 CSV 导入
-    ready:
-      description: 以下是发布此导入后将添加到您账户的新项目摘要。
-      title: 确认导入数据

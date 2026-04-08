@@ -16,7 +16,6 @@ zh-CN:
       open_label: 开盘价
       high_low_label: 最高 / 最低
       chart: 图表
-      manage: 管理
       empty: 自选列表为空
       empty_hint: 在设置 → 自选管理中添加股票。
       manage: 管理自选
@@ -33,7 +32,6 @@ zh-CN:
       market_cap_label: 市值
       high_low_label: 24h最高/最低
       chart: 图表
-      manage: 管理
       empty: 自选列表为空
       empty_hint: 在设置 → 自选管理中添加加密货币。
       manage: 管理自选

@@ -16,7 +16,6 @@ en:
       open_label: Open
       high_low_label: High / Low
       chart: Chart
-      manage: Manage
       empty: No stocks in your watchlist
       empty_hint: Add stocks in Settings → Watchlist to track them here.
       manage: Manage Watchlist
@@ -33,7 +32,6 @@ en:
       market_cap_label: Market Cap
       high_low_label: 24h High / Low
       chart: Chart
-      manage: Manage
       empty: No cryptocurrencies in your watchlist
       empty_hint: Add cryptocurrencies in Settings → Watchlist to track them here.
       manage: Manage Watchlist

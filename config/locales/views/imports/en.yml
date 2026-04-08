@@ -69,6 +69,9 @@ en:
       back_to_dashboard: Back to dashboard
     ready:
       publish: Publish import
+      description: Here's a summary of the new items that will be added to your account
+        once you publish this import.
+      title: Confirm your import data
     importing:
       title: Import in progress
       description: Your import is in progress. Check the imports menu for status updates or click 'Check Status' to refresh the page for updates. Feel free to continue using the app.
@@ -98,7 +101,3 @@ en:
       resume: Resume %{type}
       sources: Sources
       title: New CSV Import
-    ready:
-      description: Here's a summary of the new items that will be added to your account
-        once you publish this import.
-      title: Confirm your import data
