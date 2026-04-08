@@ -1,0 +1,6 @@
+en:
+  password_resets:
+    new:
+      email_placeholder: you@example.com
+    edit:
+      submit: Reset password

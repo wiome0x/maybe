@@ -1,0 +1,12 @@
+zh-CN:
+  layouts:
+    auth:
+      existing_account: 已有账号？
+      no_account: 新来到 Maybe？
+      sign_in: 登录
+      sign_up: 创建账号
+      your_account: 您的账户
+    shared:
+      footer:
+        privacy_policy: 隐私政策
+        terms_of_service: 服务条款

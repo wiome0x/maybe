@@ -23,6 +23,26 @@ class Settings::HostingsController < ApplicationController
       Setting.synth_api_key = hosting_params[:synth_api_key]
     end
 
+    if hosting_params.key?(:site_name)
+      Setting.site_name = hosting_params[:site_name]
+    end
+
+    if hosting_params.key?(:site_logo_url)
+      Setting.site_logo_url = hosting_params[:site_logo_url]
+    end
+
+    if hosting_params.key?(:website_url)
+      Setting.website_url = hosting_params[:website_url]
+    end
+
+    if hosting_params.key?(:privacy_policy_url)
+      Setting.privacy_policy_url = hosting_params[:privacy_policy_url]
+    end
+
+    if hosting_params.key?(:terms_of_service_url)
+      Setting.terms_of_service_url = hosting_params[:terms_of_service_url]
+    end
+
     redirect_to settings_hosting_path, notice: t(".success")
   rescue ActiveRecord::RecordInvalid => error
     flash.now[:alert] = t(".failure")
@@ -36,7 +56,16 @@ class Settings::HostingsController < ApplicationController
 
   private
     def hosting_params
-      params.require(:setting).permit(:require_invite_for_signup, :require_email_confirmation, :synth_api_key)
+      params.require(:setting).permit(
+        :require_invite_for_signup,
+        :require_email_confirmation,
+        :synth_api_key,
+        :site_name,
+        :site_logo_url,
+        :website_url,
+        :privacy_policy_url,
+        :terms_of_service_url
+      )
     end
 
     def ensure_admin

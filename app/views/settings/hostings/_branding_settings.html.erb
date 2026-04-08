@@ -1,0 +1,45 @@
+<div class="space-y-4">
+  <div>
+    <h2 class="font-medium mb-1"><%= t(".title") %></h2>
+    <p class="text-secondary text-sm mb-4"><%= t(".description") %></p>
+  </div>
+
+  <%= styled_form_with model: Setting.new,
+                       url: settings_hosting_path,
+                       method: :patch,
+                       class: "space-y-3",
+                       data: {
+                         controller: "auto-submit-form",
+                         "auto-submit-form-trigger-event-value": "blur"
+                       } do |form| %>
+    <%= form.text_field :site_name,
+                        label: t(".site_name"),
+                        placeholder: t(".site_name_placeholder"),
+                        value: Setting.site_name,
+                        data: { "auto-submit-form-target": "auto" } %>
+
+    <%= form.url_field :site_logo_url,
+                       label: t(".site_logo_url"),
+                       placeholder: t(".site_logo_url_placeholder"),
+                       value: Setting.site_logo_url,
+                       data: { "auto-submit-form-target": "auto" } %>
+
+    <%= form.url_field :website_url,
+                       label: t(".website_url"),
+                       placeholder: t(".website_url_placeholder"),
+                       value: Setting.website_url,
+                       data: { "auto-submit-form-target": "auto" } %>
+
+    <%= form.url_field :privacy_policy_url,
+                       label: t(".privacy_policy_url"),
+                       placeholder: t(".privacy_policy_url_placeholder"),
+                       value: Setting.privacy_policy_url,
+                       data: { "auto-submit-form-target": "auto" } %>
+
+    <%= form.url_field :terms_of_service_url,
+                       label: t(".terms_of_service_url"),
+                       placeholder: t(".terms_of_service_url_placeholder"),
+                       value: Setting.terms_of_service_url,
+                       data: { "auto-submit-form-target": "auto" } %>
+  <% end %>
+</div>

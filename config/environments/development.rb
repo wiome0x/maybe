@@ -48,7 +48,12 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = false
   config.action_mailer.perform_caching = false
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.default_url_options = { host: ENV.fetch("APP_DOMAIN", "localhost"), port: ENV.fetch("PORT") { 3000 } }
+  app_domain = ENV.fetch("APP_DOMAIN", "localhost")
+  app_protocol = ENV.fetch("APP_PROTOCOL", app_domain == "localhost" ? "http" : "https")
+  app_port = ENV["APP_PORT"].presence
+  app_url_options = { host: app_domain, protocol: app_protocol }
+  app_url_options[:port] = app_port.to_i if app_port.present? && !%w[80 443].include?(app_port)
+  config.action_mailer.default_url_options = app_url_options
 
   smtp_enabled = ENV["SMTP_ADDRESS"].present? && ENV["EMAIL_SENDER"].present?
   config.action_mailer.delivery_method = smtp_enabled ? :smtp : :letter_opener

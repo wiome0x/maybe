@@ -1,0 +1,7 @@
+zh-CN:
+  password_mailer:
+    password_reset:
+      cta: 重置密码
+      ignore_if_not_requested: 如果这不是您本人发起的请求，请忽略此邮件。
+      request_made: 我们收到了重置密码请求，请点击下方链接继续。
+      subject: "重置您的密码"

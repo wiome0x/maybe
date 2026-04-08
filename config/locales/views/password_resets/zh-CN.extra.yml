@@ -1,0 +1,6 @@
+zh-CN:
+  password_resets:
+    new:
+      email_placeholder: 请输入邮箱地址
+    edit:
+      submit: 重置密码

@@ -28,6 +28,19 @@ en:
         placeholder: Enter your API key here
         plan: "%{plan} plan"
         title: Synth Settings
+      branding_settings:
+        title: Branding
+        description: Customize logo, website name, and footer links shown on auth pages.
+        site_name: Website name
+        site_name_placeholder: Maybe Finance
+        site_logo_url: Logo URL
+        site_logo_url_placeholder: https://example.com/logo.png
+        website_url: Website URL
+        website_url_placeholder: https://invest.mindcont.com
+        privacy_policy_url: Privacy policy URL
+        privacy_policy_url_placeholder: https://invest.mindcont.com/privacy
+        terms_of_service_url: Terms of service URL
+        terms_of_service_url_placeholder: https://invest.mindcont.com/terms
       update:
         failure: Invalid setting value
         success: Settings updated

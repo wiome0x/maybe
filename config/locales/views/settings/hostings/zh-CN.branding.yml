@@ -1,0 +1,16 @@
+zh-CN:
+  settings:
+    hostings:
+      branding_settings:
+        title: 品牌设置
+        description: 自定义认证页 Logo、网站名称和页脚链接。
+        site_name: 网站名称
+        site_name_placeholder: Maybe Finance
+        site_logo_url: Logo 地址
+        site_logo_url_placeholder: https://example.com/logo.png
+        website_url: 网站链接
+        website_url_placeholder: https://invest.mindcont.com
+        privacy_policy_url: 隐私政策链接
+        privacy_policy_url_placeholder: https://invest.mindcont.com/privacy
+        terms_of_service_url: 服务条款链接
+        terms_of_service_url_placeholder: https://invest.mindcont.com/terms
