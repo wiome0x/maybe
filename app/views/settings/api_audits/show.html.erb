@@ -114,7 +114,9 @@
               </div>
               <div class="col-span-1 text-right"><%= @audit_mode == "plaid" ? log.http_status : log.response_code %></div>
               <div class="col-span-2 text-right"><%= @audit_mode == "plaid" ? log.duration_ms&.round(1) : log.response_time_ms&.round(1) %> ms</div>
-              <div class="col-span-2 text-right text-secondary"><%= log.requested_at.strftime("%Y-%m-%d %H:%M") %></div>
+              <div class="col-span-2 text-right text-secondary">
+                <%= log.requested_at.in_time_zone(@display_timezone).strftime("%Y-%m-%d %H:%M:%S %Z") %>
+              </div>
             </div>
             <% if idx < @logs.size - 1 %>
               <%= render "shared/ruler" %>

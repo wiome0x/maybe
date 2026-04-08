@@ -4,6 +4,7 @@ class Settings::ApiAuditsController < ApplicationController
 
   def show
     @audit_mode = params[:audit_mode] == "plaid" ? "plaid" : "api"
+    @display_timezone = Current.family&.timezone.presence || Time.zone.name
     @period_days = parse_period
     @start_date = @period_days.days.ago.to_date
     @end_date = Date.current
