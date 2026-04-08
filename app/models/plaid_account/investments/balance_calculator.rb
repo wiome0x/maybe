@@ -64,7 +64,7 @@ class PlaidAccount::Investments::BalanceCalculator
       # and forex pairs (e.g. `USD.HKD` currency conversion "holdings")
       true_holdings = holdings.reject do |h|
         security = security_resolver.resolve(plaid_security_id: h["security_id"])
-        security.brokerage_cash? || security.cash_equivalent?
+        security.brokerage_cash?
       end
 
       true_holdings.sum { |h| h["quantity"] * h["institution_price"] }

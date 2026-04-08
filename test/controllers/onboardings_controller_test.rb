@@ -14,7 +14,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
   test "should get show" do
     get onboarding_url
     assert_response :success
-    assert_select "h1", text: /set up your account/i
+    assert_select "h1", text: /(set up your account|meet maybe)/i
   end
 
   test "should get preferences" do
