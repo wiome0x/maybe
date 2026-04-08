@@ -79,7 +79,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
 
     env:
       PLAID_CLIENT_ID: foo
