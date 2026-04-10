@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_01_030000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_08_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -29,7 +29,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_01_030000) do
     t.uuid "accountable_id"
     t.decimal "balance", precision: 19, scale: 4
     t.string "currency"
-    t.virtual "classification", type: :string, as: "\nCASE\n    WHEN ((accountable_type)::text = ANY ((ARRAY['Loan'::character varying, 'CreditCard'::character varying, 'OtherLiability'::character varying])::text[])) THEN 'liability'::text\n    ELSE 'asset'::text\nEND", stored: true
+    t.virtual "classification", type: :string, as: "\nCASE\n    WHEN ((accountable_type)::text = ANY (ARRAY[('Loan'::character varying)::text, ('CreditCard'::character varying)::text, ('OtherLiability'::character varying)::text])) THEN 'liability'::text\n    ELSE 'asset'::text\nEND", stored: true
     t.uuid "import_id"
     t.uuid "plaid_account_id"
     t.decimal "cash_balance", precision: 19, scale: 4, default: "0.0"
@@ -105,6 +105,22 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_01_030000) do
     t.index ["revoked_at"], name: "index_api_keys_on_revoked_at"
     t.index ["user_id", "source"], name: "index_api_keys_on_user_id_and_source"
     t.index ["user_id"], name: "index_api_keys_on_user_id"
+  end
+
+  create_table "api_request_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "provider_name", null: false
+    t.string "endpoint"
+    t.string "http_method"
+    t.string "request_status", null: false
+    t.integer "response_code"
+    t.float "response_time_ms"
+    t.text "error_message"
+    t.datetime "requested_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider_name", "requested_at"], name: "idx_api_request_logs_provider_requested_at"
+    t.index ["request_status"], name: "idx_api_request_logs_status"
+    t.index ["requested_at"], name: "idx_api_request_logs_requested_at"
   end
 
   create_table "balances", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -279,21 +295,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_01_030000) do
     t.index ["family_id"], name: "index_family_exports_on_family_id"
   end
 
-  create_table "holdings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "account_id", null: false
-    t.uuid "security_id", null: false
-    t.date "date", null: false
-    t.decimal "qty", precision: 19, scale: 4, null: false
-    t.decimal "price", precision: 19, scale: 4, null: false
-    t.decimal "amount", precision: 19, scale: 4, null: false
-    t.string "currency", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["account_id", "security_id", "date", "currency"], name: "idx_on_account_id_security_id_date_currency_5323e39f8b", unique: true
-    t.index ["account_id"], name: "index_holdings_on_account_id"
-    t.index ["security_id"], name: "index_holdings_on_security_id"
-  end
-
   create_table "historical_prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "family_id", null: false
     t.uuid "security_id", null: false
@@ -314,6 +315,21 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_01_030000) do
     t.index ["family_id"], name: "index_historical_prices_on_family_id"
     t.index ["import_id"], name: "index_historical_prices_on_import_id"
     t.index ["security_id"], name: "index_historical_prices_on_security_id"
+  end
+
+  create_table "holdings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "security_id", null: false
+    t.date "date", null: false
+    t.decimal "qty", precision: 19, scale: 4, null: false
+    t.decimal "price", precision: 19, scale: 4, null: false
+    t.decimal "amount", precision: 19, scale: 4, null: false
+    t.string "currency", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "security_id", "date", "currency"], name: "idx_on_account_id_security_id_date_currency_5323e39f8b", unique: true
+    t.index ["account_id"], name: "index_holdings_on_account_id"
+    t.index ["security_id"], name: "index_holdings_on_security_id"
   end
 
   create_table "impersonation_session_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -568,6 +584,31 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_01_030000) do
     t.jsonb "raw_liabilities_payload", default: {}
     t.index ["plaid_id"], name: "index_plaid_accounts_on_plaid_id", unique: true
     t.index ["plaid_item_id"], name: "index_plaid_accounts_on_plaid_item_id"
+  end
+
+  create_table "plaid_api_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "plaid_item_id"
+    t.string "region", null: false
+    t.string "source", null: false
+    t.string "endpoint", null: false
+    t.string "trigger"
+    t.boolean "success", default: false, null: false
+    t.integer "duration_ms"
+    t.integer "http_status"
+    t.string "plaid_request_id"
+    t.string "webhook_type"
+    t.string "webhook_code"
+    t.jsonb "request_payload", default: {}, null: false
+    t.jsonb "response_payload", default: {}, null: false
+    t.jsonb "error_payload", default: {}, null: false
+    t.datetime "requested_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["endpoint", "requested_at"], name: "index_plaid_api_logs_on_endpoint_and_requested_at"
+    t.index ["plaid_item_id"], name: "index_plaid_api_logs_on_plaid_item_id"
+    t.index ["region", "requested_at"], name: "index_plaid_api_logs_on_region_and_requested_at"
+    t.index ["requested_at"], name: "index_plaid_api_logs_on_requested_at"
+    t.index ["source", "requested_at"], name: "index_plaid_api_logs_on_source_and_requested_at"
   end
 
   create_table "plaid_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -877,11 +918,11 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_01_030000) do
   add_foreign_key "entries", "accounts"
   add_foreign_key "entries", "imports"
   add_foreign_key "family_exports", "families"
-  add_foreign_key "holdings", "accounts"
-  add_foreign_key "holdings", "securities"
   add_foreign_key "historical_prices", "families"
   add_foreign_key "historical_prices", "imports"
   add_foreign_key "historical_prices", "securities", on_delete: :cascade
+  add_foreign_key "holdings", "accounts"
+  add_foreign_key "holdings", "securities"
   add_foreign_key "impersonation_session_logs", "impersonation_sessions"
   add_foreign_key "impersonation_sessions", "users", column: "impersonated_id"
   add_foreign_key "impersonation_sessions", "users", column: "impersonator_id"

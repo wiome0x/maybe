@@ -1,9 +1,27 @@
 #!/usr/bin/env sh
 
+APP_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+
+kill_matching() {
+  pattern="$1"
+
+  pids="$(pgrep -f "$pattern" 2>/dev/null || true)"
+  [ -z "$pids" ] && return 0
+
+  echo "Stopping stale process(es) matching: $pattern"
+  kill $pids 2>/dev/null || true
+  sleep 1
+
+  pids="$(pgrep -f "$pattern" 2>/dev/null || true)"
+  [ -z "$pids" ] && return 0
+
+  kill -9 $pids 2>/dev/null || true
+}
+
 if ! gem list foreman -i --silent; then
   echo "Installing foreman..."
   gem install foreman
-  
+
   # Add rehash for rbenv users
   if command -v rbenv > /dev/null; then
     echo "Running rbenv rehash..."
@@ -13,6 +31,15 @@ fi
 
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
+
+# Clean up stale development processes from earlier runs.
+fuser -k 3000/tcp 2>/dev/null || true
+kill_matching "bundle exec sidekiq"
+kill_matching "bin/rails tailwindcss:watch"
+kill_matching "foreman start -f Procfile.dev"
+
+# Clean up a stale PID file left behind by an ungraceful shutdown.
+rm -f "$APP_ROOT/tmp/pids/server.pid"
 
 # Let the debug gem allow remote connections,
 # but avoid loading until `debugger` is called

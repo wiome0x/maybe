@@ -1,4 +1,9 @@
-@import 'tailwindcss';
+@import "tailwindcss" source(none);
+
+@source "../../views";
+@source "../../components";
+@source "../../helpers";
+@source "../../javascript";
 
 @import "./maybe-design-system.css";
 
