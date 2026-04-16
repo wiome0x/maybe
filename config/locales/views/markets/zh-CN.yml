@@ -4,6 +4,9 @@ zh-CN:
     stocks:
       home: 首页
       title: 美股行情
+      section_nav:
+        watchlist: 自选列表
+        heatmap: 热力图
       name: 名称
       price: 价格
       change: 涨跌幅
@@ -19,6 +22,10 @@ zh-CN:
       empty: 自选列表为空
       empty_hint: 在设置 → 自选管理中添加股票。
       manage: 管理自选
+    stocks_heatmap:
+      home: 首页
+      title: 美股热力图
+      description: 按行业分组、按市值加权的美股实时热力图（开盘时可实时查看）。
     cryptos:
       home: 首页
       title: 加密货币

@@ -77,6 +77,7 @@ Rails.application.routes.draw do
   end
 
   get "markets/stocks", to: "markets#stocks", as: :market_stocks
+  get "markets/stocks/heatmap", to: "markets#stocks_heatmap", as: :market_stocks_heatmap
   get "markets/cryptos", to: "markets#cryptos", as: :market_cryptos
   get "markets/indices", to: "markets#indices", as: :market_indices
   get "news", to: "news#index", as: :news

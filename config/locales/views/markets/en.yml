@@ -4,6 +4,9 @@ en:
     stocks:
       home: Home
       title: US Stocks
+      section_nav:
+        watchlist: Watchlist
+        heatmap: Heatmap
       name: Name
       price: Price
       change: Change
@@ -19,6 +22,10 @@ en:
       empty: No stocks in your watchlist
       empty_hint: Add stocks in Settings → Watchlist to track them here.
       manage: Manage Watchlist
+    stocks_heatmap:
+      home: Home
+      title: US Stocks Heatmap
+      description: Real-time US market heatmap grouped by sector and weighted by market cap during market hours.
     cryptos:
       home: Home
       title: Crypto

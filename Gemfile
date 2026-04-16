@@ -17,7 +17,15 @@ gem "bootsnap", require: false
 gem "importmap-rails"
 gem "propshaft"
 gem "tailwindcss-rails"
-gem "lucide-rails", github: "maybe-finance/lucide-rails"
+
+# Optional local override for environments where GitHub access is restricted.
+# Example:
+#   LUCIDE_RAILS_PATH=vendor/lucide-rails bundle install
+if ENV["LUCIDE_RAILS_PATH"].present?
+  gem "lucide-rails", path: ENV["LUCIDE_RAILS_PATH"]
+else
+  gem "lucide-rails", github: "maybe-finance/lucide-rails"
+end
 
 # Hotwire + UI
 gem "stimulus-rails"

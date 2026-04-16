@@ -7,6 +7,10 @@ class MarketsController < ApplicationController
     @breadcrumbs = [ [ t(".home"), root_path ], [ t(".title"), nil ] ]
   end
 
+  def stocks_heatmap
+    @breadcrumbs = [ [ t(".home"), root_path ], [ t(".title"), nil ] ]
+  end
+
   def cryptos
     watchlist = Current.family.watchlist_items.cryptos.ordered
     @quotes = fetch_crypto_quotes(watchlist)
