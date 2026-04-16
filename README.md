@@ -29,6 +29,23 @@ The instructions below are for developers to get started with contributing to th
 - See `.ruby-version` file for required Ruby version
 - PostgreSQL >9.3 (ideally, latest stable version)
 
+### Cloud/dev container quick check
+
+Before running `bin/setup`, verify the runtime and bundler context:
+
+```sh
+ruby -v
+bundle -v
+which ruby
+```
+
+If your environment cannot access GitHub (or has strict proxy rules), you can pre-clone `lucide-rails` and install with a local path override:
+
+```sh
+git clone https://github.com/maybe-finance/lucide-rails.git vendor/lucide-rails
+LUCIDE_RAILS_PATH=vendor/lucide-rails bundle install
+```
+
 After cloning the repo, the basic setup commands are:
 
 ```sh

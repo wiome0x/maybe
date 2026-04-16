@@ -1,6 +1,9 @@
 <div class="space-y-4 pb-20">
-  <header class="flex justify-between items-center">
-    <h1 class="text-xl font-medium text-primary"><%= t(".title") %></h1>
+  <header class="flex flex-wrap justify-between items-center gap-3">
+    <div class="space-y-3">
+      <h1 class="text-xl font-medium text-primary"><%= t(".title") %></h1>
+      <%= render "stocks_section_nav" %>
+    </div>
     <%= render DS::Link.new(text: t(".manage"), href: settings_watchlist_path, variant: "ghost", icon: "settings") %>
   </header>
 
