@@ -31,5 +31,12 @@ zh-CN:
       settings: 设置
       ticker_label: 代码
       trade_history_entry: "%{qty} 股 %{security}，价格 %{price}"
+      filter_all: 全部
+      filter_buy: 买入
+      filter_sell: 卖出
+      buy_count: 买入次数
+      sell_count: 卖出次数
+      trade_count: "%{count} 笔交易"
+      no_matching_trades: 当前筛选条件下暂无交易。
       total_return_label: 总回报
       unknown: 未知
