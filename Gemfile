@@ -21,8 +21,9 @@ gem "tailwindcss-rails"
 # Optional local override for environments where GitHub access is restricted.
 # Example:
 #   LUCIDE_RAILS_PATH=vendor/lucide-rails bundle install
-if ENV["LUCIDE_RAILS_PATH"].present?
-  gem "lucide-rails", path: ENV["LUCIDE_RAILS_PATH"]
+lucide_rails_path = ENV["LUCIDE_RAILS_PATH"]
+if lucide_rails_path && !lucide_rails_path.empty?
+  gem "lucide-rails", path: lucide_rails_path
 else
   gem "lucide-rails", github: "maybe-finance/lucide-rails"
 end
