@@ -33,5 +33,12 @@ en:
       settings: Settings
       ticker_label: Ticker
       trade_history_entry: "%{qty} shares of %{security} at %{price}"
+      filter_all: All
+      filter_buy: Buy
+      filter_sell: Sell
+      buy_count: Buy orders
+      sell_count: Sell orders
+      trade_count: "%{count} trades"
+      no_matching_trades: No trades for this filter.
       total_return_label: Total Return
       unknown: Unknown
