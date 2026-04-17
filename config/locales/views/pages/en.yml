@@ -31,10 +31,5 @@ en:
         no_account_title: No accounts yet
         no_account_graph_hint: Add accounts to display net worth data
       global_markets:
-        title: Global View
-        world_time: World Time
-        beijing: Beijing
-        tokyo: Tokyo
-        london: London
-        frankfurt: Frankfurt
-        new_york: New York
+        title: Global Markets
+        subtitle: Live distribution of major indices on a world map

@@ -7,7 +7,22 @@ class Provider::Openai < Provider
   MODELS = %w[gpt-4.1]
 
   def initialize(access_token)
-    @client = ::OpenAI::Client.new(access_token: access_token)
+    config = {
+      access_token: access_token,
+      log_errors: true,
+      request_timeout: openai_request_timeout
+    }
+    config[:uri_base] = ENV["OPENAI_URI_BASE"] if ENV["OPENAI_URI_BASE"].present?
+
+    @client = ::OpenAI::Client.new(config) do |f|
+      f.request :retry,
+        max: openai_retry_limit,
+        interval: 0.2,
+        backoff_factor: 2,
+        methods: %i[post],
+        retry_statuses: [408, 429, 500, 502, 503, 504],
+        exceptions: [Faraday::TimeoutError, Faraday::ConnectionFailed]
+    end
   end
 
   def supports_model?(model)
@@ -83,4 +98,16 @@ class Provider::Openai < Provider
 
   private
     attr_reader :client
+
+    def openai_request_timeout
+      Integer(ENV.fetch("OPENAI_REQUEST_TIMEOUT", 180))
+    rescue ArgumentError, TypeError
+      180
+    end
+
+    def openai_retry_limit
+      Integer(ENV.fetch("OPENAI_RETRY_LIMIT", 2))
+    rescue ArgumentError, TypeError
+      2
+    end
 end
