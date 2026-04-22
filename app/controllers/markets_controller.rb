@@ -40,43 +40,54 @@ class MarketsController < ApplicationController
     ]
     cached_result = Rails.cache.read(INDICES_CACHE_KEY) || {}
     result = cached_result.deep_dup
-    fetched_any = false
+    fetched_quotes = fetch_indices_quotes(symbols)
+    result.merge!(fetched_quotes) if fetched_quotes.present?
 
-    symbols.each do |symbol|
-      begin
-        uri = URI("https://query1.finance.yahoo.com/v8/finance/chart/#{CGI.escape(symbol)}?range=1d&interval=1d")
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
-        http.open_timeout = 2
-        http.read_timeout = 3
-
-        req = Net::HTTP::Get.new(uri)
-        req["User-Agent"] = "Mozilla/5.0"
-        req["Accept"] = "application/json"
-        res = http.request(req)
-
-        next unless res.is_a?(Net::HTTPSuccess)
-        data = JSON.parse(res.body)
-        meta = data.dig("chart", "result", 0, "meta")
-        next unless meta
-
-        price = meta["regularMarketPrice"]
-        prev = meta["chartPreviousClose"] || meta["previousClose"]
-        pct = prev && prev > 0 ? ((price - prev) / prev * 100).round(2) : nil
-
-        result[symbol] = { price: price, change_percent: pct }
-        fetched_any = true
-      rescue => e
-        Rails.logger.debug("Index fetch failed for #{symbol}: #{e.message}")
-      end
-    end
-
-    Rails.cache.write(INDICES_CACHE_KEY, result, expires_in: INDICES_CACHE_TTL) if fetched_any && result.present?
+    Rails.cache.write(INDICES_CACHE_KEY, result, expires_in: INDICES_CACHE_TTL) if fetched_quotes.present? && result.present?
 
     render json: result
   end
 
   private
+    def fetch_indices_quotes(symbols)
+      uri = URI("https://query1.finance.yahoo.com/v7/finance/quote")
+      uri.query = URI.encode_www_form(symbols: symbols.join(","))
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.open_timeout = 2
+      http.read_timeout = 5
+
+      req = Net::HTTP::Get.new(uri)
+      req["User-Agent"] = "Mozilla/5.0"
+      req["Accept"] = "application/json"
+
+      res = http.request(req)
+      unless res.is_a?(Net::HTTPSuccess)
+        Rails.logger.warn("Indices fetch failed: HTTP #{res.code}")
+        return {}
+      end
+
+      data = JSON.parse(res.body)
+      quotes = data.dig("quoteResponse", "result") || []
+
+      quotes.each_with_object({}) do |quote, acc|
+        symbol = quote["symbol"]
+        price = quote["regularMarketPrice"]
+        pct = quote["regularMarketChangePercent"]
+
+        next if symbol.blank? || price.nil?
+
+        acc[symbol] = {
+          price: price,
+          change_percent: pct&.round(2)
+        }
+      end
+    rescue => e
+      Rails.logger.warn("Indices fetch failed: #{e.class}: #{e.message}")
+      {}
+    end
+
     def fetch_stock_quotes(watchlist)
       return [] if watchlist.empty?
       symbols = watchlist.pluck(:symbol)
