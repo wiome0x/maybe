@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
 
   include Pagy::Backend
 
+  before_action :set_charset
   before_action :detect_os
   before_action :set_default_chat
   before_action :set_active_storage_url_options
@@ -26,6 +27,10 @@ class ApplicationController < ActionController::Base
     def set_default_chat
       @last_viewed_chat = Current.user&.last_viewed_chat
       @chat = @last_viewed_chat
+    end
+
+    def set_charset
+      response.headers["Content-Type"] = "text/html; charset=utf-8"
     end
 
     def set_active_storage_url_options
