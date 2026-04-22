@@ -20,8 +20,8 @@ class Provider::Openai < Provider
         interval: 0.2,
         backoff_factor: 2,
         methods: %i[post],
-        retry_statuses: [408, 429, 500, 502, 503, 504],
-        exceptions: [Faraday::TimeoutError, Faraday::ConnectionFailed]
+        retry_statuses: [ 408, 429, 500, 502, 503, 504 ],
+        exceptions: [ Faraday::TimeoutError, Faraday::ConnectionFailed ]
     end
   end
 
