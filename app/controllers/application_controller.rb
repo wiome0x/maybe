@@ -5,10 +5,10 @@ class ApplicationController < ActionController::Base
 
   include Pagy::Backend
 
-  before_action :set_charset
   before_action :detect_os
   before_action :set_default_chat
   before_action :set_active_storage_url_options
+  after_action :set_charset
 
   private
     def detect_os
@@ -30,7 +30,9 @@ class ApplicationController < ActionController::Base
     end
 
     def set_charset
-      response.headers["Content-Type"] = "text/html; charset=utf-8"
+      return unless response.media_type.present?
+
+      response.headers["Content-Type"] = "#{response.media_type}; charset=utf-8"
     end
 
     def set_active_storage_url_options
