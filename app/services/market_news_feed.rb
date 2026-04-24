@@ -3,7 +3,7 @@ require "net/http"
 require "nokogiri"
 
 class MarketNewsFeed
-  Item = Data.define(:source, :title, :url, :published_at)
+  Item = Data.define(:source, :title, :url, :published_at, :translated_title)
 
   FEEDS = [
     {
@@ -52,7 +52,8 @@ class MarketNewsFeed
         source: feed[:source],
         title: title,
         url: link,
-        published_at: published_at
+        published_at: published_at,
+        translated_title: nil
       )
     end
   rescue => e

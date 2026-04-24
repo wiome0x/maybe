@@ -14,7 +14,9 @@ class MarketsController < ApplicationController
   def stocks_heatmap
     @top_gainers = fetch_market_movers("day_gainers")
     @top_losers = fetch_market_movers("day_losers")
-    @market_news = MarketNewsFeed.fetch
+    @market_news_source = params[:news_source].presence_in(%w[all cnbc seeking_alpha]) || "all"
+    @market_news = filter_market_news(MarketNewsFeed.fetch, @market_news_source)
+    @market_news = MarketNewsTranslator.translate_items(@market_news, locale: I18n.locale)
     @breadcrumbs = [ [ t(".home"), root_path ], [ t(".title"), nil ] ]
   end
 
@@ -178,5 +180,16 @@ class MarketsController < ApplicationController
     rescue => e
       Rails.logger.warn("Market movers fetch failed for #{screen_id}: #{e.class}: #{e.message}")
       []
+    end
+
+    def filter_market_news(items, source)
+      case source
+      when "cnbc"
+        items.select { |item| item.source == "CNBC" }
+      when "seeking_alpha"
+        items.select { |item| item.source == "Seeking Alpha" }
+      else
+        items
+      end
     end
 end

@@ -52,6 +52,24 @@
       <p class="text-sm text-secondary"><%= t(".news_description") %></p>
     </div>
 
+    <nav class="flex flex-wrap items-center gap-2">
+      <%= render DS::Link.new(
+        text: t(".news_filter_all"),
+        href: market_stocks_heatmap_path,
+        variant: @market_news_source == "all" ? "primary" : "ghost"
+      ) %>
+      <%= render DS::Link.new(
+        text: t(".news_filter_cnbc"),
+        href: market_stocks_heatmap_path(news_source: "cnbc"),
+        variant: @market_news_source == "cnbc" ? "primary" : "ghost"
+      ) %>
+      <%= render DS::Link.new(
+        text: t(".news_filter_seeking_alpha"),
+        href: market_stocks_heatmap_path(news_source: "seeking_alpha"),
+        variant: @market_news_source == "seeking_alpha" ? "primary" : "ghost"
+      ) %>
+    </nav>
+
     <% if @market_news.any? %>
       <div class="rounded-xl bg-container-inset p-1 min-h-[320px] xl:min-h-[520px]">
         <div class="bg-container rounded-lg shadow-border-xs overflow-hidden">
@@ -72,8 +90,13 @@
               <a href="<%= article.url %>"
                  target="_blank"
                  rel="noopener noreferrer"
-                 class="block text-sm text-primary leading-relaxed hover:underline">
-                <%= article.title %>
+                 class="block space-y-1 hover:underline">
+                <% if article.translated_title.present? %>
+                  <p class="text-sm text-primary leading-relaxed"><%= article.translated_title %></p>
+                  <p class="text-xs text-secondary leading-relaxed"><%= article.title %></p>
+                <% else %>
+                  <p class="text-sm text-primary leading-relaxed"><%= article.title %></p>
+                <% end %>
               </a>
             </div>
 
@@ -87,7 +110,9 @@
       <div class="rounded-xl border border-dashed border-primary/40 bg-surface-inset min-h-[320px] xl:min-h-[520px] flex items-center justify-center p-6">
         <div class="text-center space-y-2 max-w-xl">
           <p class="text-sm font-medium text-primary"><%= t(".news_placeholder_title") %></p>
-          <p class="text-sm text-secondary"><%= t(".news_placeholder_body") %></p>
+          <p class="text-sm text-secondary">
+            <%= @market_news_source == "all" ? t(".news_placeholder_body") : t(".news_placeholder_filtered_body") %>
+          </p>
         </div>
       </div>
     <% end %>
