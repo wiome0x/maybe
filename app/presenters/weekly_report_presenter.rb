@@ -55,7 +55,7 @@ class WeeklyReportPresenter
       {
         id: id,
         label: metric_label(id),
-        amount: numeric_amount(payload.dig(:overview, id)),
+        amount: numeric_amount(payload.dig(:overview, id.to_sym)),
         currency: overview_currency,
         color: metric_color(id),
         note: nil,
