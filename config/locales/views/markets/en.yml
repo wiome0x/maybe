@@ -28,6 +28,17 @@ en:
       home: Home
       title: US Stocks Heatmap
       description: Real-time US market heatmap grouped by sector and weighted by market cap during market hours.
+      top_gainers_title: Top 10 Gainers
+      top_losers_title: Top 10 Losers
+      movers_unavailable: Market movers are temporarily unavailable. Please try refreshing again later.
+      symbol: Symbol
+      price: Price
+      change: Change
+      news_label: Reserved
+      news_title: Daily market news
+      news_description: This area is reserved for a future daily market news stream, event highlights, and intraday commentary.
+      news_placeholder_title: News feed not connected yet
+      news_placeholder_body: This section can later show daily headlines, pre-market and after-hours summaries, sector news, and stock-specific catalysts.
     cryptos:
       home: Home
       title: Crypto

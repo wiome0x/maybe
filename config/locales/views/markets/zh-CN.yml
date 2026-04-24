@@ -28,6 +28,17 @@ zh-CN:
       home: 首页
       title: 美股热力图
       description: 按行业分组、按市值加权的美股实时热力图（开盘时可实时查看）。
+      top_gainers_title: 当前涨幅前 10
+      top_losers_title: 当前跌幅前 10
+      movers_unavailable: 当前暂时无法加载榜单数据，可稍后刷新重试。
+      symbol: 标的
+      price: 现价
+      change: 涨跌幅
+      news_label: 预留区域
+      news_title: 每日消息面
+      news_description: 该区域预留给后续的每日市场消息、热点事件和盘中快讯整合。
+      news_placeholder_title: 暂未接入消息面数据
+      news_placeholder_body: 后续可以在这里显示每日要闻、盘前盘后摘要、行业热点和个股异动说明。
     cryptos:
       home: 首页
       title: 加密货币

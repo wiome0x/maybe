@@ -17,7 +17,7 @@
             "grouping": "sector",
             "blockSize": "market_cap_basic",
             "blockColor": "change",
-            "locale": "en",
+            "locale": "<%= I18n.locale.to_s.start_with?("zh") ? "zh_CN" : "en" %>",
             "symbolUrl": "",
             "colorTheme": "dark",
             "hasTopBar": true,
@@ -32,4 +32,31 @@
       </div>
     </div>
   </div>
+
+  <section class="grid gap-4 xl:grid-cols-3 xl:items-start">
+    <%= render "movers_table",
+               title: t(".top_gainers_title"),
+               quotes: @top_gainers,
+               empty_message: t(".movers_unavailable") %>
+
+    <%= render "movers_table",
+               title: t(".top_losers_title"),
+               quotes: @top_losers,
+               empty_message: t(".movers_unavailable") %>
+  </section>
+
+  <section class="bg-container rounded-xl shadow-border-xs p-4 space-y-3 h-full">
+    <div class="space-y-2">
+      <p class="text-xs uppercase tracking-wide text-secondary"><%= t(".news_label") %></p>
+      <h2 class="text-base font-medium text-primary"><%= t(".news_title") %></h2>
+      <p class="text-sm text-secondary"><%= t(".news_description") %></p>
+    </div>
+
+    <div class="rounded-xl border border-dashed border-primary/40 bg-surface-inset min-h-[320px] xl:min-h-[520px] flex items-center justify-center p-6">
+      <div class="text-center space-y-2 max-w-xl">
+        <p class="text-sm font-medium text-primary"><%= t(".news_placeholder_title") %></p>
+        <p class="text-sm text-secondary"><%= t(".news_placeholder_body") %></p>
+      </div>
+    </div>
+  </section>
 </div>

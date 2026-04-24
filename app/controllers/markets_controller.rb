@@ -3,6 +3,7 @@ class MarketsController < ApplicationController
 
   INDICES_CACHE_KEY = "markets/indices:v2".freeze
   INDICES_CACHE_TTL = 10.minutes
+  MOVERS_CACHE_TTL = 10.minutes
 
   def stocks
     @watchlist = Current.family.watchlist_items.stocks.ordered
@@ -11,6 +12,8 @@ class MarketsController < ApplicationController
   end
 
   def stocks_heatmap
+    @top_gainers = fetch_market_movers("day_gainers")
+    @top_losers = fetch_market_movers("day_losers")
     @breadcrumbs = [ [ t(".home"), root_path ], [ t(".title"), nil ] ]
   end
 
@@ -116,5 +119,63 @@ class MarketsController < ApplicationController
 
     def ensure_watchlist_defaults
       WatchlistItem.seed_defaults_for(Current.family)
+    end
+
+    def fetch_market_movers(screen_id)
+      cache_key = "markets/movers:#{screen_id}:v1"
+      cached = Rails.cache.read(cache_key)
+      fresh = fetch_market_movers_from_yahoo(screen_id)
+
+      if fresh.present?
+        Rails.cache.write(cache_key, fresh, expires_in: MOVERS_CACHE_TTL)
+        fresh
+      else
+        cached || []
+      end
+    end
+
+    def fetch_market_movers_from_yahoo(screen_id)
+      uri = URI("https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved")
+      uri.query = URI.encode_www_form(scrIds: screen_id, count: 10)
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.open_timeout = 2
+      http.read_timeout = 5
+
+      request = Net::HTTP::Get.new(uri)
+      request["User-Agent"] = "Mozilla/5.0"
+      request["Accept"] = "application/json"
+
+      response = http.request(request)
+      unless response.is_a?(Net::HTTPSuccess)
+        Rails.logger.warn("Market movers fetch failed for #{screen_id}: HTTP #{response.code}")
+        return []
+      end
+
+      quotes = JSON.parse(response.body).dig("finance", "result", 0, "quotes") || []
+
+      quotes.filter_map do |quote|
+        price = quote["regularMarketPrice"]
+        next if quote["symbol"].blank? || price.nil?
+
+        MarketQuote.new(
+          symbol: quote["symbol"],
+          name: quote["shortName"] || quote["longName"] || quote["symbol"],
+          price: price,
+          change_percent: quote["regularMarketChangePercent"],
+          volume: quote["regularMarketVolume"],
+          market_cap: quote["marketCap"],
+          logo_url: "https://logo.synthfinance.com/ticker/#{quote['symbol']}",
+          item_type: "stock",
+          open_price: quote["regularMarketOpen"],
+          prev_close: quote["regularMarketPreviousClose"],
+          high: quote["regularMarketDayHigh"],
+          low: quote["regularMarketDayLow"]
+        )
+      end
+    rescue => e
+      Rails.logger.warn("Market movers fetch failed for #{screen_id}: #{e.class}: #{e.message}")
+      []
     end
 end

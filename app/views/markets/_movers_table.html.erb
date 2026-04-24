@@ -1,0 +1,64 @@
+<%# locals: (title:, quotes:, empty_message:) %>
+
+<div class="bg-container rounded-xl shadow-border-xs p-4 space-y-4">
+  <div class="flex items-center justify-between gap-3">
+    <h2 class="text-base font-medium text-primary"><%= title %></h2>
+    <p class="text-xs uppercase text-secondary"><%= quotes.size %></p>
+  </div>
+
+  <% if quotes.any? %>
+    <div class="rounded-xl bg-container-inset p-1">
+      <div class="flex items-center px-3 py-2 text-xs font-medium uppercase text-secondary">
+        <div class="w-10 shrink-0">#</div>
+        <div class="min-w-0 flex-1"><%= t("markets.stocks_heatmap.symbol") %></div>
+        <div class="w-24 text-right shrink-0"><%= t("markets.stocks_heatmap.price") %></div>
+        <div class="w-24 text-right shrink-0"><%= t("markets.stocks_heatmap.change") %></div>
+      </div>
+
+      <div class="bg-container rounded-lg shadow-border-xs overflow-hidden">
+        <% quotes.each_with_index do |quote, index| %>
+          <div
+            data-controller="market-chart"
+            data-market-chart-symbol-value="<%= quote.symbol %>"
+            data-market-chart-name-value="<%= quote.symbol %> - <%= quote.name %>">
+            <div class="flex items-center gap-3 px-3 py-3">
+              <div class="w-10 shrink-0 text-sm text-secondary"><%= index + 1 %></div>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-primary truncate"><%= quote.symbol %></p>
+                <p class="text-xs text-secondary truncate"><%= quote.name %></p>
+              </div>
+
+              <div class="w-24 shrink-0 text-right text-sm text-primary">
+                $<%= quote.price_formatted %>
+              </div>
+
+              <div class="w-24 shrink-0 text-right text-sm font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>">
+                <%= quote.change_formatted %>
+              </div>
+
+              <div class="shrink-0">
+                <button type="button"
+                        class="p-1.5 rounded-md hover:bg-surface-hover text-secondary hover:text-primary"
+                        data-action="click->market-chart#toggle"
+                        title="<%= t("markets.stocks.chart") %>">
+                  <%= icon "chart-candlestick", size: "sm" %>
+                </button>
+              </div>
+            </div>
+
+            <div data-market-chart-target="chart" hidden class="px-3 pb-3"></div>
+          </div>
+
+          <% unless index == quotes.size - 1 %>
+            <%= render "shared/ruler" %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="flex items-center justify-center rounded-xl bg-container-inset px-4 py-10 text-center">
+      <p class="text-sm text-secondary"><%= empty_message %></p>
+    </div>
+  <% end %>
+</div>
