@@ -1,6 +1,6 @@
 module SettingsHelper
   SETTINGS_ORDER = [
-    { name: "Account", path: :settings_profile_path },
+    { name: "Profile", path: :settings_profile_path },
     { name: "Preferences", path: :settings_preferences_path },
     { name: "Security", path: :settings_security_path },
     { name: "Self hosting", path: :settings_hosting_path, condition: :self_hosted? },
@@ -39,23 +39,11 @@ module SettingsHelper
   end
 
   def settings_nav_footer
-    previous_setting = adjacent_setting(request.path, -1)
-    next_setting = adjacent_setting(request.path, 1)
-
-    content_tag :div, class: "hidden md:flex flex-row justify-between gap-4" do
-      concat(previous_setting)
-      concat(next_setting)
-    end
+    nil
   end
 
   def settings_nav_footer_mobile
-    previous_setting = adjacent_setting(request.path, -1)
-    next_setting = adjacent_setting(request.path, 1)
-
-    content_tag :div, class: "md:hidden flex flex-col gap-4" do
-      concat(previous_setting)
-      concat(next_setting)
-    end
+    nil
   end
 
   private

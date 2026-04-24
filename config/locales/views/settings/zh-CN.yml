@@ -65,7 +65,7 @@ zh-CN:
         invitation_link: 邀请链接
         invite_member: 添加成员
         last_name: 姓
-        page_title: 账户
+        page_title: 个人资料
         pending: 待确认
         profile_subtitle: 自定义您在 Maybe 上的显示方式
         profile_title: 个人资料
@@ -133,7 +133,7 @@ zh-CN:
       merchants_label: 交易方
       other_section_title: 更多
       preferences_label: 偏好设置
-      profile_label: 账户
+      profile_label: 个人资料
       rules_label: 规则
       self_hosting_label: 自托管
       tags_label: 标签
