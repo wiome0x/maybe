@@ -1,12 +1,12 @@
 <div class="relative overflow-hidden rounded-[32px] border border-[#2b2b2b] bg-container shadow-border-xs" data-controller="global-markets">
-  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(232,236,250,0.92)_100%)]"></div>
-  <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.86)_34%,rgba(244,246,252,0.96)_100%)]"></div>
-  <div class="pointer-events-none absolute inset-x-[-8%] top-14 h-[82%] rounded-[999px] bg-[radial-gradient(circle_at_center,rgba(227,233,252,0.5)_0%,rgba(238,242,253,0.2)_48%,rgba(255,255,255,0)_76%)] blur-2xl"></div>
 
-  <div class="relative flex flex-col md:flex-row min-h-[420px] md:min-h-[480px]">
+  <%# 整体背景：浅蓝灰渐变，模拟地球仪氛围 %>
+  <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(160deg,#f8faff_0%,#f0f3f9_50%,#f5f7fb_100%)]"></div>
+
+  <div class="relative flex flex-col md:flex-row" style="min-height:420px;">
 
     <%# 左侧：标题 + 交易时间列表 %>
-    <div class="flex flex-col gap-4 px-5 pt-5 pb-4 md:px-6 md:pt-6 md:pb-6 md:w-[220px] md:shrink-0 md:border-r md:border-black/[0.06]">
+    <div class="flex flex-col gap-4 px-5 pt-5 pb-5 md:px-6 md:pt-6 md:pb-6 md:w-[220px] md:shrink-0 md:border-r md:border-white/60 bg-white/30 backdrop-blur-sm">
       <div class="space-y-1">
         <div class="flex items-center gap-1.5 text-secondary">
           <%= icon "globe", size: "sm" %>
@@ -20,12 +20,19 @@
       </div>
     </div>
 
-    <%# 右侧：地图 %>
-    <div class="relative flex-1 min-h-[320px] md:min-h-0">
-      <div class="pointer-events-none absolute inset-x-0 top-[6%] bottom-[4%] opacity-[0.97]">
-        <%= image_tag "global-markets-map.svg", alt: "", class: "h-full w-full object-contain" %>
+    <%# 右侧：地图，垂直居中 %>
+    <div class="relative flex-1" style="min-height:320px;">
+      <%# 地图容器 - SVG 和标注层共享同一坐标系 %>
+      <div class="absolute inset-0" data-global-markets-target="mapContainer">
+        <%# 地图 SVG - object-contain 居中显示 %>
+        <div class="pointer-events-none absolute inset-0">
+          <%= image_tag "global-markets-map.svg", alt: "",
+              class: "w-full h-full object-contain",
+              style: "opacity: 0.85;" %>
+        </div>
+        <%# 指数标注层 - 与 SVG 共享同一 inset-0 坐标系 %>
+        <div class="absolute inset-0 pointer-events-none" data-global-markets-target="map"></div>
       </div>
-      <div class="absolute inset-0 pointer-events-none" data-global-markets-target="map"></div>
     </div>
 
   </div>

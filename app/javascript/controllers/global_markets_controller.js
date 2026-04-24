@@ -48,7 +48,7 @@ const SESSIONS = [
 ];
 
 export default class extends Controller {
-  static targets = ["map", "sessions"];
+  static targets = ["map", "sessions", "mapContainer"];
 
   MARKETS = [
     { name: "道琼斯", symbol: "^DJI", lon: -74.0, lat: 40.7, dx: -68, dy: -98, compactDx: -52, compactDy: -82, align: "center" },
@@ -82,7 +82,7 @@ export default class extends Controller {
       this.prepareOverlay();
       this.renderMarkets(this.latestPriceMap || {});
     });
-    this.resizeObserver.observe(this.mapTarget);
+    this.resizeObserver.observe(this.mapContainerTarget);
   }
 
   disconnect() {
@@ -229,12 +229,29 @@ export default class extends Controller {
   }
 
   prepareOverlay() {
-    const width = this.mapTarget.clientWidth || 1;
-    const height = this.mapTarget.clientHeight || 1;
+    if (!this.hasMapContainerTarget) return;
 
+    const container = this.mapContainerTarget;
+    const cw = container.clientWidth || 1;
+    const ch = container.clientHeight || 1;
+
+    // SVG intrinsic size
+    const svgW = 1440;
+    const svgH = 560;
+
+    // Compute the actual rendered size of the SVG under object-contain
+    const scale = Math.min(cw / svgW, ch / svgH);
+    const renderedW = svgW * scale;
+    const renderedH = svgH * scale;
+
+    // Letterbox offsets (SVG is centered in the container)
+    const offsetX = (cw - renderedW) / 2;
+    const offsetY = (ch - renderedH) / 2;
+
+    // Map lon/lat → pixel using the rendered SVG dimensions
     this.projection = geoEquirectangular()
-      .scale(width / (2 * Math.PI))
-      .translate([width / 2, height / 2]);
+      .scale(renderedW / (2 * Math.PI))
+      .translate([renderedW / 2 + offsetX, renderedH / 2 + offsetY]);
 
     this.mapTarget.innerHTML = `
       <div class="absolute inset-0 pointer-events-none" data-global-markets-map-markers></div>
@@ -244,9 +261,11 @@ export default class extends Controller {
   }
 
   renderMarkets(priceMap) {
+    if (!this.hasMapContainerTarget) return;
+
     const isRedUp = document.body.dataset.trendColor === "red_up";
-    const width = this.mapTarget.clientWidth || 1;
-    const height = this.mapTarget.clientHeight || 1;
+    const container = this.mapContainerTarget;
+    const cw = container.clientWidth || 1;
 
     const markers = this.MARKETS.map((market) => {
       const quote = priceMap[market.symbol];
@@ -267,9 +286,10 @@ export default class extends Controller {
           : (up ? "#16a34a" : "#ef4444");
       }
 
-      const projected = this.projection([market.lon, market.lat]) || [width / 2, height / 2];
+      const projected = this.projection([market.lon, market.lat]);
+      if (!projected) return "";
       const [x, y] = projected;
-      const { dx, dy } = this.labelOffsetFor(market, width);
+      const { dx, dy } = this.labelOffsetFor(market, cw);
       const alignClass = market.align === "right"
         ? "items-end text-right"
         : market.align === "left"
@@ -282,12 +302,12 @@ export default class extends Controller {
           style="left:${x}px; top:${y}px; transform: translate(${dx}px, ${dy}px);"
         >
           <div class="flex flex-col gap-1 leading-none ${alignClass}">
-            <div class="rounded-[22px] px-1.5 py-1" style="color:${color}; text-shadow: 0 1px 1px rgba(255,255,255,.9);">
-              <div class="text-[clamp(12px,1.45vw,18px)] font-medium tracking-[-0.02em] whitespace-nowrap text-slate-800/95" style="color:${pct != null ? "#1f2937" : "#667085"}">${market.name}</div>
-              ${priceStr ? `<div class="mt-1 text-[clamp(11px,1.1vw,14px)] font-medium whitespace-nowrap text-slate-500" style="color:#667085">${priceStr}</div>` : ""}
-              <div class="mt-1 text-[clamp(15px,1.7vw,22px)] font-medium tracking-[-0.03em] whitespace-nowrap" style="color:${color}">${pctStr}</div>
+            <div class="px-1.5 py-1">
+              <div class="text-[clamp(11px,1.2vw,15px)] font-semibold whitespace-nowrap" style="color:${pct != null ? "#1e293b" : "#64748b"}">${market.name}</div>
+              ${priceStr ? `<div class="mt-0.5 text-[clamp(9px,0.9vw,12px)] font-medium whitespace-nowrap" style="color:#64748b">${priceStr}</div>` : ""}
+              <div class="mt-0.5 text-[clamp(12px,1.4vw,18px)] font-semibold whitespace-nowrap" style="color:${color}">${pctStr}</div>
             </div>
-            <span class="h-3.5 w-3.5 rounded-full shadow-[0_0_0_5px_rgba(255,255,255,.72),0_10px_18px_rgba(15,23,42,.08)]" style="background-color:${color};"></span>
+            <span class="h-2.5 w-2.5 rounded-full shadow-[0_0_0_3px_rgba(255,255,255,.85)]" style="background-color:${color};"></span>
           </div>
         </div>
       `;
