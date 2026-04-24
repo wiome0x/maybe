@@ -194,4 +194,100 @@ class PlaidAccount::Investments::HoldingsProcessorTest < ActiveSupport::TestCase
     # Should have created the successful holding
     assert @plaid_account.account.holdings.exists?(security: securities(:aapl), qty: 200)
   end
+
+  test "creates zero-quantity snapshot when a previously held security disappears from Plaid holdings" do
+    account = @plaid_account.account
+
+    stale_tsla_holding = account.holdings.create!(
+      security: securities(:aapl),
+      date: 1.day.ago.to_date,
+      qty: 5,
+      price: 100,
+      amount: 500,
+      currency: "USD"
+    )
+
+    test_investments_payload = {
+      securities: [],
+      holdings: [
+        {
+          "security_id" => "msft-current",
+          "quantity" => 3,
+          "institution_price" => 200,
+          "iso_currency_code" => "USD",
+          "institution_price_as_of" => Date.current
+        }
+      ],
+      transactions: []
+    }
+
+    @plaid_account.update!(raw_investments_payload: test_investments_payload)
+
+    @security_resolver.expects(:resolve)
+                      .with(plaid_security_id: "msft-current")
+                      .returns(OpenStruct.new(security: securities(:msft), cash_equivalent?: false, brokerage_cash?: false))
+
+    processor = PlaidAccount::Investments::HoldingsProcessor.new(@plaid_account, security_resolver: @security_resolver)
+    processor.process
+
+    zero_holding = account.holdings.find_by!(security: securities(:aapl), date: Date.current, currency: "USD")
+
+    assert_equal 0, zero_holding.qty
+    assert_equal 0, zero_holding.amount
+    assert_equal stale_tsla_holding.price, zero_holding.price
+    assert account.holdings.exists?(security: securities(:msft), date: Date.current, qty: 3)
+  end
+
+  test "replaces duplicate rows for the same security snapshot key" do
+    account = @plaid_account.account
+
+    duplicate_one = account.holdings.create!(
+      security: securities(:aapl),
+      date: Date.current,
+      qty: 1,
+      price: 100,
+      amount: 100,
+      currency: "USD"
+    )
+
+    duplicate_two = account.holdings.create!(
+      security: securities(:aapl),
+      date: Date.current,
+      qty: 2,
+      price: 200,
+      amount: 400,
+      currency: "USD"
+    )
+
+    test_investments_payload = {
+      securities: [],
+      holdings: [
+        {
+          "security_id" => "aapl-current",
+          "quantity" => 3,
+          "institution_price" => 150,
+          "iso_currency_code" => "USD",
+          "institution_price_as_of" => Date.current
+        }
+      ],
+      transactions: []
+    }
+
+    @plaid_account.update!(raw_investments_payload: test_investments_payload)
+
+    @security_resolver.expects(:resolve)
+                      .with(plaid_security_id: "aapl-current")
+                      .returns(OpenStruct.new(security: securities(:aapl), cash_equivalent?: false, brokerage_cash?: false))
+
+    processor = PlaidAccount::Investments::HoldingsProcessor.new(@plaid_account, security_resolver: @security_resolver)
+    processor.process
+
+    current_holdings = account.holdings.where(security: securities(:aapl), date: Date.current, currency: "USD")
+
+    assert_equal 1, current_holdings.count
+    assert_not current_holdings.exists?(id: duplicate_one.id)
+    assert_not current_holdings.exists?(id: duplicate_two.id)
+    assert_equal 3, current_holdings.first.qty
+    assert_equal 150, current_holdings.first.price
+  end
 end

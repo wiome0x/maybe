@@ -92,7 +92,11 @@
                         </div>
 
                         <div class="w-40 shrink-0">
-                          <p><%= format_money(account.balance_money) %></p>
+                          <% converted_balance_money = Money.new(account.converted_balance, classification_group.currency) %>
+                          <p><%= format_money(converted_balance_money) %></p>
+                          <% if account.currency != classification_group.currency %>
+                            <p class="text-xs text-secondary"><%= format_money(account.balance_money) %></p>
+                          <% end %>
                         </div>
                       </div>
                     </div>
