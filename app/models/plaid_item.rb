@@ -48,8 +48,13 @@ class PlaidItem < ApplicationRecord
     DestroyJob.perform_later(self)
   end
 
-  def import_latest_plaid_data
-    PlaidItem::Importer.new(self, plaid_provider: plaid_provider).import
+  def import_latest_plaid_data(investments_start_date: nil, investments_end_date: Date.current)
+    PlaidItem::Importer.new(
+      self,
+      plaid_provider: plaid_provider,
+      investments_start_date: investments_start_date,
+      investments_end_date: investments_end_date
+    ).import
   end
 
   # Reads the fetched data and updates internal domain objects
@@ -87,6 +92,106 @@ class PlaidItem < ApplicationRecord
     sync = sync_later
 
     deleted.merge(sync_id: sync&.id, sync_status: sync&.status)
+  end
+
+  # Synchronously rebuilds Plaid-backed data from source-of-truth API responses.
+  # This is useful when we need to re-ingest a full investment history window
+  # and clean out stale imported rows before recalculating holdings/balances.
+  def authoritative_rebuild_and_sync!(investments_start_date: nil, investments_end_date: Date.current)
+    deleted = {
+      imported_entries: 0,
+      holdings: 0,
+      balances: 0
+    }
+
+    ActiveRecord::Base.transaction do
+      accounts.find_each do |account|
+        deleted[:imported_entries] += account.entries.where.not(plaid_id: nil).delete_all
+        deleted[:holdings] += account.holdings.delete_all
+        deleted[:balances] += account.balances.delete_all
+      end
+
+      update!(next_cursor: nil)
+    end
+
+    import_latest_plaid_data(
+      investments_start_date: investments_start_date,
+      investments_end_date: investments_end_date
+    )
+    process_accounts
+
+    sync_results = accounts.map do |account|
+      sync = account.syncs.create!
+      sync.perform
+
+      {
+        account_id: account.id,
+        sync_id: sync.id,
+        status: sync.status
+      }
+    end
+
+    deleted.merge(
+      sync_results: sync_results,
+      investments_start_date: investments_start_date,
+      investments_end_date: investments_end_date
+    )
+  end
+
+  # Rehydrates historical investment transactions from previously audited Plaid API logs.
+  # This is useful when the current live Plaid response window has narrowed but older
+  # investments_transactions_get responses were already captured in plaid_api_logs.
+  def backfill_investment_history_from_api_logs!(start_date:, end_date: Date.current)
+    backfilled_accounts = plaid_accounts.map do |plaid_account|
+      payload = plaid_account.raw_investments_payload.deep_dup || {}
+      existing_transactions = Array(payload["transactions"])
+      existing_securities = Array(payload["securities"])
+
+      logged_transactions = investment_transactions_from_logs_for(plaid_account, start_date:, end_date:)
+      logged_securities = investment_securities_from_logs_for(start_date:, end_date:)
+
+      merged_transactions = merge_by_key(
+        existing_transactions + logged_transactions,
+        key: "investment_transaction_id"
+      )
+      merged_securities = merge_by_key(
+        existing_securities + logged_securities,
+        key: "security_id"
+      )
+
+      payload["transactions"] = merged_transactions
+      payload["securities"] = merged_securities
+
+      plaid_account.update!(raw_investments_payload: payload)
+
+      {
+        plaid_account_id: plaid_account.id,
+        existing_transactions: existing_transactions.size,
+        logged_transactions: logged_transactions.size,
+        merged_transactions: merged_transactions.size,
+        merged_securities: merged_securities.size
+      }
+    end
+
+    process_accounts
+
+    sync_results = accounts.map do |account|
+      sync = account.syncs.create!
+      sync.perform
+
+      {
+        account_id: account.id,
+        sync_id: sync.id,
+        status: sync.status
+      }
+    end
+
+    {
+      start_date: start_date,
+      end_date: end_date,
+      backfilled_accounts: backfilled_accounts,
+      sync_results: sync_results
+    }
   end
 
   # Once all the data is fetched, we can schedule account syncs to calculate historical balances
@@ -153,5 +258,38 @@ class PlaidItem < ApplicationRecord
     # available_products array.
     def supported_products
       available_products + billed_products
+    end
+
+    def investment_logs_scope(start_date:, end_date:)
+      plaid_api_logs.successes
+        .where(endpoint: "investments_transactions_get")
+        .in_period(start_date, end_date)
+        .order(requested_at: :asc)
+    end
+
+    def investment_transactions_from_logs_for(plaid_account, start_date:, end_date:)
+      investment_logs_scope(start_date:, end_date:)
+        .flat_map { |log| extract_investment_transactions(log) }
+        .select { |txn| txn["account_id"] == plaid_account.plaid_id }
+    end
+
+    def investment_securities_from_logs_for(start_date:, end_date:)
+      investment_logs_scope(start_date:, end_date:)
+        .flat_map { |log| extract_investment_securities(log) }
+    end
+
+    def extract_investment_transactions(log)
+      Array(log.response_payload["investment_transactions"] || log.response_payload.dig("response", "investment_transactions"))
+    end
+
+    def extract_investment_securities(log)
+      Array(log.response_payload["securities"] || log.response_payload.dig("response", "securities"))
+    end
+
+    def merge_by_key(records, key:)
+      records.each_with_object({}) do |record, memo|
+        next unless record[key].present?
+        memo[record[key]] = record
+      end.values
     end
 end

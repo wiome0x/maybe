@@ -1,7 +1,9 @@
 class PlaidItem::Importer
-  def initialize(plaid_item, plaid_provider:)
+  def initialize(plaid_item, plaid_provider:, investments_start_date: nil, investments_end_date: Date.current)
     @plaid_item = plaid_item
     @plaid_provider = plaid_provider
+    @investments_start_date = investments_start_date
+    @investments_end_date = investments_end_date
   end
 
   def import
@@ -12,7 +14,7 @@ class PlaidItem::Importer
   end
 
   private
-    attr_reader :plaid_item, :plaid_provider
+    attr_reader :plaid_item, :plaid_provider, :investments_start_date, :investments_end_date
 
     # All errors that should halt the import should be re-raised after handling
     # These errors will propagate up to the Sync record and mark it as failed.
@@ -36,7 +38,12 @@ class PlaidItem::Importer
     end
 
     def fetch_and_import_accounts_data
-      snapshot = PlaidItem::AccountsSnapshot.new(plaid_item, plaid_provider: plaid_provider)
+      snapshot = PlaidItem::AccountsSnapshot.new(
+        plaid_item,
+        plaid_provider: plaid_provider,
+        investments_start_date: investments_start_date,
+        investments_end_date: investments_end_date
+      )
 
       PlaidItem.transaction do
         snapshot.accounts.each do |raw_account|

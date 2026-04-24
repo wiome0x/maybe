@@ -37,8 +37,9 @@ class PlaidAccount::Investments::TransactionsProcessor
       if resolved_security_result.cash_equivalent?
         # Brokerage cash (for example CUR:USD) should behave like cash balance flows.
         # FX pair trades (for example USD.HKD) are internal currency conversions and
-        # should not be treated as external account inflow/outflow entries.
+        # should not be treated as investable trades or holdings.
         find_or_create_cash_entry(transaction) if resolved_security_result.brokerage_cash?
+        find_or_create_forex_entry(transaction) if resolved_security_result.forex_pair?
         return
       end
 
@@ -93,6 +94,27 @@ class PlaidAccount::Investments::TransactionsProcessor
         source: "plaid"
       )
 
+      entry.save!
+    end
+
+    def find_or_create_forex_entry(transaction)
+      entry = account.entries.find_or_initialize_by(plaid_id: transaction["investment_transaction_id"]) do |e|
+        e.entryable = Transaction.new(kind: "funds_movement")
+      end
+
+      entry.assign_attributes(
+        amount: transaction["amount"],
+        currency: transaction["iso_currency_code"],
+        date: transaction["date"]
+      )
+
+      entry.enrich_attribute(
+        :name,
+        transaction["name"],
+        source: "plaid"
+      )
+
+      entry.transaction.kind = "funds_movement"
       entry.save!
     end
 

@@ -213,7 +213,7 @@ class PlaidAccount::Investments::TransactionsProcessorTest < ActiveSupport::Test
     assert_instance_of Transaction, entry.entryable
   end
 
-  test "does not create entries for forex cash-equivalent conversion trades" do
+  test "creates funds-movement transactions for forex cash-equivalent conversion trades" do
     test_investments_payload = {
       transactions: [
         {
@@ -233,14 +233,23 @@ class PlaidAccount::Investments::TransactionsProcessorTest < ActiveSupport::Test
     @security_resolver.expects(:resolve).returns(OpenStruct.new(
       security: nil,
       cash_equivalent?: true,
-      brokerage_cash?: false
+      brokerage_cash?: false,
+      forex_pair?: true
     ))
 
     processor = PlaidAccount::Investments::TransactionsProcessor.new(@plaid_account, security_resolver: @security_resolver)
 
-    assert_no_difference [ "Entry.count", "Transaction.count", "Trade.count" ] do
+    assert_difference [ "Entry.count", "Transaction.count" ], 1 do
       processor.process
     end
+
+    entry = Entry.order(created_at: :desc).first
+
+    assert_equal 30_000.0, entry.amount.to_f
+    assert_equal "HKD", entry.currency
+    assert_equal Date.current, entry.date
+    assert_equal "USD.HKD", entry.name
+    assert_equal "funds_movement", entry.transaction.kind
   end
 
   test "creates cash entries for brokerage cash-equivalent transactions" do
@@ -263,7 +272,8 @@ class PlaidAccount::Investments::TransactionsProcessorTest < ActiveSupport::Test
     @security_resolver.expects(:resolve).returns(OpenStruct.new(
       security: nil,
       cash_equivalent?: true,
-      brokerage_cash?: true
+      brokerage_cash?: true,
+      forex_pair?: false
     ))
 
     processor = PlaidAccount::Investments::TransactionsProcessor.new(@plaid_account, security_resolver: @security_resolver)

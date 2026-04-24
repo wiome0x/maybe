@@ -88,7 +88,7 @@ class PlaidItem::AccountsSnapshotTest < ActiveSupport::TestCase
     ]).at_least_once
 
     @plaid_provider.expects(:get_transactions).never
-    @plaid_provider.expects(:get_item_investments).with(@plaid_item.access_token).once
+    @plaid_provider.expects(:get_item_investments).with(@plaid_item.access_token, start_date: nil, end_date: Date.current).once
     @plaid_provider.expects(:get_item_liabilities).never
 
     @snapshot.get_account_data("123")

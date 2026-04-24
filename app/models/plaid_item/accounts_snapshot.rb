@@ -2,9 +2,11 @@
 # providers a convenience method, get_account_data which scopes the item-level payload
 # to each Plaid Account
 class PlaidItem::AccountsSnapshot
-  def initialize(plaid_item, plaid_provider:)
+  def initialize(plaid_item, plaid_provider:, investments_start_date: nil, investments_end_date: Date.current)
     @plaid_item = plaid_item
     @plaid_provider = plaid_provider
+    @investments_start_date = investments_start_date
+    @investments_end_date = investments_end_date
   end
 
   def accounts
@@ -26,7 +28,7 @@ class PlaidItem::AccountsSnapshot
   end
 
   private
-    attr_reader :plaid_item, :plaid_provider
+    attr_reader :plaid_item, :plaid_provider, :investments_start_date, :investments_end_date
 
     TransactionsData = Data.define(:added, :modified, :removed)
     LiabilitiesData = Data.define(:credit, :mortgage, :student)
@@ -87,7 +89,11 @@ class PlaidItem::AccountsSnapshot
 
     def investments_data
       return nil unless can_fetch_investments?
-      @investments_data ||= plaid_provider.get_item_investments(plaid_item.access_token)
+      @investments_data ||= plaid_provider.get_item_investments(
+        plaid_item.access_token,
+        start_date: investments_start_date,
+        end_date: investments_end_date
+      )
     end
 
     def can_fetch_liabilities?
