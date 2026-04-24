@@ -7,5 +7,6 @@ class Settings::WeeklyReportsController < ApplicationController
 
   def show
     @weekly_report = Current.user.weekly_reports.find(params[:id])
+    @report_presenter = ::WeeklyReportPresenter.new(@weekly_report)
   end
 end

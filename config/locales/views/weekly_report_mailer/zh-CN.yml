@@ -2,21 +2,3 @@ zh-CN:
   weekly_report_mailer:
     weekly_report:
       subject: "您的周报截至 %{end_date}"
-      title: "%{name} 的用户周报"
-      period: "统计区间：%{start_date} - %{end_date}"
-      overview_title: "全局总览"
-      account_count:
-        one: "%{count} 个证券账户"
-        other: "%{count} 个证券账户"
-      trading_turnover: "交易额：%{amount}"
-      net_buys: "净买入：%{amount}"
-      contributions: "入金：%{amount}"
-      income: "收益：%{amount}"
-      taxes_fees: "税费：%{amount}"
-      most_active_account: "最活跃账户"
-      top_security: "最活跃证券"
-      accounts_title: "分账户摘要"
-      top_securities: "重点证券"
-      recent_activity: "最近活动"
-      no_accounts: "本次周报没有可用的证券账户数据。"
-      history_link: "在 Maybe 中查看这份周报"

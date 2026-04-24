@@ -16,6 +16,6 @@ class WeeklyReportMailerTest < ActionMailer::TestCase
 
     assert_equal [ user.email ], mail.to
     assert_includes mail.subject, I18n.l(period.end_date, format: :long)
-    assert_match "Overall summary", mail.text_part.body.to_s
+    assert_match "Household-wide overview", mail.text_part.body.to_s
   end
 end

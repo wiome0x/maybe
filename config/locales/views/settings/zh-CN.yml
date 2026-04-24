@@ -176,6 +176,46 @@ zh-CN:
           failed: 发送失败
           skipped: 已跳过
     weekly_reports:
+      shared:
+        eyebrow: 用户周报
+        title: 投资周报
+        status: 状态
+        generated_at: 生成时间
+        recipient: 收件地址
+        overview_title: 全局总览
+        turnover_title: 交易额趋势
+        turnover_description: 汇总这份周报覆盖的全部证券账户，查看每日交易额变化。
+        activity_mix_title: 活动构成
+        activity_mix_description: 观察这一周内，哪类活动在整体上占比最高。
+        contribution_curve_title: 资金贡献曲线
+        contribution_curve_description: 汇总全部证券账户后的净入金与股息贡献变化。
+        highlights_title: 重点摘要
+        highlights_description: 快速查看这一周里最活跃的账户和最活跃的证券。
+        largest_activity_bucket: 最大活动类别
+        no_activity: 暂无活动
+        no_chart_data: 这份周报没有保存可视化图表快照数据。
+        account_eyebrow: 账户摘要
+        account_turnover_description: 查看该账户在本周报周期内的每日交易额变化。
+        account_mix_description: 观察该账户这一周内哪类活动占比最高。
+        account_contribution_description: 查看该账户的净入金与股息贡献变化。
+        top_securities_title: 重点证券
+        top_securities_description: 查看该账户在这周内成交额最高的证券。
+        recent_activity_title: 最近活动
+        recent_activity_description: 查看这份周报快照里保存下来的最近交易与现金活动。
+        trade_count:
+          one: 1 笔交易
+          other: "%{count} 笔交易"
+        entry_count:
+          one: 1 条记录
+          other: "%{count} 条记录"
+        most_active_account: 最活跃账户
+        top_security: 最活跃证券
+        accounts_title: 分账户摘要
+        history_link: 在 Maybe 中查看这份周报
+        no_trade_activity: 当前周期没有交易活动。
+        no_activity_in_period: 当前周期没有活动。
+        no_accounts_title: 这份周报没有证券账户
+        no_accounts_body: 生成这份周报时，没有可见的证券账户数据。
       index:
         page_title: 周报历史
         history_title: 周报历史
@@ -190,25 +230,6 @@ zh-CN:
         back: 返回历史
         summary_title: 发送摘要
         summary_subtitle: 这里展示这次周报发送时保存下来的元数据。
-        status: 状态
-        scheduled_for: 计划发送时间
-        recipient: 收件地址
-        overview_title: 全局总览快照
-        overview_subtitle: 这里展示生成周报当时保存下来的跨账户摘要。
-        account_count: 账户数
-        trading_turnover: 交易额
-        net_buys: 净买入
-        contributions: 入金
-        income: 收益
-        taxes_fees: 税费
-        most_active_account: 最活跃账户
-        top_security: 最活跃证券
-        accounts_title: 分账户摘要
-        accounts_subtitle: 这里展示发送时保存在 payload 里的账户分段内容。
-        top_securities: 重点证券
-        recent_activity: 最近活动
-        no_accounts_title: 这份周报没有证券账户
-        no_accounts_body: 生成这份周报时，没有可见的证券账户数据。
     settings_nav_link_large:
       next: 下一步
       previous: 返回

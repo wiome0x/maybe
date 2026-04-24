@@ -18,6 +18,10 @@ class WeeklyReportBuilderTest < ActiveSupport::TestCase
     assert_equal 1, payload.dig(:overview, :account_count)
     assert_equal @account.name, payload.dig(:accounts, 0, :name)
     assert_equal "NVDA", payload.dig(:accounts, 0, :top_securities, 0, :ticker)
+    assert payload.dig(:overview, :turnover_series).present?
+    assert payload.dig(:overview, :breakdowns).present?
+    assert payload.dig(:accounts, 0, :turnover_chart_data).present?
+    assert payload.dig(:accounts, 0, :contribution_series).present?
   end
 
   test "returns empty account sections when user has no investment accounts" do

@@ -179,6 +179,46 @@ en:
           failed: Failed
           skipped: Skipped
     weekly_reports:
+      shared:
+        eyebrow: Weekly report
+        title: Weekly investment report
+        status: Status
+        generated_at: Generated at
+        recipient: Recipient
+        overview_title: Household-wide overview
+        turnover_title: Trading turnover
+        turnover_description: Daily traded value aggregated across the investment accounts included in this weekly report.
+        activity_mix_title: Activity mix
+        activity_mix_description: Which activity buckets dominated this report window.
+        contribution_curve_title: Contribution curve
+        contribution_curve_description: Net external cash and dividend income across all included investment accounts.
+        highlights_title: Highlights
+        highlights_description: Quick readouts for the most active account and most active security in this report.
+        largest_activity_bucket: Largest activity bucket
+        no_activity: No activity
+        no_chart_data: No chart snapshot was stored for this report.
+        account_eyebrow: Account section
+        account_turnover_description: Daily traded value for this account during the weekly report window.
+        account_mix_description: Which activity types dominated this account during the report period.
+        account_contribution_description: Net external cash and dividend income trend for this account.
+        top_securities_title: Top securities
+        top_securities_description: Highest-turnover tickers inside this account for the selected week.
+        recent_activity_title: Recent activity
+        recent_activity_description: Latest trades and cash events stored in the report snapshot.
+        trade_count:
+          one: 1 trade
+          other: "%{count} trades"
+        entry_count:
+          one: 1 entry
+          other: "%{count} entries"
+        most_active_account: Most active account
+        top_security: Most active security
+        accounts_title: Account sections
+        history_link: View this report in Maybe
+        no_trade_activity: No trade activity in this period.
+        no_activity_in_period: No activity in this period.
+        no_accounts_title: No investment accounts in this report
+        no_accounts_body: This report was generated without any visible investment accounts.
       index:
         page_title: Weekly report history
         history_title: Weekly report history
@@ -193,25 +233,6 @@ en:
         back: Back to history
         summary_title: Delivery summary
         summary_subtitle: Stored metadata for this report send.
-        status: Status
-        scheduled_for: Scheduled for
-        recipient: Recipient
-        overview_title: Overview snapshot
-        overview_subtitle: Household-wide summary captured when the report was generated.
-        account_count: Account count
-        trading_turnover: Trading turnover
-        net_buys: Net buys
-        contributions: Contributions
-        income: Income
-        taxes_fees: Taxes and fees
-        most_active_account: Most active account
-        top_security: Most active security
-        accounts_title: Account sections
-        accounts_subtitle: Per-account summaries stored in the sent report payload.
-        top_securities: Top securities
-        recent_activity: Recent activity
-        no_accounts_title: No investment accounts in this report
-        no_accounts_body: This report was generated without any visible investment accounts.
     settings_nav_link_large:
       next: Next
       previous: Back

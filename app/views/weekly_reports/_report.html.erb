@@ -1,0 +1,225 @@
+<% if variant == :app %>
+  <div class="space-y-4">
+    <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div class="space-y-1">
+          <p class="text-sm font-medium uppercase tracking-[0.16em] text-secondary"><%= t("settings.weekly_reports.shared.eyebrow") %></p>
+          <h2 class="text-2xl font-medium text-primary"><%= presenter.title %></h2>
+          <p class="text-sm text-secondary"><%= presenter.subtitle %></p>
+        </div>
+
+        <div class="grid gap-2 text-sm text-secondary">
+          <p><span class="font-medium text-primary"><%= t("settings.weekly_reports.shared.status") %>:</span> <%= t("settings.weekly_report_settings.show.statuses.#{presenter.weekly_report.status}") %></p>
+          <p><span class="font-medium text-primary"><%= t("settings.weekly_reports.shared.generated_at") %>:</span> <%= l(presenter.generated_at, format: :long) %></p>
+          <p><span class="font-medium text-primary"><%= t("settings.weekly_reports.shared.recipient") %>:</span> <%= presenter.recipient_email %></p>
+        </div>
+      </div>
+
+      <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        <% presenter.overview_metrics.each do |metric| %>
+          <div class="rounded-xl bg-container-inset p-4">
+            <p class="text-xs uppercase tracking-[0.12em] text-secondary"><%= metric[:label] %></p>
+            <p class="mt-2 text-2xl font-medium text-primary"><%= format_money Money.new(metric[:amount], metric[:currency]) %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(22rem,0.9fr)]">
+      <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+        <div>
+          <p class="text-sm font-medium text-primary"><%= t("settings.weekly_reports.shared.turnover_title") %></p>
+          <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.turnover_description") %></p>
+        </div>
+
+        <% if presenter.overview_turnover_series.present? %>
+          <div class="h-64">
+            <div
+              id="<%= dom_id(presenter.weekly_report, :overview_turnover_chart) %>"
+              class="w-full h-full"
+              data-controller="time-series-chart"
+              data-time-series-chart-data-value="<%= presenter.overview_turnover_series.to_json %>"
+              data-time-series-chart-x-axis-activity-dates-only-value="true"
+              data-time-series-chart-x-axis-date-format-value="%b %d"
+              data-time-series-chart-use-annotations-value="true"></div>
+          </div>
+        <% else %>
+          <div class="rounded-xl bg-container-inset p-5 text-sm text-secondary"><%= t("settings.weekly_reports.shared.no_chart_data") %></div>
+        <% end %>
+      </div>
+
+      <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+        <div>
+          <p class="text-sm font-medium text-primary"><%= t("settings.weekly_reports.shared.activity_mix_title") %></p>
+          <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.activity_mix_description") %></p>
+        </div>
+
+        <% if presenter.overview_breakdowns.any? %>
+          <div class="relative h-[18rem]" data-controller="donut-chart" data-donut-chart-segments-value="<%= presenter.overview_breakdowns.map { |row| { id: row[:id], amount: row[:amount].to_f, color: row[:color] } }.to_json %>" data-donut-chart-segment-height-value="6" data-donut-chart-segment-opacity-value="0.92">
+            <div data-donut-chart-target="chartContainer" class="absolute inset-0 pointer-events-none"></div>
+
+            <div data-donut-chart-target="contentContainer" class="flex h-full items-center justify-center">
+              <% largest = presenter.overview_breakdowns.max_by { |row| row[:amount].to_d } %>
+              <div data-donut-chart-target="defaultContent" class="flex max-w-[14rem] flex-col items-center text-center">
+                <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.largest_activity_bucket") %></p>
+                <p class="mt-2 text-3xl font-medium text-primary"><%= largest ? largest[:label] : t("settings.weekly_reports.shared.no_activity") %></p>
+                <% if largest %>
+                  <p class="mt-1 text-sm text-secondary"><%= format_money(Money.new(largest[:amount], presenter.overview_currency)) %></p>
+                <% end %>
+              </div>
+
+              <% presenter.overview_breakdowns.each do |row| %>
+                <div id="segment_<%= row[:id] %>" class="hidden">
+                  <div class="flex max-w-[14rem] flex-col items-center text-center">
+                    <p class="text-sm text-secondary"><%= row[:label] %></p>
+                    <p class="mt-2 text-3xl font-medium text-primary"><%= format_money(Money.new(row[:amount], presenter.overview_currency)) %></p>
+                    <% if row[:count].present? %>
+                      <p class="mt-1 text-sm" style="color: <%= row[:color] %>"><%= t("settings.weekly_reports.shared.entry_count", count: row[:count]) %></p>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="grid gap-2 sm:grid-cols-2">
+            <% presenter.overview_breakdowns.each do |row| %>
+              <div class="rounded-lg bg-container-inset px-3 py-2">
+                <div class="flex items-center gap-2">
+                  <span class="h-2.5 w-2.5 rounded-full" style="background-color: <%= row[:color] %>"></span>
+                  <p class="text-sm font-medium text-primary"><%= row[:label] %></p>
+                </div>
+                <p class="mt-2 text-lg font-medium text-primary"><%= format_money(Money.new(row[:amount], presenter.overview_currency), precision: 0) %></p>
+                <% if row[:count].present? %>
+                  <p class="text-xs text-secondary"><%= t("settings.weekly_reports.shared.entry_count", count: row[:count]) %></p>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="rounded-xl bg-container-inset p-5 text-sm text-secondary"><%= t("settings.weekly_reports.shared.no_activity") %></div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid gap-4 xl:grid-cols-2">
+      <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+        <div>
+          <p class="text-sm font-medium text-primary"><%= t("settings.weekly_reports.shared.contribution_curve_title") %></p>
+          <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.contribution_curve_description") %></p>
+        </div>
+
+        <% if presenter.overview_contribution_series.present? %>
+          <div class="h-56">
+            <div
+              id="<%= dom_id(presenter.weekly_report, :overview_contribution_chart) %>"
+              class="w-full h-full"
+              data-controller="time-series-chart"
+              data-time-series-chart-data-value="<%= presenter.overview_contribution_series.to_json %>"></div>
+          </div>
+        <% else %>
+          <div class="rounded-xl bg-container-inset p-5 text-sm text-secondary"><%= t("settings.weekly_reports.shared.no_chart_data") %></div>
+        <% end %>
+      </div>
+
+      <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+        <div>
+          <p class="text-sm font-medium text-primary"><%= t("settings.weekly_reports.shared.highlights_title") %></p>
+          <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.highlights_description") %></p>
+        </div>
+
+        <div class="grid gap-3 md:grid-cols-2">
+          <% if presenter.payload.dig(:overview, :most_active_account).present? %>
+            <div class="rounded-xl bg-container-inset p-4">
+              <p class="text-xs uppercase tracking-[0.12em] text-secondary"><%= t("settings.weekly_reports.shared.most_active_account") %></p>
+              <p class="mt-2 text-xl font-medium text-primary"><%= presenter.payload.dig(:overview, :most_active_account, :name) %></p>
+              <p class="mt-1 text-sm text-secondary"><%= format_money(Money.new(presenter.payload.dig(:overview, :most_active_account, :turnover).to_d, presenter.overview_currency)) %></p>
+            </div>
+          <% end %>
+
+          <% if presenter.payload.dig(:overview, :top_security).present? %>
+            <div class="rounded-xl bg-container-inset p-4">
+              <p class="text-xs uppercase tracking-[0.12em] text-secondary"><%= t("settings.weekly_reports.shared.top_security") %></p>
+              <p class="mt-2 text-xl font-medium text-primary"><%= presenter.payload.dig(:overview, :top_security, :ticker) %></p>
+              <p class="mt-1 text-sm text-secondary"><%= presenter.payload.dig(:overview, :top_security, :name) %></p>
+              <p class="mt-1 text-sm text-secondary"><%= format_money(Money.new(presenter.payload.dig(:overview, :top_security, :turnover).to_d, presenter.overview_currency)) %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <% presenter.accounts.each do |account| %>
+        <%= render "weekly_reports/account_section", account: account, variant: :app %>
+      <% end %>
+      <% if presenter.accounts.empty? %>
+        <div class="rounded-xl bg-container-inset p-6 text-sm text-secondary">
+          <p class="font-medium text-primary"><%= t("settings.weekly_reports.shared.no_accounts_title") %></p>
+          <p class="mt-1"><%= t("settings.weekly_reports.shared.no_accounts_body") %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5;">
+    <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; margin-bottom: 20px;">
+      <p style="margin: 0 0 6px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #6b7280;"><%= t("settings.weekly_reports.shared.eyebrow") %></p>
+      <h1 style="margin: 0; font-size: 28px; color: #111827;"><%= presenter.title %></h1>
+      <p style="margin: 8px 0 0; color: #6b7280;"><%= presenter.subtitle %></p>
+      <p style="margin: 8px 0 0; color: #6b7280;"><strong><%= t("settings.weekly_reports.shared.generated_at") %>:</strong> <%= l(presenter.generated_at, format: :long) %></p>
+      <p style="margin: 4px 0 0; color: #6b7280;"><strong><%= t("settings.weekly_reports.shared.recipient") %>:</strong> <%= presenter.recipient_email %></p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <h2 style="margin: 0 0 12px; font-size: 20px;"><%= t("settings.weekly_reports.shared.overview_title") %></h2>
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: separate; border-spacing: 0 12px;">
+        <tr>
+          <% presenter.overview_metrics.each_slice(2) do |row| %>
+            <% row.each do |metric| %>
+              <td style="width: 50%; padding-right: 12px; vertical-align: top;">
+                <div style="background: #f8fafc; border-radius: 14px; padding: 16px;">
+                  <p style="margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280;"><%= metric[:label] %></p>
+                  <p style="margin: 8px 0 0; font-size: 24px; font-weight: 600; color: #111827;"><%= format_money(Money.new(metric[:amount], metric[:currency])) %></p>
+                </div>
+              </td>
+            <% end %>
+            <% if row.size == 1 %><td></td><% end %>
+          </tr><tr>
+          <% end %>
+        </tr>
+      </table>
+    </div>
+
+    <% if presenter.overview_breakdowns.any? %>
+      <div style="margin-bottom: 20px;">
+        <h2 style="margin: 0 0 12px; font-size: 20px;"><%= t("settings.weekly_reports.shared.activity_mix_title") %></h2>
+        <% max_breakdown = presenter.overview_breakdowns.map { |row| row[:amount].to_d }.max.to_d %>
+        <% presenter.overview_breakdowns.each do |row| %>
+          <% width = max_breakdown.zero? ? 0 : ((row[:amount].to_d / max_breakdown) * 100).round(1) %>
+          <div style="margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 4px;">
+              <span style="color: #111827;"><%= row[:label] %></span>
+              <span style="color: #6b7280;"><%= format_money(Money.new(row[:amount], presenter.overview_currency), precision: 0) %></span>
+            </div>
+            <div style="height: 8px; background: #e5e7eb; border-radius: 999px; overflow: hidden;">
+              <div style="height: 8px; width: <%= width %>%; background: <%= row[:color] %>; border-radius: 999px;"></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% presenter.accounts.each do |account| %>
+      <%= render "weekly_reports/account_section", account: account, variant: :email %>
+    <% end %>
+
+    <% if presenter.accounts.empty? %>
+      <p><%= t("settings.weekly_reports.shared.no_accounts_title") %></p>
+    <% end %>
+
+    <% if local_assigns[:weekly_report]&.persisted? %>
+      <p style="margin-top: 24px;"><%= link_to t("settings.weekly_reports.shared.history_link"), settings_weekly_report_delivery_url(local_assigns[:weekly_report]) %></p>
+    <% end %>
+  </div>
+<% end %>

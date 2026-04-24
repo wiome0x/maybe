@@ -3,9 +3,7 @@ class WeeklyReportMailer < ApplicationMailer
 
   def weekly_report
     @weekly_report = params[:weekly_report]
-    @payload = @weekly_report.payload.deep_symbolize_keys
-    @overview = @payload.fetch(:overview, {})
-    @accounts = @payload.fetch(:accounts, [])
+    @report_presenter = WeeklyReportPresenter.new(@weekly_report)
     @period = @weekly_report.period
 
     I18n.with_locale(@weekly_report.user.family.locale) do
