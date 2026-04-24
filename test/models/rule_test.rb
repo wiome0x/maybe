@@ -55,6 +55,38 @@ class RuleTest < ActiveSupport::TestCase
     assert_equal @groceries_category, transaction_entry2.transaction.category
   end
 
+  test "account, category, and tag filters are available for transaction rules" do
+    filter_keys = Rule.new(family: @family, resource_type: "transaction").condition_filters.map(&:key)
+
+    assert_includes filter_keys, "transaction_account"
+    assert_includes filter_keys, "transaction_direction"
+    assert_includes filter_keys, "transaction_kind"
+    assert_includes filter_keys, "transaction_category"
+    assert_includes filter_keys, "transaction_tag"
+  end
+
+  test "rule summaries are human readable" do
+    transaction_entry = create_transaction(date: Date.current, amount: 100, account: @account, merchant: @whole_foods_merchant, name: "Whole Foods Market")
+    travel_tag = @family.tags.create!(name: "Travel")
+
+    rule = Rule.create!(
+      family: @family,
+      resource_type: "transaction",
+      effective_date: 1.day.ago.to_date,
+      conditions: [
+        Rule::Condition.new(condition_type: "transaction_name", operator: "like", value: "Whole Foods"),
+        Rule::Condition.new(condition_type: "transaction_account", operator: "=", value: @account.id)
+      ],
+      actions: [
+        Rule::Action.new(action_type: "set_transaction_category", value: @groceries_category.id),
+        Rule::Action.new(action_type: "set_transaction_tags", value: [ travel_tag.id ])
+      ]
+    )
+
+    assert_equal "Description contains Whole Foods AND Account equal to Rule test", rule.conditions_summary
+    assert_equal "Set category to Groceries AND Add tags Travel", rule.actions_summary
+  end
+
   # Artificial limitation put in place to prevent users from creating overly complex rules
   # Rules should be shallow and wide
   test "no nested compound conditions" do

@@ -1,4 +1,8 @@
 class Rule::ActionExecutor::SetTransactionName < Rule::ActionExecutor
+  def label
+    "Rename transaction"
+  end
+
   def type
     "text"
   end

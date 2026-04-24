@@ -1,4 +1,8 @@
 class Rule::ConditionFilter::TransactionAmount < Rule::ConditionFilter
+  def label
+    "Amount"
+  end
+
   def type
     "number"
   end

@@ -27,4 +27,19 @@ class Family::SyncerTest < ActiveSupport::TestCase
 
     assert_equal "completed", family_sync.reload.status
   end
+
+  test "perform_post_sync only applies active rules" do
+    syncer = Family::Syncer.new(@family)
+    category = categories(:food_and_drink)
+    action = -> { Rule::Action.new(action_type: "set_transaction_category", value: category.id) }
+    @family.rules.create!(resource_type: "transaction", active: true, actions: [ action.call ])
+    @family.rules.create!(resource_type: "transaction", active: false, actions: [ action.call ])
+
+    assert_equal 1, @family.rules.active.count
+
+    Rule.any_instance.expects(:apply_later).once
+    @family.expects(:auto_match_transfers!).once
+
+    syncer.perform_post_sync
+  end
 end

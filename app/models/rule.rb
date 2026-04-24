@@ -5,6 +5,8 @@ class Rule < ApplicationRecord
   has_many :conditions, dependent: :destroy
   has_many :actions, dependent: :destroy
 
+  scope :active, -> { where(active: true) }
+
   accepts_nested_attributes_for :conditions, allow_destroy: true
   accepts_nested_attributes_for :actions, allow_destroy: true
 
@@ -59,6 +61,14 @@ class Rule < ApplicationRecord
     else
       "If #{first_condition.filter.label.downcase} #{first_condition.operator} #{first_condition.value_display}"
     end
+  end
+
+  def conditions_summary
+    conditions.map(&:summary).reject(&:blank?).join(" AND ")
+  end
+
+  def actions_summary
+    actions.map(&:summary).reject(&:blank?).join(" AND ")
   end
 
   private

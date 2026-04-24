@@ -59,6 +59,19 @@ class Rule::Condition < ApplicationRecord
     rule.registry.get_filter!(condition_type)
   end
 
+  def operator_label
+    operators.find { |label, key| key == operator }&.first.to_s
+  end
+
+  def summary
+    if compound?
+      joiner = operator == "or" ? " OR " : " AND "
+      sub_conditions.map(&:summary).join(joiner)
+    else
+      [ filter.label, operator_label.downcase, value_display ].reject(&:blank?).join(" ")
+    end
+  end
+
   private
     def build_compound_scope(scope)
       if operator == "or"

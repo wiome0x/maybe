@@ -1,4 +1,8 @@
 class Rule::ActionExecutor::SetTransactionCategory < Rule::ActionExecutor
+  def label
+    "Set category"
+  end
+
   def type
     "select"
   end

@@ -1,4 +1,8 @@
 class Rule::ActionExecutor::SetTransactionMerchant < Rule::ActionExecutor
+  def label
+    "Set merchant"
+  end
+
   def type
     "select"
   end

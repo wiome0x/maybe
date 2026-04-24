@@ -1,4 +1,8 @@
 class Rule::ConditionFilter::TransactionName < Rule::ConditionFilter
+  def label
+    "Description"
+  end
+
   def prepare(scope)
     scope.with_entry
   end

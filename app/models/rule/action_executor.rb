@@ -1,5 +1,5 @@
 class Rule::ActionExecutor
-  TYPES = [ "select", "function", "text" ]
+  TYPES = [ "select", "select_multiple", "function", "text" ]
 
   def initialize(rule)
     @rule = rule

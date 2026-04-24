@@ -16,8 +16,16 @@
       <%# Initial rendering based on rule.action_executors.first from the rule form. %>
       <%# This is currently always SetTransactionCategory from transaction_resource.rb, which is a select type. %>
       <%# Subsequent renders are injected by the Stimulus controller, which uses the templates from below. %>
-      <span class="font-medium text-primary uppercase text-xs">to</span>
-      <%= form.select :value, action.options || [], {} %>
+      <% if action.executor.type == "select_multiple" %>
+        <span class="font-medium text-primary uppercase text-xs">add</span>
+        <%= form.select :value,
+                        action.options || [],
+                        { selected: action.selected_values },
+                        multiple: true %>
+      <% else %>
+        <span class="font-medium text-primary uppercase text-xs">to</span>
+        <%= form.select :value, action.options || [], {} %>
+      <% end %>
     <% end %>
   </div>
 
@@ -31,6 +39,11 @@
   <template data-rule--actions-target="selectTemplate">
     <span class="font-medium text-primary uppercase text-xs">to</span>
     <%= form.select :value, [], {} %>
+  </template>
+
+  <template data-rule--actions-target="selectMultipleTemplate">
+    <span class="font-medium text-primary uppercase text-xs">add</span>
+    <%= form.select :value, [], {}, multiple: true %>
   </template>
 
   <template data-rule--actions-target="textTemplate">

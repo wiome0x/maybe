@@ -40,23 +40,25 @@ class Rule::ActionTest < ActiveSupport::TestCase
 
   test "set_transaction_tags" do
     tag = @family.tags.create!(name: "Rule test tag")
+    second_tag = @family.tags.create!(name: "Second rule test tag")
+    existing_tag = @family.tags.create!(name: "Existing tag")
 
     # Does not modify transactions that are locked (user edited them)
     @txn1.lock_attr!(:tag_ids)
+    @txn2.tags << existing_tag
 
     action = Rule::Action.new(
       rule: @transaction_rule,
       action_type: "set_transaction_tags",
-      value: tag.id
+      value: [ tag.id, second_tag.id ].to_json
     )
 
     action.apply(@rule_scope)
 
     assert_equal [], @txn1.reload.tags
 
-    [ @txn2, @txn3 ].each do |transaction|
-      assert_equal [ tag ], transaction.reload.tags
-    end
+    assert_equal [ existing_tag, tag, second_tag ].sort_by(&:id), @txn2.reload.tags.sort_by(&:id)
+    assert_equal [ tag, second_tag ].sort_by(&:id), @txn3.reload.tags.sort_by(&:id)
   end
 
   test "set_transaction_merchant" do

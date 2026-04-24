@@ -1,4 +1,8 @@
 class Rule::ConditionFilter::TransactionMerchant < Rule::ConditionFilter
+  def label
+    "Merchant"
+  end
+
   def type
     "select"
   end

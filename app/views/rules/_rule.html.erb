@@ -12,15 +12,8 @@
         </div>
         <p class="flex items-center flex-wrap gap-1.5 m-0">
           <span class="px-2 py-1 border border-secondary rounded-full">
-            <% if rule.conditions.first.compound? %>
-              <%= rule.conditions.first.sub_conditions.first.filter.label %> <%= rule.conditions.first.sub_conditions.first.operator %> <%= rule.conditions.first.sub_conditions.first.value_display %>
-            <% else %>
-              <%= rule.conditions.first.filter.label %> <%= rule.conditions.first.operator %> <%= rule.conditions.first.value_display %>
-            <% end %>
+            <%= rule.conditions_summary %>
           </span>
-          <% if rule.conditions.count > 1 %>
-            <%= t("rules.rule.and_more", count: rule.conditions.count - 1) %> <%= t("rules.rule.condition", count: rule.conditions.count - 1) %>
-          <% end %>
         </p>
       </div>
     <% end %>
@@ -30,15 +23,8 @@
       </div>
       <p class="flex items-center flex-wrap gap-1.5 m-0">
         <span class="px-2 py-1 border border-secondary rounded-full">
-          <% if rule.actions.first.value && rule.actions.first.options %>
-            <%= rule.actions.first.executor.label %> <%= t("rules.rule.to") %> <%= rule.actions.first.value_display %>
-          <% else %>
-            <%= rule.actions.first.executor.label %>
-          <% end %>
+          <%= rule.actions_summary %>
         </span>
-        <% if rule.actions.count > 1 %>
-          <%= t("rules.rule.and_more", count: rule.actions.count - 1) %> <%= t("rules.rule.action", count: rule.actions.count - 1) %>
-        <% end %>
       </p>
     </div>
     <div class="flex items-center gap-2 mt-1">

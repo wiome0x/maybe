@@ -5,9 +5,14 @@ class Rule::Registry::TransactionResource < Rule::Registry
 
   def condition_filters
     [
+      Rule::ConditionFilter::TransactionAccount.new(rule),
       Rule::ConditionFilter::TransactionName.new(rule),
       Rule::ConditionFilter::TransactionAmount.new(rule),
-      Rule::ConditionFilter::TransactionMerchant.new(rule)
+      Rule::ConditionFilter::TransactionDirection.new(rule),
+      Rule::ConditionFilter::TransactionKind.new(rule),
+      Rule::ConditionFilter::TransactionMerchant.new(rule),
+      Rule::ConditionFilter::TransactionCategory.new(rule),
+      Rule::ConditionFilter::TransactionTag.new(rule)
     ]
   end
 

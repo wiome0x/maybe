@@ -7,6 +7,7 @@ export default class extends Controller {
     "destroyField",
     "actionValue",
     "selectTemplate",
+    "selectMultipleTemplate",
     "textTemplate"
   ];
 
@@ -29,6 +30,8 @@ export default class extends Controller {
 
     if (actionExecutor.type === "select") {
       this.#buildSelectFor(actionExecutor);
+    } else if (actionExecutor.type === "select_multiple") {
+      this.#buildSelectMultipleFor(actionExecutor);
     } else if (actionExecutor.type === "text") {
       this.#buildTextInputFor();
     } else {
@@ -47,30 +50,21 @@ export default class extends Controller {
   }
 
   #buildSelectFor(actionExecutor) {
-    // Clone the select template
     const template = this.selectTemplateTarget.content.cloneNode(true);
     const selectEl = template.querySelector("select");
 
-    // Add options to the select element
-    if (selectEl) {
-      selectEl.innerHTML = "";
-      if (!actionExecutor.options || actionExecutor.options.length === 0) {
-        selectEl.disabled = true;
-        const optionEl = document.createElement("option");
-        optionEl.textContent = "(none)";
-        selectEl.appendChild(optionEl);
-      } else {
-        selectEl.disabled = false;
-        for (const option of actionExecutor.options) {
-          const optionEl = document.createElement("option");
-          optionEl.value = option[1];
-          optionEl.textContent = option[0];
-          selectEl.appendChild(optionEl);
-        }
-      }
-    }
+    this.#populateSelectOptions(selectEl, actionExecutor.options);
 
-    // Add the template content to the actionValue target and ensure it's visible
+    this.actionValueTarget.appendChild(template);
+    this.actionValueTarget.classList.remove("hidden");
+  }
+
+  #buildSelectMultipleFor(actionExecutor) {
+    const template = this.selectMultipleTemplateTarget.content.cloneNode(true);
+    const selectEl = template.querySelector("select");
+
+    this.#populateSelectOptions(selectEl, actionExecutor.options);
+
     this.actionValueTarget.appendChild(template);
     this.actionValueTarget.classList.remove("hidden");
   }
@@ -86,5 +80,26 @@ export default class extends Controller {
     // Add the template content to the actionValue target and ensure it's visible
     this.actionValueTarget.appendChild(template);
     this.actionValueTarget.classList.remove("hidden");
+  }
+
+  #populateSelectOptions(selectEl, options) {
+    if (!selectEl) return;
+
+    selectEl.innerHTML = "";
+    if (!options || options.length === 0) {
+      selectEl.disabled = true;
+      const optionEl = document.createElement("option");
+      optionEl.textContent = "(none)";
+      selectEl.appendChild(optionEl);
+      return;
+    }
+
+    selectEl.disabled = false;
+    for (const option of options) {
+      const optionEl = document.createElement("option");
+      optionEl.value = option[1];
+      optionEl.textContent = option[0];
+      selectEl.appendChild(optionEl);
+    }
   }
 }

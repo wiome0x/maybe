@@ -1,6 +1,10 @@
 class Rule::ActionExecutor::SetTransactionTags < Rule::ActionExecutor
+  def label
+    "Add tags"
+  end
+
   def type
-    "select"
+    "select_multiple"
   end
 
   def options
@@ -8,7 +12,8 @@ class Rule::ActionExecutor::SetTransactionTags < Rule::ActionExecutor
   end
 
   def execute(transaction_scope, value: nil, ignore_attribute_locks: false)
-    tag = family.tags.find_by_id(value)
+    tag_ids = normalized_tag_ids(value)
+    return if tag_ids.empty?
 
     scope = transaction_scope
 
@@ -16,12 +21,29 @@ class Rule::ActionExecutor::SetTransactionTags < Rule::ActionExecutor
       scope = scope.enrichable(:tag_ids)
     end
 
-    rows = scope.each do |txn|
+    scope.each do |txn|
       txn.enrich_attribute(
         :tag_ids,
-        [ tag.id ],
+        (txn.tag_ids + tag_ids).uniq,
         source: "rule"
       )
     end
   end
+
+  private
+    def normalized_tag_ids(value)
+      raw_values =
+        case value
+        when Array
+          value
+        when String
+          value.strip.start_with?("[") ? JSON.parse(value) : value.split(",")
+        else
+          Array(value)
+        end
+
+      family.tags.where(id: raw_values.map(&:presence).compact).pluck(:id)
+    rescue JSON::ParserError
+      []
+    end
 end
