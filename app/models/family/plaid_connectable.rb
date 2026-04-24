@@ -15,7 +15,15 @@ module Family::PlaidConnectable
   end
 
   def create_plaid_item!(public_token:, item_name:, region:)
+    Rails.logger.tagged("PlaidConnectable") do
+      Rails.logger.info("Exchanging public token | family=#{id} region=#{region} institution=#{item_name}")
+    end
+
     public_token_response = plaid(region).exchange_public_token(public_token)
+
+    Rails.logger.tagged("PlaidConnectable") do
+      Rails.logger.info("Token exchanged | family=#{id} plaid_item_id=#{public_token_response.item_id}")
+    end
 
     plaid_item = plaid_items.create!(
       name: item_name,
@@ -23,6 +31,10 @@ module Family::PlaidConnectable
       access_token: public_token_response.access_token,
       plaid_region: region
     )
+
+    Rails.logger.tagged("PlaidConnectable") do
+      Rails.logger.info("PlaidItem persisted | family=#{id} plaid_item=#{plaid_item.id} plaid_id=#{plaid_item.plaid_id}")
+    end
 
     plaid_item.sync_later
 

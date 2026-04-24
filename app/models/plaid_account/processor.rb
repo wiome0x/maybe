@@ -12,6 +12,10 @@ class PlaidAccount::Processor
   # Processing the account is the first step and if it fails, we halt the entire processor
   # Each subsequent step can fail independently, but we continue processing the rest of the steps
   def process
+    Rails.logger.tagged("PlaidAccount::Processor", "plaid_account=#{plaid_account.id}") do
+      Rails.logger.info("Processing | name=#{plaid_account.name} type=#{plaid_account.plaid_type}/#{plaid_account.plaid_subtype} balance=#{plaid_account.current_balance} currency=#{plaid_account.currency}")
+    end
+
     process_account!
     process_transactions
     process_investments
@@ -52,25 +56,45 @@ class PlaidAccount::Processor
 
         account.save!
 
-        # Create or update the current balance anchor valuation for event-sourced ledger
-        # Note: This is a partial implementation. In the future, we'll introduce HoldingValuation
-        # to properly track the holdings vs. cash breakdown, but for now we're only tracking
-        # the total balance in the current anchor. The cash_balance field on the account model
-        # is still being used for the breakdown.
+        Rails.logger.tagged("PlaidAccount::Processor", "plaid_account=#{plaid_account.id}") do
+          Rails.logger.info("Account upserted | account=#{account.id} new=#{account.previously_new_record?} balance=#{balance_calculator.balance} cash=#{balance_calculator.cash_balance}")
+        end
+
         account.set_current_balance(balance_calculator.balance)
       end
     end
 
     def process_transactions
+      added   = plaid_account.raw_transactions_payload["added"]&.size || 0
+      modified = plaid_account.raw_transactions_payload["modified"]&.size || 0
+      removed  = plaid_account.raw_transactions_payload["removed"]&.size || 0
+
+      Rails.logger.tagged("PlaidAccount::Processor", "plaid_account=#{plaid_account.id}") do
+        Rails.logger.info("Processing transactions | added=#{added} modified=#{modified} removed=#{removed}")
+      end
+
       PlaidAccount::Transactions::Processor.new(plaid_account).process
     rescue => e
+      Rails.logger.tagged("PlaidAccount::Processor", "plaid_account=#{plaid_account.id}") do
+        Rails.logger.error("process_transactions failed | #{e.class}: #{e.message}")
+      end
       report_exception(e)
     end
 
     def process_investments
+      inv_txns    = plaid_account.raw_investments_payload["transactions"]&.size || 0
+      inv_holdings = plaid_account.raw_investments_payload["holdings"]&.size || 0
+
+      Rails.logger.tagged("PlaidAccount::Processor", "plaid_account=#{plaid_account.id}") do
+        Rails.logger.info("Processing investments | transactions=#{inv_txns} holdings=#{inv_holdings}")
+      end
+
       PlaidAccount::Investments::TransactionsProcessor.new(plaid_account, security_resolver: security_resolver).process
       PlaidAccount::Investments::HoldingsProcessor.new(plaid_account, security_resolver: security_resolver).process
     rescue => e
+      Rails.logger.tagged("PlaidAccount::Processor", "plaid_account=#{plaid_account.id}") do
+        Rails.logger.error("process_investments failed | #{e.class}: #{e.message}")
+      end
       report_exception(e)
     end
 
@@ -84,6 +108,9 @@ class PlaidAccount::Processor
         PlaidAccount::Liabilities::StudentLoanProcessor.new(plaid_account).process
       end
     rescue => e
+      Rails.logger.tagged("PlaidAccount::Processor", "plaid_account=#{plaid_account.id}") do
+        Rails.logger.error("process_liabilities failed | #{e.class}: #{e.message}")
+      end
       report_exception(e)
     end
 

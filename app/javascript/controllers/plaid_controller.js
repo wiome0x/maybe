@@ -26,7 +26,11 @@ export default class extends Controller {
   }
 
   handleSuccess = (public_token, metadata) => {
+    const institution = metadata?.institution?.name || "unknown";
+    console.info(`[Plaid] onSuccess | institution=${institution} region=${this.regionValue} isUpdate=${this.isUpdateValue}`);
+
     if (this.isUpdateValue) {
+      console.info(`[Plaid] Update mode — triggering sync for item=${this.itemIdValue}`);
       // Trigger a sync to verify the connection and update status
       fetch(`/plaid_items/${this.itemIdValue}/sync`, {
         method: "POST",
@@ -36,12 +40,12 @@ export default class extends Controller {
           "X-CSRF-Token": document.querySelector('[name="csrf-token"]').content,
         },
       }).then(() => {
-        // Refresh the page to show the updated status
         window.location.href = "/accounts";
       });
       return;
     }
 
+    console.info(`[Plaid] New connection — creating PlaidItem | institution=${institution}`);
     // For new connections, create a new Plaid item
     fetch("/plaid_items", {
       method: "POST",
@@ -64,6 +68,12 @@ export default class extends Controller {
   };
 
   handleExit = (err, metadata) => {
+    if (err) {
+      console.warn(`[Plaid] onExit with error | error_type=${err.error_type} error_code=${err.error_code} message=${err.error_message} status=${metadata?.status}`);
+    } else {
+      console.info(`[Plaid] onExit (user closed) | status=${metadata?.status} institution=${metadata?.institution?.name}`);
+    }
+
     // If there was an error during update mode, refresh the page to show latest status
     if (err && metadata.status === "requires_credentials") {
       window.location.href = "/accounts";
@@ -71,10 +81,10 @@ export default class extends Controller {
   };
 
   handleEvent = (eventName, metadata) => {
-    // no-op
+    console.info(`[Plaid] onEvent | event=${eventName} institution=${metadata?.institution_name} view=${metadata?.view_name} error=${metadata?.error_code || "none"}`);
   };
 
   handleLoad = () => {
-    // no-op
+    console.info("[Plaid] Link loaded successfully");
   };
 }

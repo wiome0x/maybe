@@ -5,12 +5,24 @@ class PlaidItemsController < ApplicationController
     region = params[:region] == "eu" ? :eu : :us
     webhooks_url = region == :eu ? plaid_eu_webhooks_url : plaid_us_webhooks_url
 
+    Rails.logger.tagged("PlaidLink") do
+      Rails.logger.info("Requesting link token | family=#{Current.family.id} region=#{region} accountable_type=#{params[:accountable_type]} webhooks_url=#{webhooks_url}")
+    end
+
     @link_token = Current.family.get_link_token(
       webhooks_url: webhooks_url,
       redirect_url: accounts_url,
       accountable_type: params[:accountable_type] || "Depository",
       region: region
     )
+
+    Rails.logger.tagged("PlaidLink") do
+      if @link_token.present?
+        Rails.logger.info("Link token obtained successfully | family=#{Current.family.id} region=#{region}")
+      else
+        Rails.logger.warn("Link token is nil — Plaid may not be configured | family=#{Current.family.id} region=#{region}")
+      end
+    end
   end
 
   def edit
@@ -23,11 +35,19 @@ class PlaidItemsController < ApplicationController
   end
 
   def create
+    Rails.logger.tagged("PlaidLink") do
+      Rails.logger.info("Exchanging public token | family=#{Current.family.id} region=#{plaid_item_params[:region]} institution=#{item_name}")
+    end
+
     Current.family.create_plaid_item!(
       public_token: plaid_item_params[:public_token],
       item_name: item_name,
       region: plaid_item_params[:region]
     )
+
+    Rails.logger.tagged("PlaidLink") do
+      Rails.logger.info("PlaidItem created and sync enqueued | family=#{Current.family.id} institution=#{item_name}")
+    end
 
     redirect_to accounts_path, notice: t(".success")
   end
