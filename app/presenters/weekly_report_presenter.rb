@@ -198,18 +198,17 @@ class WeeklyReportPresenter
       data[:balance_chart_data].presence || data[:turnover_chart_data]
     end
 
-    def top_securities
-      (data[:top_securities] || []).map do |row|
+    def top_holdings
+      (data[:top_holdings] || []).map do |row|
         row.merge(
-          buy_volume: numeric_amount(row[:buy_volume]),
-          sell_volume: numeric_amount(row[:sell_volume]),
-          net_flow: numeric_amount(row[:net_flow])
+          amount: numeric_amount(row[:amount]),
+          weight: row[:weight].to_d
         )
       end
     end
 
-    def max_security_turnover
-      top_securities.map { |row| row[:buy_volume].to_d + row[:sell_volume].to_d }.max.to_d
+    def max_holding_amount
+      top_holdings.map { |row| row[:amount].to_d }.max.to_d
     end
 
     def recent_activity

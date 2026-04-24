@@ -80,6 +80,15 @@ class WeeklyReportBuilder
             currency: account.currency
           }
         end,
+        top_holdings: account.current_holdings.limit(5).map do |holding|
+          {
+            ticker: holding.ticker,
+            name: holding.name,
+            amount: convert_amount(holding.amount, holding.currency, account.currency),
+            weight: holding.weight&.to_f,
+            currency: account.currency
+          }
+        end,
         recent_activity: report.recent_activity(limit: 6).map do |row|
           {
             date: row.entry.date.iso8601,

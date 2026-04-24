@@ -205,8 +205,8 @@ en:
         account_balance_title: Account value trend
         account_balance_description: Total account value changes during the weekly report window.
         account_mix_description: Which activity types dominated this account during the report period.
-        top_securities_title: Top securities
-        top_securities_description: Highest-turnover tickers inside this account for the selected week.
+        top_holdings_title: Top holdings
+        top_holdings_description: Largest current positions in this account by market value and portfolio weight.
         recent_activity_title: Recent activity
         recent_activity_description: Latest trades and cash events stored in the report snapshot.
         trade_count:
@@ -219,7 +219,7 @@ en:
         top_security: Most active security
         accounts_title: Account sections
         history_link: View this report in Maybe
-        no_trade_activity: No trade activity in this period.
+        no_trade_activity: No current holdings to show.
         no_activity_in_period: No activity in this period.
         no_accounts_title: No investment accounts in this report
         no_accounts_body: This report was generated without any visible investment accounts.

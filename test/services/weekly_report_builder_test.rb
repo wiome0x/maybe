@@ -9,6 +9,7 @@ class WeeklyReportBuilderTest < ActiveSupport::TestCase
 
   test "builds overview and account sections for investment accounts" do
     create_trade_entry("weekly-buy", "2026-04-20", "NVDA", 1, 100, 100)
+    create_current_holding("NVDA", qty: 2, price: 150, amount: 300)
     create_transaction_entry("weekly-dep", "2026-04-21", -500, "CASH RECEIPTS / ELECTRONIC FUND TRANSFERS")
     plaid_item = @user.family.plaid_items.create!(plaid_id: "item_weekly_report_builder", name: "IBKR", access_token: "test-token")
     plaid_account = PlaidAccount.create!(
@@ -32,7 +33,10 @@ class WeeklyReportBuilderTest < ActiveSupport::TestCase
     assert_equal "IBKR", payload.dig(:accounts, 0, :name)
     assert_equal @account.name, payload.dig(:accounts, 0, :account_label)
     assert payload.dig(:accounts, 0, :current_value).present?
-    assert_equal "NVDA", payload.dig(:accounts, 0, :top_securities, 0, :ticker)
+    assert payload.dig(:accounts, 0, :top_holdings).present?
+    assert_includes payload.dig(:accounts, 0, :top_holdings).map { |row| row[:ticker] }, "NVDA"
+    assert payload.dig(:accounts, 0, :top_holdings, 0, :amount).present?
+    assert payload.dig(:accounts, 0, :top_holdings, 0, :weight).present?
     assert payload.dig(:overview, :balance_series).present?
     assert payload.dig(:overview, :multi_balance_series, :series).present?
     assert_equal "total", payload.dig(:overview, :multi_balance_series, :series, 0, :id)
@@ -81,6 +85,21 @@ class WeeklyReportBuilderTest < ActiveSupport::TestCase
         currency: currency,
         name: name,
         entryable: Transaction.new(kind: kind)
+      )
+    end
+
+    def create_current_holding(ticker, qty:, price:, amount:, currency: "USD")
+      security = Security.find_or_create_by!(ticker: ticker) do |record|
+        record.name = ticker
+      end
+
+      @account.holdings.create!(
+        security: security,
+        date: Date.current,
+        qty: qty,
+        price: price,
+        amount: amount,
+        currency: currency
       )
     end
 end

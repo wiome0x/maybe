@@ -202,8 +202,8 @@ zh-CN:
         account_balance_title: 账户资产趋势
         account_balance_description: 查看该账户在本周报周期内的总资产变化。
         account_mix_description: 观察该账户这一周内哪类活动占比最高。
-        top_securities_title: 重点证券
-        top_securities_description: 查看该账户在这周内成交额最高的证券。
+        top_holdings_title: 当前重仓股
+        top_holdings_description: 查看该账户当前持仓中市值最高的证券及其占比。
         recent_activity_title: 最近活动
         recent_activity_description: 查看这份周报快照里保存下来的最近交易与现金活动。
         trade_count:
@@ -216,7 +216,7 @@ zh-CN:
         top_security: 最活跃证券
         accounts_title: 分账户摘要
         history_link: 在 Maybe 中查看这份周报
-        no_trade_activity: 当前周期没有交易活动。
+        no_trade_activity: 当前没有可显示的重仓持仓。
         no_activity_in_period: 当前周期没有活动。
         no_accounts_title: 这份周报没有证券账户
         no_accounts_body: 生成这份周报时，没有可见的证券账户数据。
