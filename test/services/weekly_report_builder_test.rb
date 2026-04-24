@@ -10,6 +10,18 @@ class WeeklyReportBuilderTest < ActiveSupport::TestCase
   test "builds overview and account sections for investment accounts" do
     create_trade_entry("weekly-buy", "2026-04-20", "NVDA", 1, 100, 100)
     create_transaction_entry("weekly-dep", "2026-04-21", -500, "CASH RECEIPTS / ELECTRONIC FUND TRANSFERS")
+    plaid_item = @user.family.plaid_items.create!(plaid_id: "item_weekly_report_builder", name: "IBKR", access_token: "test-token")
+    plaid_account = PlaidAccount.create!(
+      plaid_id: "acc_weekly_report_builder",
+      current_balance: 1000,
+      available_balance: 1000,
+      currency: "USD",
+      name: "Named Brokerage",
+      plaid_type: "investment",
+      plaid_subtype: "brokerage",
+      plaid_item: plaid_item
+    )
+    @account.update!(plaid_account: plaid_account)
 
     period = Period.custom(start_date: Date.parse("2026-04-19"), end_date: Date.parse("2026-04-25"))
     payload = WeeklyReportBuilder.new(user: @user, period: period).build
@@ -17,7 +29,8 @@ class WeeklyReportBuilderTest < ActiveSupport::TestCase
     assert_equal @user.email, payload[:recipient_email]
     assert_equal 1, payload.dig(:overview, :account_count)
     assert payload.dig(:overview, :current_value).present?
-    assert_equal @account.name, payload.dig(:accounts, 0, :name)
+    assert_equal "IBKR", payload.dig(:accounts, 0, :name)
+    assert_equal @account.name, payload.dig(:accounts, 0, :account_label)
     assert payload.dig(:accounts, 0, :current_value).present?
     assert_equal "NVDA", payload.dig(:accounts, 0, :top_securities, 0, :ticker)
     assert payload.dig(:overview, :balance_series).present?

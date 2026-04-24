@@ -4,6 +4,9 @@
         <div class="space-y-1">
           <p class="text-sm font-medium uppercase tracking-[0.16em] text-secondary"><%= t("settings.weekly_reports.shared.account_eyebrow") %></p>
           <h3 class="text-2xl font-medium text-primary"><%= account.name %></h3>
+          <% if account.account_label.present? %>
+            <p class="text-sm text-secondary"><%= account.account_label %></p>
+          <% end %>
           <p class="text-sm text-secondary"><%= account.subtitle %></p>
         </div>
       </div>
@@ -139,6 +142,9 @@
   <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; margin: 20px 0;">
     <p style="margin: 0 0 6px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #6b7280;"><%= t("settings.weekly_reports.shared.account_eyebrow") %></p>
     <h2 style="margin: 0; font-size: 22px; color: #111827;"><%= account.name %></h2>
+    <% if account.account_label.present? %>
+      <p style="margin: 8px 0 0; color: #6b7280;"><%= account.account_label %></p>
+    <% end %>
     <p style="margin: 8px 0 16px; color: #6b7280;"><%= account.subtitle %></p>
 
     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: separate; border-spacing: 0 10px;">

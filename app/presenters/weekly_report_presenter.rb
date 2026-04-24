@@ -146,6 +146,13 @@ class WeeklyReportPresenter
       data[:subtitle]
     end
 
+    def account_label
+      label = data[:account_label]
+      return nil if label.blank? || label == name
+
+      label
+    end
+
     def currency
       data[:currency]
     end

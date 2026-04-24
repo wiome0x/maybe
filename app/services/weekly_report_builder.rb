@@ -32,6 +32,10 @@ class WeeklyReportBuilder
       user.family.accounts.visible.where(accountable_type: "Investment").alphabetically
     end
 
+    def account_display_name(account)
+      account.plaid_account&.plaid_item&.name.presence || account.name
+    end
+
     def build_account_section(account, chart_color:)
       report = Account::InvestmentReport.new(account, period: period)
       metrics = report.metrics.map do |metric|
@@ -46,7 +50,8 @@ class WeeklyReportBuilder
 
       {
         account_id: account.id,
-        name: account.name,
+        name: account_display_name(account),
+        account_label: account.name,
         currency: account.currency,
         chart_color: chart_color,
         subtitle: report.subtitle,
