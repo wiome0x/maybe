@@ -1,0 +1,8 @@
+sent_report:
+  user: family_admin
+  period_start_date: <%= 6.days.ago.to_date %>
+  period_end_date: <%= Date.current %>
+  scheduled_for: <%= Time.current %>
+  sent_at: <%= Time.current %>
+  status: sent
+  payload: {}

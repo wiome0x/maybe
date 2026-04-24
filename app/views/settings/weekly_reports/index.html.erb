@@ -1,0 +1,39 @@
+<%= content_for :page_title, t(".page_title") %>
+
+<%= settings_section title: t(".history_title"), subtitle: t(".history_subtitle") do %>
+  <% if @weekly_reports.any? %>
+    <div class="space-y-3">
+      <% @weekly_reports.each do |report| %>
+        <div class="rounded-xl bg-container-inset p-4">
+          <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-primary">
+                <%= l(report.period_start_date, format: :long) %> - <%= l(report.period_end_date, format: :long) %>
+              </p>
+              <p class="text-sm text-secondary"><%= t(".scheduled_for") %>: <%= l(report.scheduled_for.in_time_zone(Current.family.timezone), format: :long) %></p>
+              <% if report.sent_at.present? %>
+                <p class="text-sm text-secondary"><%= t(".sent_at") %>: <%= l(report.sent_at.in_time_zone(Current.family.timezone), format: :long) %></p>
+              <% end %>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="rounded-full px-2.5 py-1 text-xs font-medium <%= report.sent? ? "bg-green-100 text-green-700" : report.failed? ? "bg-red-100 text-red-700" : report.skipped? ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-700" %>">
+                <%= t("settings.weekly_report_settings.show.statuses.#{report.status}") %>
+              </span>
+              <%= render DS::Link.new(
+                text: t(".view"),
+                href: settings_weekly_report_delivery_path(report),
+                variant: "secondary"
+              ) %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="rounded-xl bg-container-inset p-6 text-sm text-secondary">
+      <p class="font-medium text-primary"><%= t(".empty_title") %></p>
+      <p class="mt-1"><%= t(".empty_body") %></p>
+    </div>
+  <% end %>
+<% end %>

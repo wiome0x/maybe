@@ -57,6 +57,8 @@ Rails.application.routes.draw do
   namespace :settings do
     resource :profile, only: [ :show, :destroy ]
     resource :preferences, only: :show
+    resource :weekly_report, only: %i[show update], controller: "weekly_report_settings"
+    resources :weekly_report_deliveries, path: "weekly_reports", only: %i[index show], controller: "weekly_reports"
     resource :transaction_organization, only: :show
     resource :hosting, only: %i[show update] do
       delete :clear_cache, on: :collection

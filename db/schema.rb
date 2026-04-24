@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_24_090000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_25_093000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -906,6 +906,37 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_24_090000) do
     t.index ["family_id"], name: "index_watchlist_items_on_family_id"
   end
 
+  create_table "weekly_report_subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.boolean "enabled", default: false, null: false
+    t.integer "send_weekday", default: 1, null: false
+    t.integer "send_hour", default: 8, null: false
+    t.string "timezone", null: false
+    t.string "period_key", default: "last_7_days", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_weekly_report_subscriptions_on_user_id", unique: true
+  end
+
+  create_table "weekly_reports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.date "period_start_date", null: false
+    t.date "period_end_date", null: false
+    t.datetime "scheduled_for", null: false
+    t.datetime "sent_at"
+    t.string "status", default: "pending", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.text "html_body"
+    t.text "text_body"
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["scheduled_for"], name: "index_weekly_reports_on_scheduled_for"
+    t.index ["status"], name: "index_weekly_reports_on_status"
+    t.index ["user_id", "period_start_date", "period_end_date"], name: "index_weekly_reports_on_user_and_period", unique: true
+    t.index ["user_id"], name: "index_weekly_reports_on_user_id"
+  end
+
   add_foreign_key "accounts", "families"
   add_foreign_key "accounts", "imports"
   add_foreign_key "accounts", "plaid_accounts"
@@ -962,4 +993,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_24_090000) do
   add_foreign_key "users", "chats", column: "last_viewed_chat_id"
   add_foreign_key "users", "families"
   add_foreign_key "watchlist_items", "families"
+  add_foreign_key "weekly_report_subscriptions", "users"
+  add_foreign_key "weekly_reports", "users"
 end

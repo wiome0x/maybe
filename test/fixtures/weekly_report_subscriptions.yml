@@ -1,0 +1,7 @@
+family_admin:
+  user: family_admin
+  enabled: false
+  send_weekday: 1
+  send_hour: 8
+  timezone: America/New_York
+  period_key: last_7_days

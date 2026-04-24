@@ -134,6 +134,7 @@ zh-CN:
       other_section_title: 更多
       preferences_label: 偏好设置
       profile_label: 个人资料
+      weekly_report_label: 周报
       rules_label: 规则
       self_hosting_label: 自托管
       tags_label: 标签
@@ -141,6 +142,73 @@ zh-CN:
       transactions_section_title: 交易整理
       whats_new_label: 最新动态
       watchlist_label: 自选管理
+    weekly_report_settings:
+      update:
+        success: 周报设置已更新
+      show:
+        page_title: 周报
+        subscription_title: 用户周报订阅
+        subscription_subtitle: 配置 Maybe 何时将投资周报发送到你的注册邮箱
+        enabled_label: 启用周报
+        enabled_hint: 系统会按周生成一份投资账户摘要，并发送到当前注册邮箱。
+        send_weekday: 发送星期
+        send_time: 发送时间
+        timezone: 时区
+        report_range: 报告范围
+        last_7_days: 最近 7 天
+        recipient_label: 收件地址
+        range_label: 统计范围
+        structure_label: 内容结构
+        range_hint: 第一版固定为最近 7 天
+        structure_hint: 一封邮件先展示全局总览，再按证券账户逐段汇总。
+        save: 保存
+        history_title: 最近周报
+        history_subtitle: 每条记录都保存了当时生成的快照和发送状态。
+        scheduled_for: 计划发送时间
+        sent_at: 实际发送时间
+        view_history_item: 查看详情
+        view_all_history: 查看全部历史
+        no_history_title: 还没有周报记录
+        no_history_body: 首次按计划生成周报后，会在这里看到发送快照和状态。
+        statuses:
+          pending: 待发送
+          sent: 已发送
+          failed: 发送失败
+          skipped: 已跳过
+    weekly_reports:
+      index:
+        page_title: 周报历史
+        history_title: 周报历史
+        history_subtitle: 查看过去生成过的周报快照，不会重新实时计算账户数据。
+        scheduled_for: 计划发送时间
+        sent_at: 实际发送时间
+        view: 查看
+        empty_title: 还没有周报历史
+        empty_body: 首次执行定时发送后，周报历史会出现在这里。
+      show:
+        page_title: 周报详情
+        back: 返回历史
+        summary_title: 发送摘要
+        summary_subtitle: 这里展示这次周报发送时保存下来的元数据。
+        status: 状态
+        scheduled_for: 计划发送时间
+        recipient: 收件地址
+        overview_title: 全局总览快照
+        overview_subtitle: 这里展示生成周报当时保存下来的跨账户摘要。
+        account_count: 账户数
+        trading_turnover: 交易额
+        net_buys: 净买入
+        contributions: 入金
+        income: 收益
+        taxes_fees: 税费
+        most_active_account: 最活跃账户
+        top_security: 最活跃证券
+        accounts_title: 分账户摘要
+        accounts_subtitle: 这里展示发送时保存在 payload 里的账户分段内容。
+        top_securities: 重点证券
+        recent_activity: 最近活动
+        no_accounts_title: 这份周报没有证券账户
+        no_accounts_body: 生成这份周报时，没有可见的证券账户数据。
     settings_nav_link_large:
       next: 下一步
       previous: 返回

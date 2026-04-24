@@ -1,0 +1,22 @@
+en:
+  weekly_report_mailer:
+    weekly_report:
+      subject: "Your weekly report through %{end_date}"
+      title: "Weekly report for %{name}"
+      period: "Reporting period: %{start_date} - %{end_date}"
+      overview_title: "Overall summary"
+      account_count:
+        one: "%{count} investment account"
+        other: "%{count} investment accounts"
+      trading_turnover: "Trading turnover: %{amount}"
+      net_buys: "Net buys: %{amount}"
+      contributions: "Contributions: %{amount}"
+      income: "Income: %{amount}"
+      taxes_fees: "Taxes and fees: %{amount}"
+      most_active_account: "Most active account"
+      top_security: "Most active security"
+      accounts_title: "Account sections"
+      top_securities: "Top securities"
+      recent_activity: "Recent activity"
+      no_accounts: "No investment account activity was available for this weekly report."
+      history_link: "View this report in Maybe"

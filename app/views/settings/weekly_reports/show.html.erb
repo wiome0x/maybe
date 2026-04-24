@@ -1,0 +1,128 @@
+<%= content_for :page_title, t(".page_title") %>
+
+<div class="mb-4">
+  <%= render DS::Link.new(
+    text: t(".back"),
+    href: settings_weekly_report_deliveries_path,
+    variant: "ghost",
+    icon: "chevron-left"
+  ) %>
+</div>
+
+<%= settings_section title: t(".summary_title"), subtitle: t(".summary_subtitle") do %>
+  <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+    <div class="rounded-xl bg-container-inset p-4">
+      <p class="text-xs uppercase tracking-[0.12em] text-secondary"><%= t(".status") %></p>
+      <p class="mt-2 text-lg font-medium text-primary"><%= t("settings.weekly_report_settings.show.statuses.#{@weekly_report.status}") %></p>
+    </div>
+    <div class="rounded-xl bg-container-inset p-4">
+      <p class="text-xs uppercase tracking-[0.12em] text-secondary"><%= t(".scheduled_for") %></p>
+      <p class="mt-2 text-lg font-medium text-primary"><%= l(@weekly_report.scheduled_for.in_time_zone(Current.family.timezone), format: :long) %></p>
+    </div>
+    <div class="rounded-xl bg-container-inset p-4">
+      <p class="text-xs uppercase tracking-[0.12em] text-secondary"><%= t(".recipient") %></p>
+      <p class="mt-2 text-lg font-medium text-primary"><%= @weekly_report.recipient_email %></p>
+    </div>
+  </div>
+<% end %>
+
+<%= settings_section title: t(".overview_title"), subtitle: t(".overview_subtitle") do %>
+  <% overview = @weekly_report.payload_overview %>
+  <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+    <% [
+      [t(".account_count"), overview["account_count"]],
+      [t(".trading_turnover"), format_money(Money.new(overview["trading_turnover"].to_d, Current.family.currency))],
+      [t(".net_buys"), format_money(Money.new(overview["net_buys"].to_d, Current.family.currency))],
+      [t(".contributions"), format_money(Money.new(overview["contributions"].to_d, Current.family.currency))],
+      [t(".income"), format_money(Money.new(overview["income"].to_d, Current.family.currency))],
+      [t(".taxes_fees"), format_money(Money.new(overview["taxes_fees"].to_d, Current.family.currency))]
+    ].each do |label, value| %>
+      <div class="rounded-xl bg-container-inset p-4">
+        <p class="text-xs uppercase tracking-[0.12em] text-secondary"><%= label %></p>
+        <p class="mt-2 text-lg font-medium text-primary"><%= value %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <% if overview["most_active_account"].present? || overview["top_security"].present? %>
+    <div class="grid gap-3 md:grid-cols-2">
+      <% if overview["most_active_account"].present? %>
+        <div class="rounded-xl bg-container-inset p-4">
+          <p class="text-sm font-medium text-primary"><%= t(".most_active_account") %></p>
+          <p class="mt-2 text-primary"><%= overview["most_active_account"]["name"] %></p>
+          <p class="text-sm text-secondary"><%= format_money(Money.new(overview["most_active_account"]["turnover"].to_d, Current.family.currency)) %></p>
+        </div>
+      <% end %>
+
+      <% if overview["top_security"].present? %>
+        <div class="rounded-xl bg-container-inset p-4">
+          <p class="text-sm font-medium text-primary"><%= t(".top_security") %></p>
+          <p class="mt-2 text-primary"><%= overview["top_security"]["ticker"] %> · <%= overview["top_security"]["name"] %></p>
+          <p class="text-sm text-secondary"><%= format_money(Money.new(overview["top_security"]["turnover"].to_d, Current.family.currency)) %></p>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= settings_section title: t(".accounts_title"), subtitle: t(".accounts_subtitle") do %>
+  <% if @weekly_report.payload_accounts.any? %>
+    <div class="space-y-4">
+      <% @weekly_report.payload_accounts.each do |account| %>
+        <div class="rounded-xl bg-container-inset p-4 space-y-4">
+          <div>
+            <p class="text-base font-medium text-primary"><%= account["name"] %></p>
+            <p class="text-sm text-secondary"><%= account["subtitle"] %></p>
+          </div>
+
+          <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            <% account["summary"].each_value do |metric| %>
+              <div>
+                <p class="text-xs uppercase tracking-[0.12em] text-secondary"><%= metric["label"] %></p>
+                <p class="mt-1 text-sm font-medium text-primary"><%= format_money(Money.new(metric["amount"].to_d, account["currency"])) %></p>
+              </div>
+            <% end %>
+          </div>
+
+          <% if account["top_securities"].any? %>
+            <div>
+              <p class="text-sm font-medium text-primary"><%= t(".top_securities") %></p>
+              <div class="mt-2 space-y-2">
+                <% account["top_securities"].each do |security| %>
+                  <div class="flex items-center justify-between text-sm">
+                    <p class="text-primary"><%= security["ticker"] %> · <%= security["name"] %></p>
+                    <p class="text-secondary"><%= format_money(Money.new((security["buy_volume"].to_d + security["sell_volume"].to_d), account["currency"])) %></p>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <% if account["recent_activity"].any? %>
+            <div>
+              <p class="text-sm font-medium text-primary"><%= t(".recent_activity") %></p>
+              <div class="mt-2 space-y-2">
+                <% account["recent_activity"].each do |activity| %>
+                  <div class="rounded-lg bg-container px-3 py-2">
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <p class="text-sm font-medium text-primary"><%= activity["label"] %></p>
+                        <p class="text-sm text-secondary"><%= activity["detail"] %></p>
+                      </div>
+                      <p class="shrink-0 text-sm font-medium text-primary"><%= format_money(Money.new(activity["amount"].to_d, account["currency"])) %></p>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="rounded-xl bg-container-inset p-6 text-sm text-secondary">
+      <p class="font-medium text-primary"><%= t(".no_accounts_title") %></p>
+      <p class="mt-1"><%= t(".no_accounts_body") %></p>
+    </div>
+  <% end %>
+<% end %>

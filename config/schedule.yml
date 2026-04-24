@@ -24,3 +24,9 @@ clean_api_request_logs:
   class: "ApiRequestLogCleanupJob"
   queue: "scheduled"
   description: "Cleans up API request logs older than 90 days"
+
+dispatch_weekly_reports:
+  cron: "0 * * * *"
+  class: "WeeklyReportDispatchJob"
+  queue: "scheduled"
+  description: "Generates and sends due weekly reports every hour"

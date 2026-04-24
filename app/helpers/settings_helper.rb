@@ -2,6 +2,7 @@ module SettingsHelper
   SETTINGS_ORDER = [
     { name: "Profile", path: :settings_profile_path },
     { name: "Preferences", path: :settings_preferences_path },
+    { name: "Weekly report", path: :settings_weekly_report_path },
     { name: "Security", path: :settings_security_path },
     { name: "Self hosting", path: :settings_hosting_path, condition: :self_hosted? },
     { name: "API Key", path: :settings_api_key_path },

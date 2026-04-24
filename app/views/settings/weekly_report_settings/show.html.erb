@@ -1,0 +1,80 @@
+<%= content_for :page_title, t(".page_title") %>
+
+<%= settings_section title: t(".subscription_title"), subtitle: t(".subscription_subtitle") do %>
+  <%= styled_form_with model: @subscription, url: settings_weekly_report_path, method: :patch, class: "space-y-4" do |form| %>
+    <div class="rounded-xl bg-container-inset p-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-sm font-medium text-primary"><%= t(".enabled_label") %></p>
+          <p class="text-sm text-secondary"><%= t(".enabled_hint") %></p>
+        </div>
+        <%= form.toggle :enabled %>
+      </div>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2">
+      <%= form.select :send_weekday, @weekday_options, { label: t(".send_weekday") } %>
+      <%= form.select :send_hour, @hour_options, { label: t(".send_time") } %>
+    </div>
+
+    <%= form.select :timezone, timezone_options, { label: t(".timezone") } %>
+    <%= form.select :period_key, [[t(".last_7_days"), "last_7_days"]], { label: t(".report_range") } %>
+
+    <div class="rounded-xl bg-container-inset p-4 space-y-2 text-sm text-secondary">
+      <p><span class="font-medium text-primary"><%= t(".recipient_label") %>:</span> <%= Current.user.email %></p>
+      <p><span class="font-medium text-primary"><%= t(".range_label") %>:</span> <%= t(".range_hint") %></p>
+      <p><span class="font-medium text-primary"><%= t(".structure_label") %>:</span> <%= t(".structure_hint") %></p>
+    </div>
+
+    <div class="flex justify-end">
+      <%= render DS::Button.new(text: t(".save"), class: "md:w-auto w-full justify-center") %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= settings_section title: t(".history_title"), subtitle: t(".history_subtitle") do %>
+  <% if @recent_reports.any? %>
+    <div class="space-y-3">
+      <% @recent_reports.each do |report| %>
+        <div class="rounded-xl bg-container-inset p-4">
+          <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-primary">
+                <%= l(report.period_start_date, format: :long) %> - <%= l(report.period_end_date, format: :long) %>
+              </p>
+              <p class="text-sm text-secondary">
+                <%= t(".scheduled_for") %>: <%= l(report.scheduled_for.in_time_zone(@subscription.timezone), format: :long) %>
+              </p>
+              <% if report.sent_at.present? %>
+                <p class="text-sm text-secondary"><%= t(".sent_at") %>: <%= l(report.sent_at.in_time_zone(@subscription.timezone), format: :long) %></p>
+              <% end %>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="rounded-full px-2.5 py-1 text-xs font-medium <%= report.sent? ? "bg-green-100 text-green-700" : report.failed? ? "bg-red-100 text-red-700" : report.skipped? ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-700" %>">
+                <%= t(".statuses.#{report.status}") %>
+              </span>
+              <%= render DS::Link.new(
+                text: t(".view_history_item"),
+                href: settings_weekly_report_delivery_path(report),
+                variant: "secondary"
+              ) %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <%= render DS::Link.new(
+        text: t(".view_all_history"),
+        href: settings_weekly_report_deliveries_path,
+        variant: "secondary",
+        full_width: true
+      ) %>
+    </div>
+  <% else %>
+    <div class="rounded-xl bg-container-inset p-6 text-sm text-secondary">
+      <p class="font-medium text-primary"><%= t(".no_history_title") %></p>
+      <p class="mt-1"><%= t(".no_history_body") %></p>
+    </div>
+  <% end %>
+<% end %>

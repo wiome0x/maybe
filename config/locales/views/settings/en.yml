@@ -137,6 +137,7 @@ en:
       other_section_title: More
       preferences_label: Preferences
       profile_label: Profile
+      weekly_report_label: Weekly report
       rules_label: Rules
       self_hosting_label: Self hosting
       tags_label: Tags
@@ -144,6 +145,73 @@ en:
       transactions_section_title: Transaction Setup
       whats_new_label: What's new
       watchlist_label: Watchlist
+    weekly_report_settings:
+      update:
+        success: Weekly report settings updated
+      show:
+        page_title: Weekly report
+        subscription_title: Weekly report subscription
+        subscription_subtitle: Configure when Maybe sends your weekly investment summary to your registered email
+        enabled_label: Enable weekly report
+        enabled_hint: Maybe will generate one report per week for your investment accounts and email it to your registered address.
+        send_weekday: Send on
+        send_time: Send time
+        timezone: Timezone
+        report_range: Report range
+        last_7_days: Last 7 days
+        recipient_label: Recipient
+        range_label: Coverage
+        structure_label: Structure
+        range_hint: Fixed to the most recent 7 days
+        structure_hint: One email with a household-wide overview first, then one summary section per investment account.
+        save: Save
+        history_title: Recent weekly reports
+        history_subtitle: Each record stores the generated snapshot and send status for that week.
+        scheduled_for: Scheduled for
+        sent_at: Sent at
+        view_history_item: View details
+        view_all_history: View all history
+        no_history_title: No weekly reports yet
+        no_history_body: Once a scheduled weekly report is generated, it will appear here with its snapshot and delivery status.
+        statuses:
+          pending: Pending
+          sent: Sent
+          failed: Failed
+          skipped: Skipped
+    weekly_reports:
+      index:
+        page_title: Weekly report history
+        history_title: Weekly report history
+        history_subtitle: Review past weekly report snapshots without recalculating live account data.
+        scheduled_for: Scheduled for
+        sent_at: Sent at
+        view: View
+        empty_title: No weekly reports yet
+        empty_body: Weekly report history will appear here after the first scheduled run.
+      show:
+        page_title: Weekly report detail
+        back: Back to history
+        summary_title: Delivery summary
+        summary_subtitle: Stored metadata for this report send.
+        status: Status
+        scheduled_for: Scheduled for
+        recipient: Recipient
+        overview_title: Overview snapshot
+        overview_subtitle: Household-wide summary captured when the report was generated.
+        account_count: Account count
+        trading_turnover: Trading turnover
+        net_buys: Net buys
+        contributions: Contributions
+        income: Income
+        taxes_fees: Taxes and fees
+        most_active_account: Most active account
+        top_security: Most active security
+        accounts_title: Account sections
+        accounts_subtitle: Per-account summaries stored in the sent report payload.
+        top_securities: Top securities
+        recent_activity: Recent activity
+        no_accounts_title: No investment accounts in this report
+        no_accounts_body: This report was generated without any visible investment accounts.
     settings_nav_link_large:
       next: Next
       previous: Back

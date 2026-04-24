@@ -1,0 +1,61 @@
+<h1><%= t(".title", name: @weekly_report.user.display_name) %></h1>
+<p><%= t(".period", start_date: l(@period.start_date, format: :long), end_date: l(@period.end_date, format: :long)) %></p>
+
+<h2><%= t(".overview_title") %></h2>
+<ul>
+  <li><%= t(".account_count", count: @overview[:account_count]) %></li>
+  <li><%= t(".trading_turnover", amount: format_money(Money.new(@overview[:trading_turnover].to_d, @weekly_report.user.family.currency))) %></li>
+  <li><%= t(".net_buys", amount: format_money(Money.new(@overview[:net_buys].to_d, @weekly_report.user.family.currency))) %></li>
+  <li><%= t(".contributions", amount: format_money(Money.new(@overview[:contributions].to_d, @weekly_report.user.family.currency))) %></li>
+  <li><%= t(".income", amount: format_money(Money.new(@overview[:income].to_d, @weekly_report.user.family.currency))) %></li>
+  <li><%= t(".taxes_fees", amount: format_money(Money.new(@overview[:taxes_fees].to_d, @weekly_report.user.family.currency))) %></li>
+</ul>
+
+<% if @overview[:most_active_account].present? %>
+  <p><strong><%= t(".most_active_account") %>:</strong> <%= @overview[:most_active_account][:name] %> (<%= format_money(Money.new(@overview[:most_active_account][:turnover].to_d, @weekly_report.user.family.currency)) %>)</p>
+<% end %>
+
+<% if @overview[:top_security].present? %>
+  <p><strong><%= t(".top_security") %>:</strong> <%= @overview[:top_security][:ticker] %> · <%= @overview[:top_security][:name] %></p>
+<% end %>
+
+<h2><%= t(".accounts_title") %></h2>
+
+<% if @accounts.any? %>
+  <% @accounts.each do |account| %>
+    <section style="margin-bottom: 24px;">
+      <h3><%= account[:name] %></h3>
+      <p><%= account[:subtitle] %></p>
+
+      <ul>
+        <% account[:summary].each_value do |metric| %>
+          <li><strong><%= metric[:label] %>:</strong> <%= format_money(Money.new(metric[:amount].to_d, account[:currency])) %></li>
+        <% end %>
+      </ul>
+
+      <% if account[:top_securities].any? %>
+        <p><strong><%= t(".top_securities") %>:</strong></p>
+        <ul>
+          <% account[:top_securities].each do |security| %>
+            <li><%= security[:ticker] %> · <%= security[:name] %> (<%= format_money(Money.new(security[:buy_volume].to_d + security[:sell_volume].to_d, account[:currency])) %>)</li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if account[:recent_activity].any? %>
+        <p><strong><%= t(".recent_activity") %>:</strong></p>
+        <ul>
+          <% account[:recent_activity].each do |activity| %>
+            <li><%= l(Date.parse(activity[:date]), format: :long) %> · <%= activity[:label] %> · <%= format_money(Money.new(activity[:amount].to_d, account[:currency])) %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    </section>
+  <% end %>
+<% else %>
+  <p><%= t(".no_accounts") %></p>
+<% end %>
+
+<% if @weekly_report.persisted? %>
+  <p><%= link_to t(".history_link"), settings_weekly_report_delivery_url(@weekly_report) %></p>
+<% end %>
