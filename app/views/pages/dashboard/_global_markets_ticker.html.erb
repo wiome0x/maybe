@@ -1,29 +1,32 @@
-<div class="relative overflow-hidden rounded-[32px] border border-[#2b2b2b] bg-container px-5 py-5 shadow-border-xs md:px-7 md:py-6" data-controller="global-markets">
+<div class="relative overflow-hidden rounded-[32px] border border-[#2b2b2b] bg-container shadow-border-xs" data-controller="global-markets">
   <div class="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(232,236,250,0.92)_100%)]"></div>
   <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.86)_34%,rgba(244,246,252,0.96)_100%)]"></div>
   <div class="pointer-events-none absolute inset-x-[-8%] top-14 h-[82%] rounded-[999px] bg-[radial-gradient(circle_at_center,rgba(227,233,252,0.5)_0%,rgba(238,242,253,0.2)_48%,rgba(255,255,255,0)_76%)] blur-2xl"></div>
 
-  <div class="relative flex items-start justify-between gap-4">
-    <%# 左侧标题 %>
-    <div class="space-y-1.5">
-      <div class="flex items-center gap-1.5 text-secondary">
-        <%= icon "globe", size: "sm" %>
-        <span class="text-sm font-medium"><%= t("pages.dashboard.global_markets.title") %></span>
+  <div class="relative flex flex-col md:flex-row min-h-[420px] md:min-h-[480px]">
+
+    <%# 左侧：标题 + 交易时间列表 %>
+    <div class="flex flex-col gap-4 px-5 pt-5 pb-4 md:px-7 md:pt-6 md:pb-6 md:w-[200px] md:shrink-0 md:border-r md:border-black/[0.06]">
+      <div class="space-y-1">
+        <div class="flex items-center gap-1.5 text-secondary">
+          <%= icon "globe", size: "sm" %>
+          <span class="text-sm font-medium"><%= t("pages.dashboard.global_markets.title") %></span>
+        </div>
+        <p class="text-xs leading-5 text-secondary"><%= t("pages.dashboard.global_markets.subtitle") %></p>
       </div>
-      <p class="max-w-[24rem] text-xs leading-5 text-secondary md:text-sm"><%= t("pages.dashboard.global_markets.subtitle") %></p>
+
+      <%# 交易时间列表 — JS 动态填充 %>
+      <div data-global-markets-target="sessions" class="flex flex-col gap-1.5">
+      </div>
     </div>
 
-    <%# 右侧：主要市场交易时间状态 %>
-    <div data-global-markets-target="sessions"
-         class="flex flex-wrap justify-end gap-x-2 gap-y-2 max-w-[480px] shrink-0 pt-0.5">
-      <%# JS 动态填充 %>
+    <%# 右侧：地图 %>
+    <div class="relative flex-1 min-h-[320px] md:min-h-0">
+      <div class="pointer-events-none absolute inset-x-0 top-[6%] bottom-[4%] opacity-[0.97]">
+        <%= image_tag "global-markets-map.svg", alt: "", class: "h-full w-full object-contain" %>
+      </div>
+      <div class="absolute inset-0 pointer-events-none" data-global-markets-target="map"></div>
     </div>
-  </div>
 
-  <div class="relative -mx-3 mt-4 min-h-[320px] md:-mx-5 md:mt-2 md:min-h-[440px]">
-    <div class="pointer-events-none absolute inset-x-0 top-[6%] bottom-[4%] opacity-[0.97]">
-      <%= image_tag "global-markets-map.svg", alt: "", class: "h-full w-full object-contain" %>
-    </div>
-    <div class="absolute inset-0 pointer-events-none" data-global-markets-target="map"></div>
   </div>
 </div>
