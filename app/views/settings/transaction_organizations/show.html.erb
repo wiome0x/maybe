@@ -2,11 +2,10 @@
 
 <section class="bg-container rounded-xl shadow-border-xs p-5">
   <div class="space-y-3">
-    <div>
-      <p class="text-xs uppercase tracking-wide text-secondary"><%= t(".eyebrow") %></p>
-      <h2 class="text-primary text-lg font-medium mt-1"><%= t(".title") %></h2>
-      <p class="text-sm text-secondary mt-2"><%= t(".description") %></p>
-    </div>
+    <%= render "section_header",
+               eyebrow: t(".eyebrow"),
+               title: t(".title"),
+               description: t(".description") %>
 
     <div class="grid gap-3 md:grid-cols-3">
       <div class="rounded-lg bg-container-inset p-4">
@@ -32,68 +31,43 @@
 
 <section class="bg-container rounded-xl shadow-border-xs p-5">
   <div class="space-y-4">
-    <div>
-      <p class="text-xs uppercase text-secondary"><%= t(".entrypoints_label") %></p>
-      <h2 class="text-primary text-lg font-medium mt-1"><%= t(".entrypoints_title") %></h2>
-      <p class="text-sm text-secondary mt-2"><%= t(".entrypoints_description") %></p>
-    </div>
+    <%= render "section_header",
+               eyebrow: t(".entrypoints_label"),
+               title: t(".entrypoints_title"),
+               description: t(".entrypoints_description") %>
 
     <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-      <div class="rounded-lg bg-container-inset p-4 flex flex-col gap-3">
-        <div>
-          <p class="text-xs uppercase text-secondary mb-1"><%= t(".rules_label") %></p>
-          <p class="text-sm text-primary"><%= t(".rules_card_body") %></p>
-        </div>
-        <p class="text-sm text-secondary"><%= t(".rules_count", count: @rules_count) %></p>
-        <%= render DS::Link.new(
-          text: t(".rules_cta"),
-          variant: "secondary",
-          href: rules_path,
-          icon: "git-branch"
-        ) %>
-      </div>
+      <%= render "entrypoint_card",
+                 label: t(".rules_label"),
+                 body: t(".rules_card_body"),
+                 count_text: t(".rules_count", count: @rules_count),
+                 cta_text: t(".rules_cta"),
+                 href: rules_path,
+                 icon: "git-branch" %>
 
-      <div class="rounded-lg bg-container-inset p-4 flex flex-col gap-3">
-        <div>
-          <p class="text-xs uppercase text-secondary mb-1"><%= t(".category_label") %></p>
-          <p class="text-sm text-primary"><%= t(".category_card_body") %></p>
-        </div>
-        <p class="text-sm text-secondary"><%= t(".categories_count", count: @categories_count) %></p>
-        <%= render DS::Link.new(
-          text: t(".categories_cta"),
-          variant: "secondary",
-          href: categories_path,
-          icon: "shapes"
-        ) %>
-      </div>
+      <%= render "entrypoint_card",
+                 label: t(".category_label"),
+                 body: t(".category_card_body"),
+                 count_text: t(".categories_count", count: @categories_count),
+                 cta_text: t(".categories_cta"),
+                 href: categories_path,
+                 icon: "shapes" %>
 
-      <div class="rounded-lg bg-container-inset p-4 flex flex-col gap-3">
-        <div>
-          <p class="text-xs uppercase text-secondary mb-1"><%= t(".merchant_label") %></p>
-          <p class="text-sm text-primary"><%= t(".merchant_card_body") %></p>
-        </div>
-        <p class="text-sm text-secondary"><%= t(".merchants_count", count: @merchants_count) %></p>
-        <%= render DS::Link.new(
-          text: t(".merchants_cta"),
-          variant: "secondary",
-          href: family_merchants_path,
-          icon: "store"
-        ) %>
-      </div>
+      <%= render "entrypoint_card",
+                 label: t(".merchant_label"),
+                 body: t(".merchant_card_body"),
+                 count_text: t(".merchants_count", count: @merchants_count),
+                 cta_text: t(".merchants_cta"),
+                 href: family_merchants_path,
+                 icon: "store" %>
 
-      <div class="rounded-lg bg-container-inset p-4 flex flex-col gap-3">
-        <div>
-          <p class="text-xs uppercase text-secondary mb-1"><%= t(".tag_label") %></p>
-          <p class="text-sm text-primary"><%= t(".tag_card_body") %></p>
-        </div>
-        <p class="text-sm text-secondary"><%= t(".tags_count", count: @tags_count) %></p>
-        <%= render DS::Link.new(
-          text: t(".tags_cta"),
-          variant: "secondary",
-          href: tags_path,
-          icon: "tags"
-        ) %>
-      </div>
+      <%= render "entrypoint_card",
+                 label: t(".tag_label"),
+                 body: t(".tag_card_body"),
+                 count_text: t(".tags_count", count: @tags_count),
+                 cta_text: t(".tags_cta"),
+                 href: tags_path,
+                 icon: "tags" %>
     </div>
   </div>
 </section>
@@ -101,11 +75,10 @@
 <section class="bg-container rounded-xl shadow-border-xs p-5">
   <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
     <div class="space-y-2">
-      <div>
-        <p class="text-xs uppercase text-secondary"><%= t(".rules_label") %></p>
-        <h2 class="text-primary text-lg font-medium mt-1"><%= t(".rules_title") %></h2>
-      </div>
-      <p class="text-sm text-secondary"><%= t(".rules_description") %></p>
+      <%= render "section_header",
+                 eyebrow: t(".rules_label"),
+                 title: t(".rules_title"),
+                 description: t(".rules_description") %>
       <p class="text-sm text-primary"><%= t(".rules_count", count: @rules_count) %></p>
     </div>
 
@@ -122,10 +95,10 @@
 
 <section class="bg-container rounded-xl shadow-border-xs p-5">
   <div class="space-y-3">
-    <div>
-      <p class="text-xs uppercase text-secondary"><%= t(".example_label") %></p>
-      <h2 class="text-primary text-lg font-medium mt-1"><%= t(".example_title") %></h2>
-    </div>
+    <%= render "section_header",
+               eyebrow: t(".example_label"),
+               title: t(".example_title"),
+               description: "" %>
 
     <div class="rounded-lg bg-container-inset p-4 space-y-2">
       <p class="text-sm text-primary"><%= t(".example_case") %></p>

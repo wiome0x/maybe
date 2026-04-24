@@ -1,0 +1,17 @@
+<%# locals: (label:, body:, count_text:, cta_text:, href:, icon:, variant: "secondary") %>
+
+<div class="rounded-lg bg-container-inset p-4 flex flex-col gap-3">
+  <div class="space-y-1">
+    <p class="text-xs uppercase text-secondary"><%= label %></p>
+    <p class="text-sm text-primary"><%= body %></p>
+  </div>
+
+  <p class="text-sm text-secondary"><%= count_text %></p>
+
+  <%= render DS::Link.new(
+    text: cta_text,
+    variant: variant,
+    href: href,
+    icon: icon
+  ) %>
+</div>
