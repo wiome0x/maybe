@@ -2,10 +2,6 @@ en:
   data_tracking:
     index:
       title: Data Tracking
-      import_csv: Import CSV
-      import_history: "Import History · %{count}"
-      empty_title: No imports yet
-      empty_subtitle: Upload a CSV file with historical stock price data to get started.
     trend_chart:
       title: Price Trends
       ticker: Ticker
@@ -14,9 +10,10 @@ en:
       ticker_list_subtitle: Search by ticker, English name, or Chinese name
       quick_group_title: Magnificent 7
       quick_group_subtitle: Jump between major US tech names
+      no_data_badge: No data
       start_date: Start Date
       end_date: End Date
       search: Search
       empty_title: No trend data
-      empty_subtitle: Enter a ticker symbol and click Search to view price history.
+      empty_subtitle: No historical price data is available for the selected ticker.
       range_summary: "%{start_date} to %{end_date} · %{points} trading days"

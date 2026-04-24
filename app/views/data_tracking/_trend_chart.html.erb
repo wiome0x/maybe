@@ -19,6 +19,9 @@
               <% if option[:zh_name].present? || option[:en_name].present? %>
                 <span class="text-xs opacity-80"><%= [option[:zh_name], option[:en_name]].compact.join(" / ") %></span>
               <% end %>
+              <% unless option[:available] %>
+                <span class="rounded-full bg-alpha-black-100 px-1.5 py-0.5 text-[10px] uppercase opacity-80"><%= t(".no_data_badge") %></span>
+              <% end %>
             </button>
           <% end %>
         </div>

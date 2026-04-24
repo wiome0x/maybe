@@ -10,8 +10,7 @@ class DataTrackingController < ApplicationController
   }.freeze
 
   def index
-    @imports = Current.family.imports.where(type: "HistoricalDataImport").ordered
-    @breadcrumbs = [ [ "Home", root_path ], [ "Data Tracking", nil ] ]
+    @breadcrumbs = [ [ t("layouts.application.home"), root_path ], [ t("layouts.application.data_tracking"), nil ] ]
     load_trend_data
   end
 
@@ -56,6 +55,14 @@ class DataTrackingController < ApplicationController
           quick: aliases[:quick] || false
         }
       end
-      @quick_ticker_options = @ticker_options.select { |option| option[:quick] }
+      @quick_ticker_options = SECURITY_ALIASES.map do |ticker, aliases|
+        {
+          ticker: ticker,
+          en_name: aliases[:en],
+          zh_name: aliases[:zh],
+          quick: true,
+          available: available_tickers.include?(ticker)
+        }
+      end
     end
 end

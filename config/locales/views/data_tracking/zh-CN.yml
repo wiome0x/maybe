@@ -1,11 +1,7 @@
 zh-CN:
   data_tracking:
     index:
-      title: 数据追踪
-      import_csv: 导入 CSV
-      import_history: "导入历史 · %{count}"
-      empty_title: 暂无导入记录
-      empty_subtitle: 上传历史股价 CSV 文件后即可开始分析。
+      title: 数据回溯
     trend_chart:
       title: 价格趋势
       ticker: 代码
@@ -14,9 +10,10 @@ zh-CN:
       ticker_list_subtitle: 支持代码、英文名和中文名搜索
       quick_group_title: 七姐妹快捷查看
       quick_group_subtitle: 一键切换热门美股科技股
+      no_data_badge: 无数据
       start_date: 开始日期
       end_date: 结束日期
       search: 搜索
       empty_title: 暂无趋势数据
-      empty_subtitle: 输入代码并点击搜索即可查看价格历史。
+      empty_subtitle: 当前代码在已导入的历史价格中没有可展示数据。
       range_summary: "%{start_date} 到 %{end_date} · %{points} 个交易日"

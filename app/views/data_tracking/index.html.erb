@@ -1,33 +1,7 @@
 <div class="space-y-4 pb-20">
   <header class="flex justify-between items-center">
     <h1 class="text-xl font-medium text-primary"><%= t(".title") %></h1>
-    <%= render DS::Link.new(
-      text: t(".import_csv"),
-      icon: "upload",
-      variant: "primary",
-      href: new_import_path(type: "HistoricalDataImport"),
-      frame: :modal
-    ) %>
   </header>
-
-  <%# Import History %>
-  <section class="bg-container rounded-xl shadow-border-xs p-4">
-    <% if @imports.any? %>
-      <div class="bg-container-inset rounded-xl p-1">
-        <h2 class="uppercase px-4 py-2 text-secondary text-xs"><%= t(".import_history", count: @imports.size) %></h2>
-        <div class="bg-container rounded-lg shadow-border-xs">
-          <%= render "data_tracking/import_list" %>
-        </div>
-      </div>
-    <% else %>
-      <div class="flex justify-center items-center py-20">
-        <div class="text-center space-y-2">
-          <p class="text-sm text-primary font-medium"><%= t(".empty_title") %></p>
-          <p class="text-sm text-secondary"><%= t(".empty_subtitle") %></p>
-        </div>
-      </div>
-    <% end %>
-  </section>
 
   <%# Trend Visualization %>
   <section class="bg-container rounded-xl shadow-border-xs p-4">
