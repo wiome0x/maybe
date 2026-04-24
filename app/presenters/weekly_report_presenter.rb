@@ -92,132 +92,32 @@ class WeeklyReportPresenter
   end
 
   private
-  def metric_label(id)
-    I18n.t("investments.reports.metrics.#{id}.label")
+
+    def metric_label(id)
+      I18n.t("investments.reports.metrics.#{id}.label")
   end
 
-  def metric_color(id)
-    {
-      "trading_turnover" => "#0F766E",
-      "net_buys" => "#1D4ED8",
-      "income" => "#B45309",
-      "taxes_fees" => "#B91C1C"
-    }.fetch(id, "#475569")
-  end
-
-  def summary_to_breakdowns(metrics)
-    metrics.filter { |metric| metric[:numeric] != false && metric[:amount].positive? }.map do |metric|
+    def metric_color(id)
       {
-        id: metric[:id],
-        label: metric[:label],
-        amount: numeric_amount(metric[:amount]),
-        color: metric[:color],
-        count: nil
-      }
-    end
-  end
-
-  def numeric_amount(value)
-    if value.is_a?(Money)
-      value.amount
-    elsif value.respond_to?(:dig)
-      (value.dig(:amount) || value.dig("amount") || value).to_d
-    else
-      value.to_d
-    end
-  end
-
-  class AccountSection
-    def initialize(data)
-      @data = data.deep_symbolize_keys
+        "trading_turnover" => "#0F766E",
+        "net_buys" => "#1D4ED8",
+        "income" => "#B45309",
+        "taxes_fees" => "#B91C1C"
+      }.fetch(id, "#475569")
     end
 
-    attr_reader :data
-
-    def id
-      data[:account_id]
-    end
-
-    def name
-      data[:name]
-    end
-
-    def subtitle
-      data[:subtitle]
-    end
-
-    def account_label
-      label = data[:account_label]
-      return nil if label.blank? || label == name
-
-      label
-    end
-
-    def currency
-      data[:currency]
-    end
-
-    def color
-      data[:chart_color]
-    end
-
-    def current_value
-      numeric_amount(data[:current_value])
-    end
-
-    def metrics
-      [
-        {
-          id: "current_value",
-          label: I18n.t("settings.weekly_reports.shared.current_value"),
-          amount: current_value,
-          color: color || "#0F766E",
-          note: nil
-        }
-      ] + (data[:metrics] || []).select { |metric| METRIC_IDS.include?(metric[:id].to_s) }.map do |metric|
-        metric.merge(amount: numeric_amount(metric[:amount]))
-      end
-    end
-
-    def breakdowns
-      rows = data[:breakdowns] || []
-      return rows.map { |row| row.merge(amount: numeric_amount(row[:amount])) } if rows.any?
-
-      metrics.filter { |metric| metric[:amount].to_d.positive? }.map do |metric|
+    def summary_to_breakdowns(metrics)
+      metrics.filter { |metric| metric[:numeric] != false && metric[:amount].positive? }.map do |metric|
         {
           id: metric[:id],
           label: metric[:label],
-          amount: metric[:amount].to_d,
+          amount: numeric_amount(metric[:amount]),
           color: metric[:color],
           count: nil
         }
       end
     end
 
-    def turnover_chart_data
-      data[:balance_chart_data].presence || data[:turnover_chart_data]
-    end
-
-    def top_holdings
-      (data[:top_holdings] || []).map do |row|
-        row.merge(
-          amount: numeric_amount(row[:amount]),
-          weight: row[:weight].to_d
-        )
-      end
-    end
-
-    def max_holding_amount
-      top_holdings.map { |row| row[:amount].to_d }.max.to_d
-    end
-
-    def recent_activity
-      (data[:recent_activity] || []).map do |row|
-        row.merge(amount: numeric_amount(row[:amount]))
-      end
-    end
-
-    private
     def numeric_amount(value)
       if value.is_a?(Money)
         value.amount
@@ -227,5 +127,106 @@ class WeeklyReportPresenter
         value.to_d
       end
     end
-  end
+
+    class AccountSection
+      def initialize(data)
+        @data = data.deep_symbolize_keys
+      end
+
+      attr_reader :data
+
+      def id
+        data[:account_id]
+      end
+
+      def name
+        data[:name]
+      end
+
+      def subtitle
+        data[:subtitle]
+      end
+
+      def account_label
+        label = data[:account_label]
+        return nil if label.blank? || label == name
+
+        label
+      end
+
+      def currency
+        data[:currency]
+      end
+
+      def color
+        data[:chart_color]
+      end
+
+      def current_value
+        numeric_amount(data[:current_value])
+      end
+
+      def metrics
+        [
+          {
+            id: "current_value",
+            label: I18n.t("settings.weekly_reports.shared.current_value"),
+            amount: current_value,
+            color: color || "#0F766E",
+            note: nil
+          }
+        ] + (data[:metrics] || []).select { |metric| METRIC_IDS.include?(metric[:id].to_s) }.map do |metric|
+          metric.merge(amount: numeric_amount(metric[:amount]))
+        end
+      end
+
+      def breakdowns
+        rows = data[:breakdowns] || []
+        return rows.map { |row| row.merge(amount: numeric_amount(row[:amount])) } if rows.any?
+
+        metrics.filter { |metric| metric[:amount].to_d.positive? }.map do |metric|
+          {
+            id: metric[:id],
+            label: metric[:label],
+            amount: metric[:amount].to_d,
+            color: metric[:color],
+            count: nil
+          }
+        end
+      end
+
+      def turnover_chart_data
+        data[:balance_chart_data].presence || data[:turnover_chart_data]
+      end
+
+      def top_holdings
+        (data[:top_holdings] || []).map do |row|
+          row.merge(
+            amount: numeric_amount(row[:amount]),
+            weight: row[:weight].to_d
+          )
+        end
+      end
+
+      def max_holding_amount
+        top_holdings.map { |row| row[:amount].to_d }.max.to_d
+      end
+
+      def recent_activity
+        (data[:recent_activity] || []).map do |row|
+          row.merge(amount: numeric_amount(row[:amount]))
+        end
+      end
+
+      private
+        def numeric_amount(value)
+          if value.is_a?(Money)
+            value.amount
+          elsif value.respond_to?(:dig)
+            (value.dig(:amount) || value.dig("amount") || value).to_d
+          else
+            value.to_d
+          end
+        end
+    end
 end

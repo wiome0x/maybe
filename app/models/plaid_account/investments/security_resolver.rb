@@ -14,24 +14,24 @@ class PlaidAccount::Investments::SecurityResolver
 
     plaid_security = get_plaid_security(plaid_security_id)
 
-      if plaid_security.nil?
-        report_unresolvable_security(plaid_security_id)
-        response = Response.new(security: nil, cash_equivalent?: false, brokerage_cash?: false, forex_pair?: false)
-      elsif brokerage_cash?(plaid_security)
-        response = Response.new(security: nil, cash_equivalent?: true, brokerage_cash?: true, forex_pair?: false)
-      else
-        security = Security::Resolver.new(
-          plaid_security["ticker_symbol"],
-          exchange_operating_mic: plaid_security["market_identifier_code"]
-        ).resolve
+    if plaid_security.nil?
+      report_unresolvable_security(plaid_security_id)
+      response = Response.new(security: nil, cash_equivalent?: false, brokerage_cash?: false, forex_pair?: false)
+    elsif brokerage_cash?(plaid_security)
+      response = Response.new(security: nil, cash_equivalent?: true, brokerage_cash?: true, forex_pair?: false)
+    else
+      security = Security::Resolver.new(
+        plaid_security["ticker_symbol"],
+        exchange_operating_mic: plaid_security["market_identifier_code"]
+      ).resolve
 
-        response = Response.new(
-          security: security,
-          cash_equivalent?: cash_equivalent?(plaid_security),
-          brokerage_cash?: false,
-          forex_pair?: forex_pair?(plaid_security)
-        )
-      end
+      response = Response.new(
+        security: security,
+        cash_equivalent?: cash_equivalent?(plaid_security),
+        brokerage_cash?: false,
+        forex_pair?: forex_pair?(plaid_security)
+      )
+    end
 
     @security_cache[plaid_security_id] = response
 

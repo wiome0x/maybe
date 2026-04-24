@@ -158,16 +158,16 @@ class Family::DataExporter
         @family.transactions
           .includes(:category, :tags, entry: :account)
           .find_each do |transaction|
-            csv << [
-              transaction.entry.date.iso8601,
-              transaction.entry.account.name,
-              transaction.entry.amount.to_s,
-              transaction.entry.name,
-              transaction.category&.name,
-              transaction.tags.pluck(:name).join(","),
-              transaction.entry.notes,
-              transaction.entry.currency
-            ]
+          csv << [
+            transaction.entry.date.iso8601,
+            transaction.entry.account.name,
+            transaction.entry.amount.to_s,
+            transaction.entry.name,
+            transaction.category&.name,
+            transaction.tags.pluck(:name).join(","),
+            transaction.entry.notes,
+            transaction.entry.currency
+          ]
         end
       end
     end
@@ -179,15 +179,15 @@ class Family::DataExporter
         @family.trades
           .includes(:security, entry: :account)
           .find_each do |trade|
-            csv << [
-              trade.entry.date.iso8601,
-              trade.entry.account.name,
-              trade.security.ticker,
-              trade.qty.to_s,
-              trade.price.to_s,
-              trade.entry.amount.to_s,
-              trade.currency
-            ]
+          csv << [
+            trade.entry.date.iso8601,
+            trade.entry.account.name,
+            trade.security.ticker,
+            trade.qty.to_s,
+            trade.price.to_s,
+            trade.entry.amount.to_s,
+            trade.currency
+          ]
         end
       end
     end
