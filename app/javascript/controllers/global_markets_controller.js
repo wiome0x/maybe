@@ -74,9 +74,9 @@ export default class extends Controller {
     this.loadMarkets();
     this.refreshTimer = setInterval(() => this.loadMarkets(), 60000);
 
-    // Update session clocks every minute
+    // Update session clocks every 30 seconds
     this.renderSessions();
-    this.sessionTimer = setInterval(() => this.renderSessions(), 60000);
+    this.sessionTimer = setInterval(() => this.renderSessions(), 30000);
 
     this.resizeObserver = new ResizeObserver(() => {
       this.prepareOverlay();
@@ -104,32 +104,38 @@ export default class extends Controller {
   #sessionBadge(session, now) {
     const { open, minutesUntilOpen, minutesUntilClose, inLunch } = this.#sessionStatus(session, now);
 
-    let dotColor, label, sublabel;
+    let dotColor, statusText, timeText, bgClass;
 
     if (open && !inLunch) {
       // 盘中
       dotColor = "#16a34a";
-      label = session.name;
-      sublabel = `收盘 ${this.#fmtMins(minutesUntilClose)}`;
+      statusText = "盘中";
+      timeText = minutesUntilClose != null ? `${this.#fmtMins(minutesUntilClose)}后收盘` : "";
+      bgClass = "bg-green-50/80 border-green-200/60";
     } else if (inLunch) {
       // 午休
       dotColor = "#f59e0b";
-      label = session.name;
-      sublabel = `午休 ${this.#fmtMins(minutesUntilClose)}后开`;
+      statusText = "午休";
+      timeText = minutesUntilClose != null ? `${this.#fmtMins(minutesUntilClose)}后开盘` : "";
+      bgClass = "bg-amber-50/80 border-amber-200/60";
     } else {
       // 休市
       dotColor = "#9ca3af";
-      label = session.name;
-      sublabel = minutesUntilOpen != null
-        ? `${this.#fmtMins(minutesUntilOpen)}后开盘`
-        : "休市";
+      statusText = "休市";
+      timeText = minutesUntilOpen != null ? `${this.#fmtMins(minutesUntilOpen)}后开盘` : "周末休市";
+      bgClass = "bg-white/70 border-black/[0.07]";
     }
 
     return `
-      <div class="flex items-center gap-1.5 rounded-full border border-black/[0.07] bg-white/80 px-2.5 py-1 backdrop-blur-sm shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
-        <span class="h-1.5 w-1.5 rounded-full shrink-0" style="background:${dotColor}; box-shadow: 0 0 0 2px ${dotColor}22"></span>
-        <span class="text-[11px] font-medium text-slate-700 whitespace-nowrap">${label}</span>
-        <span class="text-[10px] text-slate-400 whitespace-nowrap">${sublabel}</span>
+      <div class="flex items-center gap-2 rounded-xl border ${bgClass} px-3 py-1.5 backdrop-blur-sm shadow-[0_1px_4px_rgba(0,0,0,0.05)]">
+        <span class="h-2 w-2 rounded-full shrink-0 animate-[pulse_2s_ease-in-out_infinite]" style="background:${dotColor}; box-shadow: 0 0 0 3px ${dotColor}22"></span>
+        <div class="flex flex-col leading-none gap-0.5">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[12px] font-semibold text-slate-700 whitespace-nowrap">${session.name}</span>
+            <span class="text-[10px] font-medium whitespace-nowrap" style="color:${dotColor}">${statusText}</span>
+          </div>
+          <span class="text-[10px] text-slate-400 whitespace-nowrap">${timeText}</span>
+        </div>
       </div>
     `;
   }
