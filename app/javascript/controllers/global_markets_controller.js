@@ -104,33 +104,30 @@ export default class extends Controller {
   #sessionBadge(session, now) {
     const { open, minutesUntilOpen, minutesUntilClose, inLunch } = this.#sessionStatus(session, now);
 
-    let dotColor, statusText, timeText, timeColor;
+    let dotColor, statusText, timeText;
 
     if (open && !inLunch) {
       dotColor = "#16a34a";
       statusText = "盘中";
-      timeColor = "#16a34a";
       timeText = minutesUntilClose != null ? `${this.#fmtMins(minutesUntilClose)}后收盘` : "";
     } else if (inLunch) {
       dotColor = "#f59e0b";
       statusText = "午休";
-      timeColor = "#f59e0b";
       timeText = minutesUntilClose != null ? `${this.#fmtMins(minutesUntilClose)}后开盘` : "";
     } else {
-      dotColor = "#9ca3af";
+      dotColor = "#cbd5e1";
       statusText = "休市";
-      timeColor = "#9ca3af";
       timeText = minutesUntilOpen != null ? `${this.#fmtMins(minutesUntilOpen)}后开盘` : "周末休市";
     }
 
     return `
-      <div class="flex items-center justify-between gap-2 rounded-lg px-2.5 py-2 bg-black/[0.025] hover:bg-black/[0.04] transition-colors">
-        <div class="flex items-center gap-2 min-w-0">
-          <span class="h-1.5 w-1.5 rounded-full shrink-0" style="background:${dotColor}; box-shadow: 0 0 0 3px ${dotColor}22"></span>
-          <span class="text-[12px] font-medium text-slate-700 truncate">${session.name}</span>
-          <span class="text-[10px] font-medium shrink-0" style="color:${dotColor}">${statusText}</span>
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(0,0,0,0.05);">
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span style="width:6px; height:6px; border-radius:50%; background:${dotColor}; flex-shrink:0; box-shadow:0 0 0 2.5px ${dotColor}30;"></span>
+          <span style="font-size:12px; font-weight:600; color:#374151;">${session.name}</span>
+          <span style="font-size:10px; font-weight:500; color:${dotColor}; background:${dotColor}15; padding:1px 5px; border-radius:4px;">${statusText}</span>
         </div>
-        <span class="text-[10px] text-slate-400 whitespace-nowrap shrink-0">${timeText}</span>
+        <span style="font-size:10px; color:#94a3b8; white-space:nowrap; padding-left:6px;">${timeText}</span>
       </div>
     `;
   }
