@@ -1,0 +1,7 @@
+zh-CN:
+  settings:
+    watchlists:
+      create:
+        created: "%{symbol} 已添加到自选。"
+      destroy:
+        removed: "%{symbol} 已从自选中移除。"

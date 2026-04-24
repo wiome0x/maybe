@@ -1,0 +1,14 @@
+en:
+  settings:
+    watchlists:
+      show:
+        page_title: Watchlist
+        stocks_title: Stocks Watchlist
+        stocks_subtitle: Drag to reorder. Track the stocks you care about on the Markets page.
+        stocks_placeholder: e.g. AAPL, TSLA
+        crypto_title: Crypto Watchlist
+        crypto_subtitle: Drag to reorder. Track the cryptocurrencies you care about on the Markets page.
+        crypto_placeholder: e.g. BTC, ETH, SOL
+        add: Add
+        stocks_empty: No stocks added yet.
+        crypto_empty: No cryptocurrencies added yet.

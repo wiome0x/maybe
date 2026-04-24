@@ -1,0 +1,7 @@
+en:
+  settings:
+    watchlists:
+      create:
+        created: "%{symbol} added to watchlist."
+      destroy:
+        removed: "%{symbol} removed from watchlist."

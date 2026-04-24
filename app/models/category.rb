@@ -72,8 +72,10 @@ class Category < ApplicationRecord
       def default_categories
         [
           [ "Income", "#e99537", "circle-dollar-sign", "income" ],
+          [ "Dividends", "#4da568", "piggy-bank", "income" ],
           [ "Loan Payments", "#6471eb", "credit-card", "expense" ],
           [ "Fees", "#6471eb", "credit-card", "expense" ],
+          [ "Withholding Tax", "#db5a54", "credit-card", "expense" ],
           [ "Entertainment", "#df4e92", "drama", "expense" ],
           [ "Food & Drink", "#eb5429", "utensils", "expense" ],
           [ "Shopping", "#e99537", "shopping-cart", "expense" ],

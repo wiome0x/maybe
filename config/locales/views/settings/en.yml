@@ -140,7 +140,7 @@ en:
       rules_label: Rules
       self_hosting_label: Self hosting
       tags_label: Tags
-      transactions_section_title: Transactions
+      transactions_section_title: Transaction Setup
       whats_new_label: What's new
       watchlist_label: Watchlist
     settings_nav_link_large:

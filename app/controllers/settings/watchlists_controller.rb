@@ -10,7 +10,7 @@ class Settings::WatchlistsController < ApplicationController
     item = Current.family.watchlist_items.new(watchlist_params)
 
     if item.save
-      redirect_to settings_watchlist_path, notice: "#{item.symbol} added to watchlist."
+      redirect_to settings_watchlist_path, notice: t(".created", symbol: item.symbol)
     else
       redirect_to settings_watchlist_path, alert: item.errors.full_messages.join(", ")
     end
@@ -20,7 +20,7 @@ class Settings::WatchlistsController < ApplicationController
     item = Current.family.watchlist_items.find(params[:id])
     symbol = item.symbol
     item.destroy
-    redirect_to settings_watchlist_path, notice: "#{symbol} removed from watchlist."
+    redirect_to settings_watchlist_path, notice: t(".removed", symbol: symbol)
   end
 
   def reorder

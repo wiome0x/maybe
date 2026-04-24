@@ -1,0 +1,14 @@
+zh-CN:
+  settings:
+    watchlists:
+      show:
+        page_title: 自选管理
+        stocks_title: 股票自选
+        stocks_subtitle: 拖拽即可排序，用于在行情页追踪你关注的股票。
+        stocks_placeholder: 例如 AAPL、TSLA
+        crypto_title: 加密货币自选
+        crypto_subtitle: 拖拽即可排序，用于在行情页追踪你关注的加密货币。
+        crypto_placeholder: 例如 BTC、ETH、SOL
+        add: 添加
+        stocks_empty: 还没有添加股票。
+        crypto_empty: 还没有添加加密货币。
