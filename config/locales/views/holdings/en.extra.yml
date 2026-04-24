@@ -2,4 +2,5 @@ en:
   holdings:
     index:
       cash: Cash
+      largest_holding: Top holding
       portfolio_allocation: Portfolio Allocation

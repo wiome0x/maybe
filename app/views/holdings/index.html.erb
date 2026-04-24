@@ -2,86 +2,123 @@
   <div class="bg-container space-y-4 p-5 rounded-xl shadow-border-xs">
     <div class="flex items-center justify-between">
       <%= tag.h2 t(".holdings"), class: "font-medium text-lg" %>
-      <%= link_to new_trade_path(account_id: @account.id),
-                  id: dom_id(@account, "new_trade"),
-                  data: { turbo_frame: :modal },
-                  class: "flex gap-1 font-medium items-center bg-gray-50 text-primary p-2 rounded-lg" do %>
-        <span class="text-primary">
-          <%= icon("plus", color: "current") %>
-        </span>
-        <%= tag.span t(".new_holding"), class: "text-sm" %>
-      <% end %>
     </div>
 
     <% stock_holdings = @account.current_holdings.reject { |h| h.ticker.include?(".") } %>
-
-    <div class="bg-container-inset rounded-xl p-1">
-      <div class="grid grid-cols-12 items-center uppercase text-xs font-medium text-secondary px-4 py-2">
-        <%= tag.p t(".name"), class: "col-span-4" %>
-        <%= tag.p t(".weight"), class: "col-span-2 justify-self-end" %>
-        <%= tag.p t(".average_cost"), class: "col-span-2 justify-self-end" %>
-        <%= tag.p t(".holdings"), class: "col-span-2 justify-self-end" %>
-        <%= tag.p t(".return"), class: "col-span-2 justify-self-end" %>
-      </div>
-
-      <div class="bg-container rounded-lg shadow-border-xs">
-        <%= render "holdings/cash", account: @account %>
-        <%= render "shared/ruler" %>
-
-        <% if stock_holdings.any? %>
-          <%= render partial: "holdings/holding", collection: stock_holdings, spacer_template: "shared/ruler" %>
-        <% end %>
-      </div>
-    </div>
-
     <% chart_holdings = stock_holdings.select { |h| h.weight.present? && h.weight > 0 } %>
-    <% if chart_holdings.any? %>
-      <%
-        cash_weight = @account.balance.zero? ? 0 : (@account.cash_balance / @account.balance * 100).round(1)
-        slices = []
-        slices << { label: t(".cash"), value: cash_weight } if cash_weight > 0
-        chart_holdings.each { |h| slices << { label: h.ticker, value: h.weight.round(1) } }
-        pie_colors = %w[#6B7280 #3B82F6 #10B981 #F59E0B #EF4444 #8B5CF6 #EC4899 #14B8A6 #F97316 #6366F1]
-        total = slices.sum { |s| s[:value] }
-      %>
-      <div class="bg-container-inset rounded-xl p-4">
-        <h3 class="text-xs font-medium text-secondary uppercase mb-3"><%= t(".portfolio_allocation") %></h3>
-        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center">
-          <svg width="180" height="180" viewBox="0 0 180 180" style="flex-shrink:0">
-            <%
-              cx = 90; cy = 90; outer_r = 75; inner_r = 45
-              angle = -90.0
-              slices.each_with_index do |s, i|
-                pct = s[:value] / total
-                sweep = pct * 360.0
-                start_rad = angle * Math::PI / 180
-                end_rad = (angle + sweep) * Math::PI / 180
-                large = sweep > 180 ? 1 : 0
-                color = pie_colors[i % pie_colors.length]
+    <%
+      cash_weight = @account.balance.zero? ? 0 : (@account.cash_balance / @account.balance * 100).round(1)
+      slices = []
+      slices << { label: t(".cash"), value: cash_weight } if cash_weight > 0
+      chart_holdings.each { |h| slices << { label: h.ticker, value: h.weight.round(1) } }
+      pie_colors = %w[#6B7280 #3B82F6 #10B981 #F59E0B #EF4444 #8B5CF6 #EC4899 #14B8A6 #F97316 #6366F1]
+      total = slices.sum { |s| s[:value] }
+      largest_slice = slices.max_by { |s| s[:value] }
+      labeled_slice_indexes = slices.each_with_index
+        .sort_by { |(slice, _index)| -slice[:value] }
+        .first(3)
+        .map(&:last)
+    %>
 
-                ox1 = cx + outer_r * Math.cos(start_rad)
-                oy1 = cy + outer_r * Math.sin(start_rad)
-                ox2 = cx + outer_r * Math.cos(end_rad)
-                oy2 = cy + outer_r * Math.sin(end_rad)
-                ix1 = cx + inner_r * Math.cos(end_rad)
-                iy1 = cy + inner_r * Math.sin(end_rad)
-                ix2 = cx + inner_r * Math.cos(start_rad)
-                iy2 = cy + inner_r * Math.sin(start_rad)
-            %>
-              <path d="M<%= ox1 %> <%= oy1 %> A<%= outer_r %> <%= outer_r %> 0 <%= large %> 1 <%= ox2 %> <%= oy2 %> L<%= ix1 %> <%= iy1 %> A<%= inner_r %> <%= inner_r %> 0 <%= large %> 0 <%= ix2 %> <%= iy2 %> Z" fill="<%= color %>" stroke="white" stroke-width="2"/>
-            <% angle += sweep; end %>
-          </svg>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px">
-            <% slices.each_with_index do |s, i| %>
-              <div style="display:flex;align-items:center;gap:6px;padding:2px 0">
-                <span style="width:10px;height:10px;border-radius:2px;background:<%= pie_colors[i % pie_colors.length] %>;flex-shrink:0"></span>
-                <span class="text-xs text-secondary"><%= s[:label] %></span>
-                <span class="text-xs font-medium text-primary" style="margin-left:auto"><%= s[:value] %>%</span>
-              </div>
-            <% end %>
-          </div>
+    <div class="grid gap-4 xl:grid-cols-[minmax(0,1.8fr)_minmax(20rem,0.9fr)] xl:items-start">
+      <div class="bg-container-inset rounded-xl p-1 min-w-0">
+        <div class="grid grid-cols-12 items-center uppercase text-xs font-medium text-secondary px-4 py-2">
+          <%= tag.p t(".name"), class: "col-span-4" %>
+          <%= tag.p t(".weight"), class: "col-span-2 justify-self-end" %>
+          <%= tag.p t(".average_cost"), class: "col-span-2 justify-self-end" %>
+          <%= tag.p t(".holdings"), class: "col-span-2 justify-self-end" %>
+          <%= tag.p t(".return"), class: "col-span-2 justify-self-end" %>
+        </div>
+
+        <div class="bg-container rounded-lg shadow-border-xs">
+          <%= render "holdings/cash", account: @account %>
+          <%= render "shared/ruler" %>
+
+          <% if stock_holdings.any? %>
+            <%= render partial: "holdings/holding", collection: stock_holdings, spacer_template: "shared/ruler" %>
+          <% end %>
         </div>
       </div>
-    <% end %>
+
+      <% if chart_holdings.any? %>
+        <div class="bg-container-inset rounded-xl p-4 h-full">
+          <h3 class="text-xs font-medium text-secondary uppercase mb-3"><%= t(".portfolio_allocation") %></h3>
+          <div class="flex flex-col items-center justify-center gap-5 h-full min-h-[26rem]">
+            <svg width="220" height="220" viewBox="0 0 180 180" class="shrink-0 overflow-visible">
+              <%
+                cx = 90; cy = 90; outer_r = 75; inner_r = 45
+                angle = -90.0
+                slices.each_with_index do |s, i|
+                  pct = s[:value] / total
+                  sweep = pct * 360.0
+                  start_rad = angle * Math::PI / 180
+                  end_rad = (angle + sweep) * Math::PI / 180
+                  large = sweep > 180 ? 1 : 0
+                  color = pie_colors[i % pie_colors.length]
+
+                  ox1 = cx + outer_r * Math.cos(start_rad)
+                  oy1 = cy + outer_r * Math.sin(start_rad)
+                  ox2 = cx + outer_r * Math.cos(end_rad)
+                  oy2 = cy + outer_r * Math.sin(end_rad)
+                  ix1 = cx + inner_r * Math.cos(end_rad)
+                  iy1 = cy + inner_r * Math.sin(end_rad)
+                  ix2 = cx + inner_r * Math.cos(start_rad)
+                  iy2 = cy + inner_r * Math.sin(start_rad)
+              %>
+                <path d="M<%= ox1 %> <%= oy1 %> A<%= outer_r %> <%= outer_r %> 0 <%= large %> 1 <%= ox2 %> <%= oy2 %> L<%= ix1 %> <%= iy1 %> A<%= inner_r %> <%= inner_r %> 0 <%= large %> 0 <%= ix2 %> <%= iy2 %> Z" fill="<%= color %>" stroke="white" stroke-width="2"/>
+
+                <% if labeled_slice_indexes.include?(i) %>
+                  <%
+                    mid_angle = angle + (sweep / 2.0)
+                    mid_rad = mid_angle * Math::PI / 180
+                    label_start_r = outer_r + 2
+                    label_bend_r = outer_r + 10
+                    label_text_r = outer_r + 18
+                    start_x = cx + label_start_r * Math.cos(mid_rad)
+                    start_y = cy + label_start_r * Math.sin(mid_rad)
+                    bend_x = cx + label_bend_r * Math.cos(mid_rad)
+                    bend_y = cy + label_bend_r * Math.sin(mid_rad)
+                    text_x = cx + label_text_r * Math.cos(mid_rad)
+                    text_y = cy + label_text_r * Math.sin(mid_rad)
+                    label_on_right = Math.cos(mid_rad) >= 0
+                    text_anchor = label_on_right ? "start" : "end"
+                    label_x = label_on_right ? text_x + 6 : text_x - 6
+                  %>
+                  <path d="M<%= start_x.round(2) %> <%= start_y.round(2) %> L<%= bend_x.round(2) %> <%= bend_y.round(2) %> L<%= label_x.round(2) %> <%= bend_y.round(2) %>" fill="none" stroke="<%= color %>" stroke-width="1.5" stroke-linecap="round"/>
+                  <text x="<%= label_x.round(2) %>" y="<%= (bend_y - 2).round(2) %>" text-anchor="<%= text_anchor %>" class="fill-current text-primary" style="font-size: 9px; font-weight: 700;">
+                    <%= s[:label] %>
+                  </text>
+                  <text x="<%= label_x.round(2) %>" y="<%= (bend_y + 9).round(2) %>" text-anchor="<%= text_anchor %>" class="fill-current text-secondary" style="font-size: 8px; font-weight: 600;">
+                    <%= number_to_percentage(s[:value], precision: 1) %>
+                  </text>
+                <% end %>
+              <% angle += sweep; end %>
+
+              <% if largest_slice %>
+                <text x="<%= cx %>" y="<%= cy - 10 %>" text-anchor="middle" class="fill-current text-secondary" style="font-size: 10px; font-weight: 500;">
+                  <%= t(".largest_holding") %>
+                </text>
+                <text x="<%= cx %>" y="<%= cy + 10 %>" text-anchor="middle" class="fill-current text-primary" style="font-size: 16px; font-weight: 700;">
+                  <%= largest_slice[:label] %>
+                </text>
+                <text x="<%= cx %>" y="<%= cy + 28 %>" text-anchor="middle" class="fill-current text-primary" style="font-size: 12px; font-weight: 600;">
+                  <%= number_to_percentage(largest_slice[:value], precision: 1) %>
+                </text>
+              <% end %>
+            </svg>
+
+            <div class="grid w-full gap-x-6 gap-y-2 sm:grid-cols-2">
+              <% slices.each_with_index do |s, i| %>
+                <div class="flex items-center gap-2 py-0.5">
+                  <span class="h-2.5 w-2.5 rounded-[3px] shrink-0" style="background:<%= pie_colors[i % pie_colors.length] %>"></span>
+                  <span class="text-xs text-secondary truncate"><%= s[:label] %></span>
+                  <span class="text-xs font-medium text-primary ml-auto"><%= s[:value] %>%</span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
 <% end %>

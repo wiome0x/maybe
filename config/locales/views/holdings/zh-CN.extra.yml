@@ -2,4 +2,5 @@ zh-CN:
   holdings:
     index:
       cash: 现金
+      largest_holding: 最大持仓
       portfolio_allocation: 持仓分配
