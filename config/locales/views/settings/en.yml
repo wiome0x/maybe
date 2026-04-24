@@ -76,6 +76,7 @@ en:
         remove_member: Remove Member
         save: Save
         email_change_pending: "You have requested to change your email to %{email}. Please go to your email and confirm for the change to take effect."
+        export: Export
         data_import_export: Data Import/Export
         export_data: Export data
     securities:

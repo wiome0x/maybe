@@ -123,7 +123,7 @@
 <% end %>
 
 <% if Current.user.admin? %>
-  <%= settings_section title: t(".data_import_export") do %>
+  <%= settings_section title: t(".export") do %>
     <div class="space-y-4">
       <div class="flex gap-4 items-center">
         <%= render DS::Link.new(
