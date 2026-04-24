@@ -90,7 +90,7 @@
       </div>
 
       <div class="hidden lg:flex items-center gap-1 col-span-2">
-        <%= render "transactions/transaction_category", transaction: transaction %>
+        <%= render "transactions/transaction_category", transaction: transaction, entry: entry %>
       </div>
 
       <div class="col-span-2 ml-auto text-right">
@@ -101,4 +101,3 @@
     </div>
   <% end %>
 <% end %>
-

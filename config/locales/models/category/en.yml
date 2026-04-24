@@ -1,0 +1,9 @@
+en:
+  categories:
+    names:
+      buy: "Buy"
+      sell: "Sell"
+      fx_inflow: "FX Inflow"
+      fx_outflow: "FX Outflow"
+      cash_inflow: "Cash Inflow"
+      cash_outflow: "Cash Outflow"
