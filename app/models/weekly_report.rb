@@ -26,6 +26,11 @@ class WeeklyReport < ApplicationRecord
     payload&.fetch("recipient_email", nil).presence || user.email
   end
 
+  def all_recipient_emails
+    extra = payload&.fetch("extra_recipient_emails", []) || []
+    ([ recipient_email ] + extra.reject(&:blank?)).uniq
+  end
+
   def period
     Period.custom(start_date: period_start_date, end_date: period_end_date)
   end

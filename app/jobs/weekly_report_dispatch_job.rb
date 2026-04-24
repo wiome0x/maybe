@@ -39,7 +39,7 @@ class WeeklyReportDispatchJob < ApplicationJob
       end
 
       weekly_report.status = :pending
-      weekly_report.payload = WeeklyReportBuilder.new(user: user, period: period).build
+      weekly_report.payload = WeeklyReportBuilder.new(user: user, period: period, extra_recipient_emails: subscription.extra_recipient_emails).build
       weekly_report.save!
 
       message = WeeklyReportMailer.with(weekly_report: weekly_report).weekly_report

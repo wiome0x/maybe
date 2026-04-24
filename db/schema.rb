@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_25_093000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_25_094000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -915,6 +915,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_25_093000) do
     t.string "period_key", default: "last_7_days", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "extra_recipient_emails", default: [], array: true
     t.index ["user_id"], name: "index_weekly_report_subscriptions_on_user_id", unique: true
   end
 

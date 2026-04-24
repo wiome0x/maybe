@@ -1,5 +1,6 @@
 class WeeklyReportSubscription < ApplicationRecord
   PERIOD_KEYS = %w[last_7_days].freeze
+  MAX_EXTRA_RECIPIENTS = 3
 
   belongs_to :user
 
@@ -8,6 +9,12 @@ class WeeklyReportSubscription < ApplicationRecord
   validates :send_hour, inclusion: { in: 0..23 }
   validates :timezone, inclusion: { in: ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.identifier } }
   validates :user_id, uniqueness: true
+  validate :extra_recipients_limit
+  validate :extra_recipients_format
+
+  def all_recipient_emails
+    ([ user.email ] + extra_recipient_emails.reject(&:blank?)).uniq
+  end
 
   scope :enabled, -> { where(enabled: true) }
 
@@ -46,5 +53,22 @@ class WeeklyReportSubscription < ApplicationRecord
       self.send_weekday = Date.current.wday if send_weekday.nil?
       self.send_hour ||= 8
       self.timezone ||= user&.family&.timezone || Time.zone.tzinfo.identifier
+      self.extra_recipient_emails ||= []
+    end
+
+    def extra_recipients_limit
+      return if extra_recipient_emails.blank?
+      if extra_recipient_emails.reject(&:blank?).size > MAX_EXTRA_RECIPIENTS
+        errors.add(:extra_recipient_emails, "最多只能添加 #{MAX_EXTRA_RECIPIENTS} 个额外收件人")
+      end
+    end
+
+    def extra_recipients_format
+      return if extra_recipient_emails.blank?
+      extra_recipient_emails.reject(&:blank?).each do |email|
+        unless email.match?(URI::MailTo::EMAIL_REGEXP)
+          errors.add(:extra_recipient_emails, "#{email} 不是有效的邮箱地址")
+        end
+      end
     end
 end

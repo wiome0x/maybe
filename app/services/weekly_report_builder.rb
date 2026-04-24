@@ -1,9 +1,10 @@
 class WeeklyReportBuilder
   ACCOUNT_BREAKDOWN_COLORS = %w[#1D4ED8 #0F766E #B45309 #7C3AED #DC2626 #475569].freeze
 
-  def initialize(user:, period:)
+  def initialize(user:, period:, extra_recipient_emails: [])
     @user = user
     @period = period
+    @extra_recipient_emails = extra_recipient_emails
   end
 
   def build
@@ -14,6 +15,7 @@ class WeeklyReportBuilder
     {
       generated_at: Time.current.iso8601,
       recipient_email: user.email,
+      extra_recipient_emails: extra_recipient_emails.reject(&:blank?),
       period: {
         key: period.key,
         label: period.label,
@@ -26,7 +28,7 @@ class WeeklyReportBuilder
   end
 
   private
-    attr_reader :user, :period
+    attr_reader :user, :period, :extra_recipient_emails
 
     def investment_accounts
       user.family.accounts.visible.where(accountable_type: "Investment").alphabetically

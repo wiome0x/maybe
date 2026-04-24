@@ -20,10 +20,29 @@
     <%= form.select :timezone, timezone_options, { label: t(".timezone") } %>
     <%= form.select :period_key, [[t(".last_7_days"), "last_7_days"]], { label: t(".report_range") } %>
 
-    <div class="rounded-xl bg-container-inset p-4 space-y-2 text-sm text-secondary">
-      <p><span class="font-medium text-primary"><%= t(".recipient_label") %>:</span> <%= Current.user.email %></p>
-      <p><span class="font-medium text-primary"><%= t(".range_label") %>:</span> <%= t(".range_hint") %></p>
-      <p><span class="font-medium text-primary"><%= t(".structure_label") %>:</span> <%= t(".structure_hint") %></p>
+    <div class="rounded-xl bg-container-inset p-4 space-y-3">
+      <div>
+        <p class="text-sm font-medium text-primary">收件邮箱</p>
+        <p class="text-sm text-secondary">主邮箱为注册邮箱，最多可添加 3 个额外收件人。</p>
+      </div>
+
+      <div class="rounded-lg bg-container px-3 py-2.5 flex items-center gap-2">
+        <%= icon "mail", class: "w-4 h-4 text-secondary shrink-0" %>
+        <span class="text-sm text-primary"><%= Current.user.email %></span>
+        <span class="ml-auto text-xs text-secondary">主邮箱</span>
+      </div>
+
+      <% 3.times do |i| %>
+        <% existing = @subscription.extra_recipient_emails[i] %>
+        <div class="flex items-center gap-2">
+          <%= icon "mail", class: "w-4 h-4 text-secondary shrink-0" %>
+          <%= form.text_field "extra_recipient_emails[]",
+                value: existing,
+                placeholder: "额外收件人 #{i + 1}（选填）",
+                type: "email",
+                class: "flex-1 rounded-lg border border-primary bg-container px-3 py-2 text-sm text-primary placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        </div>
+      <% end %>
     </div>
 
     <div class="flex justify-end">

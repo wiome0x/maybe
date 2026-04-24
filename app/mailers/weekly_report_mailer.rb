@@ -8,7 +8,7 @@ class WeeklyReportMailer < ApplicationMailer
 
     I18n.with_locale(@weekly_report.user.family.locale) do
       mail(
-        to: @weekly_report.recipient_email,
+        to: @weekly_report.all_recipient_emails,
         subject: I18n.t(
           "weekly_report_mailer.weekly_report.subject",
           end_date: I18n.l(@period.end_date, format: :long)

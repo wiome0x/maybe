@@ -21,7 +21,10 @@ class Settings::WeeklyReportSettingsController < ApplicationController
 
   private
     def subscription_params
-      params.require(:weekly_report_subscription).permit(:enabled, :send_weekday, :send_hour, :timezone, :period_key)
+      params.require(:weekly_report_subscription).permit(
+        :enabled, :send_weekday, :send_hour, :timezone, :period_key,
+        extra_recipient_emails: []
+      )
     end
 
     def load_form_options
