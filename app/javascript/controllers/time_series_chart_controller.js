@@ -9,6 +9,10 @@ export default class extends Controller {
     strokeWidth: { type: Number, default: 2 },
     useLabels: { type: Boolean, default: true },
     useTooltip: { type: Boolean, default: true },
+    useAnnotations: { type: Boolean, default: false },
+    xAxisTickCount: { type: Number, default: 2 },
+    xAxisDateFormat: { type: String, default: "%b %d, %Y" },
+    xAxisActivityDatesOnly: { type: Boolean, default: false },
   };
 
   _d3SvgMemo = null;
@@ -57,6 +61,9 @@ export default class extends Controller {
       date_formatted: d.date_formatted,
       value: d.value,
       trend: d.trend,
+      activities: d.activities || [],
+      activity_count: d.activity_count || 0,
+      activity_summary_label: d.activity_summary_label,
     }));
   }
 
@@ -108,6 +115,10 @@ export default class extends Controller {
     if (this.useLabelsValue) {
       this._drawXAxisLabels();
       this._drawGradientBelowTrendline();
+    }
+
+    if (this.useAnnotationsValue) {
+      this._drawActivityMarkers();
     }
 
     if (this.useTooltipValue) {
@@ -188,6 +199,12 @@ export default class extends Controller {
   }
 
   _drawXAxisLabels() {
+    const tickValues = this.xAxisActivityDatesOnlyValue
+      ? this._normalDataPoints
+          .filter((point) => point.activities.length > 0)
+          .map((point) => point.date)
+      : this._defaultXAxisTickValues();
+
     // Add ticks
     this._d3Group
       .append("g")
@@ -195,12 +212,9 @@ export default class extends Controller {
       .call(
         d3
           .axisBottom(this._d3XScale)
-          .tickValues([
-            this._normalDataPoints[0].date,
-            this._normalDataPoints[this._normalDataPoints.length - 1].date,
-          ])
+          .tickValues(tickValues)
           .tickSize(0)
-          .tickFormat(d3.timeFormat("%b %d, %Y")),
+          .tickFormat(d3.timeFormat(this.xAxisDateFormatValue)),
       )
       .select(".domain")
       .remove();
@@ -213,10 +227,29 @@ export default class extends Controller {
       .style("font-weight", "500")
       .attr("text-anchor", "middle")
       .attr("dx", (_d, i) => {
-        // We know we only have 2 values
-        return i === 0 ? "5em" : "-5em";
+        if (tickValues.length === 1) return "0";
+        if (i === 0) return "3em";
+        if (i === tickValues.length - 1) return "-3em";
+
+        return "0";
       })
       .attr("dy", "0em");
+  }
+
+  _defaultXAxisTickValues() {
+    const tickCount = Math.max(
+      2,
+      Math.min(this.xAxisTickCountValue, this._normalDataPoints.length),
+    );
+    const tickIndexes = Array.from({ length: tickCount }, (_value, index) => {
+      if (tickCount === 1) return 0;
+
+      return Math.round(
+        (index * (this._normalDataPoints.length - 1)) / (tickCount - 1),
+      );
+    });
+
+    return [...new Set(tickIndexes.map((index) => this._normalDataPoints[index].date))];
   }
 
   _drawGradientBelowTrendline() {
@@ -277,8 +310,24 @@ export default class extends Controller {
       .append("div")
       .attr(
         "class",
-        "bg-container text-sm font-sans absolute p-2 border border-secondary rounded-lg pointer-events-none opacity-0",
+        "bg-container text-sm font-sans absolute p-3 border border-secondary rounded-lg pointer-events-none opacity-0 w-72 shadow-lg",
       );
+  }
+
+  _drawActivityMarkers() {
+    this._d3Group
+      .selectAll(".activity-marker")
+      .data(this._normalDataPoints.filter((d) => d.activities.length > 0))
+      .enter()
+      .append("circle")
+      .attr("class", "activity-marker")
+      .attr("cx", (d) => this._d3XScale(d.date))
+      .attr("cy", (d) => this._d3YScale(this._getDatumValue(d)))
+      .attr("r", 3.5)
+      .attr("fill", this._trendColor)
+      .attr("stroke", "var(--color-white)")
+      .attr("stroke-width", 1.5)
+      .attr("pointer-events", "none");
   }
 
   _trackMouseForShowingTooltip() {
@@ -373,9 +422,11 @@ export default class extends Controller {
   }
 
   _tooltipTemplate(datum) {
+    const activities = datum.activities || [];
+
     return `
       <div style="margin-bottom: 4px; color: var(--color-gray-500);">
-        ${datum.date_formatted}
+        ${this._escapeHtml(datum.date_formatted)}
       </div>
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2 text-primary">
@@ -395,7 +446,59 @@ export default class extends Controller {
         `
         }
       </div>
+      ${
+        activities.length > 0
+          ? `
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--color-alpha-black-100);">
+          <div style="margin-bottom: 6px; color: var(--color-gray-500); font-size: 12px;">
+            ${this._escapeHtml(datum.activity_summary_label || "")}
+          </div>
+          <div class="space-y-2">
+            ${activities
+              .slice(0, 4)
+              .map(
+                (activity) => `
+                  <div class="flex items-start justify-between gap-3">
+                    <div style="min-width: 0;">
+                      <div class="flex items-center gap-2 text-primary">
+                        <span style="width: 8px; height: 8px; border-radius: 9999px; background-color: ${activity.color}; flex-shrink: 0;"></span>
+                        <span>${this._escapeHtml(activity.label)}</span>
+                      </div>
+                      <div style="margin-top: 2px; color: var(--color-gray-500); font-size: 12px;">
+                        ${this._escapeHtml(activity.detail)}
+                      </div>
+                    </div>
+                    <div style="color: ${activity.color}; font-weight: 500; white-space: nowrap;">
+                      ${this._escapeHtml(activity.amount)}
+                    </div>
+                  </div>
+                `,
+              )
+              .join("")}
+            ${
+              activities.length > 4
+                ? `
+              <div style="margin-top: 6px; color: var(--color-gray-500); font-size: 12px;">
+                +${activities.length - 4}
+              </div>
+            `
+                : ""
+            }
+          </div>
+        </div>
+      `
+          : ""
+      }
     `;
+  }
+
+  _escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
   }
 
   _getTrendIcon(datum) {

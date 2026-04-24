@@ -79,6 +79,9 @@ en:
         recent_activity_title: Recent Activity
         recent_activity_description: Latest transactions and trades inside this report window.
         no_activity_in_period: No activity in this period.
+        activity_summary:
+          one: 1 activity
+          other: "%{count} activities"
     reports:
       title: "%{period} report"
       coverage_warnings:

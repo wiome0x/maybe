@@ -105,9 +105,33 @@ class Account::InvestmentReport
     ].select { |item| item.amount.positive? }
   end
 
+  def turnover_chart_data
+    series = turnover_series.as_json
+
+    series[:values] = series[:values].map do |value|
+      date = value[:date].to_date
+      activities = daily_trade_entries(date).map do |entry|
+        {
+          label: activity_label(entry),
+          detail: activity_detail(entry),
+          amount: Money.new(signed_display_amount(entry), account.currency).format,
+          color: activity_color(entry)
+        }
+      end
+
+      value.merge(
+        activities: activities,
+        activity_count: activities.count,
+        activity_summary_label: I18n.t("investments.tabs.reports.activity_summary", count: activities.count)
+      )
+    end
+
+    series
+  end
+
   def turnover_series
     @turnover_series ||= build_series do |date|
-      daily_trade_entries(date).sum { |entry| entry.amount.to_d.abs }
+      daily_trade_entries(date).sum { |entry| absolute_amount_in_account_currency(entry) }
     end
   end
 
@@ -116,9 +140,9 @@ class Account::InvestmentReport
       running_total = 0.to_d
 
       build_series do |date|
-        running_total += deposit_entries_for(date).sum { |entry| -entry.amount.to_d }
-        running_total += dividend_entries_for(date).sum { |entry| -entry.amount.to_d }
-        running_total -= withholding_entries_for(date).sum(&:amount)
+        running_total += deposit_entries_for(date).sum { |entry| absolute_amount_in_account_currency(entry) }
+        running_total += dividend_entries_for(date).sum { |entry| absolute_amount_in_account_currency(entry) }
+        running_total -= withholding_entries_for(date).sum { |entry| absolute_amount_in_account_currency(entry) }
         running_total
       end
     end
@@ -136,8 +160,8 @@ class Account::InvestmentReport
     grouped = trade_entries.group_by { |entry| entry.trade.security.ticker }
 
     grouped.map do |ticker, entries|
-      buy_volume = entries.select { |entry| entry.trade.qty.positive? }.sum(&:amount).to_d
-      sell_volume = entries.select { |entry| entry.trade.qty.negative? }.sum { |entry| entry.amount.to_d.abs }
+      buy_volume = entries.select { |entry| entry.trade.qty.positive? }.sum { |entry| absolute_amount_in_account_currency(entry) }
+      sell_volume = entries.select { |entry| entry.trade.qty.negative? }.sum { |entry| absolute_amount_in_account_currency(entry) }
       SecuritySummary.new(
         ticker: ticker,
         name: entries.first.trade.security.name || ticker,
@@ -192,11 +216,11 @@ class Account::InvestmentReport
     end
 
     def buys_total
-      trade_entries.select { |entry| entry.trade.qty.positive? }.sum(&:amount).to_d
+      trade_entries.select { |entry| entry.trade.qty.positive? }.sum { |entry| absolute_amount_in_account_currency(entry) }
     end
 
     def sells_total
-      trade_entries.select { |entry| entry.trade.qty.negative? }.sum { |entry| entry.amount.to_d.abs }
+      trade_entries.select { |entry| entry.trade.qty.negative? }.sum { |entry| absolute_amount_in_account_currency(entry) }
     end
 
     def buy_trade_count
@@ -224,19 +248,19 @@ class Account::InvestmentReport
     end
 
     def deposits_total
-      deposit_entries.sum { |entry| -entry.amount.to_d }
+      deposit_entries.sum { |entry| absolute_amount_in_account_currency(entry) }
     end
 
     def dividends_total
-      dividend_entries.sum { |entry| -entry.amount.to_d }
+      dividend_entries.sum { |entry| absolute_amount_in_account_currency(entry) }
     end
 
     def withholding_total
-      withholding_entries.sum(&:amount).to_d
+      withholding_entries.sum { |entry| absolute_amount_in_account_currency(entry) }
     end
 
     def forex_total
-      forex_entries.sum { |entry| entry.amount.to_d.abs }
+      forex_entries.sum { |entry| absolute_amount_in_account_currency(entry) }
     end
 
     def fees_total
@@ -280,6 +304,10 @@ class Account::InvestmentReport
       return amount.to_d if from_currency == account.currency
 
       Money.new(amount, from_currency).exchange_to(account.currency, date: date, fallback_rate: 1).amount
+    end
+
+    def absolute_amount_in_account_currency(entry)
+      convert_to_account_currency(entry.amount.to_d.abs, entry.currency, entry.date)
     end
 
     def deposit_entry?(entry)
@@ -345,11 +373,13 @@ class Account::InvestmentReport
 
     def signed_display_amount(entry)
       if entry.trade?
-        entry.trade.qty.positive? ? -entry.amount.to_d : entry.amount.to_d.abs
+        entry.trade.qty.positive? ? -absolute_amount_in_account_currency(entry) : absolute_amount_in_account_currency(entry)
       elsif deposit_entry?(entry) || dividend_entry?(entry)
-        -entry.amount.to_d.abs
+        absolute_amount_in_account_currency(entry)
+      elsif withholding_entry?(entry)
+        -absolute_amount_in_account_currency(entry)
       else
-        entry.amount.to_d
+        absolute_amount_in_account_currency(entry)
       end
     end
 

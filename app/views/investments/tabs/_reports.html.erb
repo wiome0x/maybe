@@ -20,18 +20,6 @@
       <% end %>
     </div>
 
-    <% if report.coverage_warnings.any? %>
-      <div class="rounded-xl border border-alpha-black-100 bg-container-inset p-4 space-y-2">
-        <div class="flex items-center gap-2 text-primary">
-          <%= icon "triangle-alert", size: "sm", color: "current" %>
-          <p class="text-sm font-medium"><%= t(".coverage_notes") %></p>
-        </div>
-        <% report.coverage_warnings.each do |warning| %>
-          <p class="text-sm text-secondary"><%= warning %></p>
-        <% end %>
-      </div>
-    <% end %>
-
     <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
       <% report.metrics.each do |metric| %>
         <div class="rounded-xl bg-container-inset p-4">
@@ -55,7 +43,10 @@
           id="<%= dom_id(account, :turnover_report_chart) %>"
           class="w-full h-full"
           data-controller="time-series-chart"
-          data-time-series-chart-data-value="<%= report.turnover_series.to_json %>"></div>
+          data-time-series-chart-data-value="<%= report.turnover_chart_data.to_json %>"
+          data-time-series-chart-x-axis-activity-dates-only-value="true"
+          data-time-series-chart-x-axis-date-format-value="%b %d"
+          data-time-series-chart-use-annotations-value="true"></div>
       </div>
     </div>
 
@@ -230,7 +221,7 @@
                 </div>
 
                 <p class="text-sm font-medium shrink-0" style="color: <%= row.color %>">
-                  <%= format_money Money.new(row.amount, row.entry.currency) %>
+                  <%= format_money Money.new(row.amount, account.currency) %>
                 </p>
               </div>
             </div>
