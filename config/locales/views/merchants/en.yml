@@ -12,6 +12,9 @@ en:
       name_placeholder: Merchant name
     index:
       empty: No merchants yet
+      empty_description: Add common merchants, banks, platforms, or brokers to improve grouping, search, and rule matching.
+      intro_title: Merchants identify who the transaction was with
+      intro_description: In transaction organization, merchants represent the counterparty for a transaction, such as a shop, bank, platform, or broker. They are useful for search, grouping, and rule matching.
       new: New merchant
       title: Merchants
     merchant:

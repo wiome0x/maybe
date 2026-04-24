@@ -20,6 +20,9 @@ en:
       categories_expenses: Expense categories
       categories_incomes: Income categories
       empty: No categories found
+      empty_description: Start with the recommended defaults or build a category structure that fits your household and investment analysis.
+      intro_title: Categories define the main analysis bucket
+      intro_description: In transaction organization, categories determine what kind of activity a transaction belongs to, such as dining, salary, fees, or dividends. They directly affect later reporting, filtering, and analysis.
       new: New category
     menu:
       loading: Loading...

@@ -140,12 +140,58 @@ en:
       rules_label: Rules
       self_hosting_label: Self hosting
       tags_label: Tags
+      transaction_organization_label: Transaction organization
       transactions_section_title: Transaction Setup
       whats_new_label: What's new
       watchlist_label: Watchlist
     settings_nav_link_large:
       next: Next
       previous: Back
+    transaction_organizations:
+      show:
+        page_title: Transaction organization
+        eyebrow: Transaction organization
+        title: Understand categories, merchants, tags, and rules in one place
+        description: Transaction organization turns repeated activity into stable, analyzable data. At this stage, rules are the primary workflow, while categories, merchants, and tags remain hidden as standalone top-level pages.
+        category_label: Category
+        category_body: Use categories for the main analysis bucket, such as dining, salary, fees, or dividends.
+        merchant_label: Merchant
+        merchant_body: Use merchants to identify who the transaction was with, such as Starbucks, Chase, or Interactive Brokers.
+        tag_label: Tag
+        tag_body: Use tags for cross-cutting context such as reimbursement, family, subscription, watchlist, or review.
+        status_label: Current stage
+        status_body: Rules are the main way to organize transactions today. Separate category, merchant, and tag pages remain hidden until they are reorganized under a unified transaction organization entry point.
+        entrypoints_label: Secondary pages
+        entrypoints_title: Use this page to reach each organization tool
+        entrypoints_description: Transaction organization stays as the single top-level entry point. Categories, merchants, tags, and rules remain available here as secondary pages while the unified structure settles in.
+        rules_label: Rules
+        rules_title: Organize transactions with rules
+        rules_description: Rules work best for repeated activity. You can filter by account, description, amount, direction, transaction type, merchant, category, or tag, then automatically set categories, merchants, tags, or names.
+        rules_card_body: Best for repeated activity and automation. This is still the primary organization workflow today.
+        rules_count:
+          one: "%{count} rule configured"
+          other: "%{count} rules configured"
+        rules_cta: Open rules
+        back_cta: Back to transaction organization
+        category_card_body: Maintain the main analysis taxonomy for your household and adjust the category structure over time.
+        categories_count:
+          one: "%{count} category configured"
+          other: "%{count} categories configured"
+        categories_cta: View categories
+        merchant_card_body: Maintain merchants and counterparties for grouping, search, and rule matching.
+        merchants_count:
+          one: "%{count} merchant configured"
+          other: "%{count} merchants configured"
+        merchants_cta: View merchants
+        tag_card_body: Maintain cross-cutting labels for reimbursement, family, subscriptions, watchlists, or review workflows.
+        tags_count:
+          one: "%{count} tag configured"
+          other: "%{count} tags configured"
+        tags_cta: View tags
+        example_label: Example
+        example_title: Typical workflow
+        example_case: If the description contains Starbucks and the account is your credit card, automatically organize the transaction into Dining and add tags like reimbursement or subscription.
+        example_result: Once that rule is in place, similar transactions are organized automatically after sync, making filtering, search, and analysis more reliable.
     user_avatar_field:
       accepted_formats: JPG or PNG. 5MB max.
       choose: Upload photo

@@ -12,6 +12,9 @@ en:
       placeholder: Tag name
     index:
       empty: No tags yet
+      empty_description: Create tags for recurring contexts like family, reimbursements, subscriptions, watchlists, or review workflows.
+      intro_title: Tags add cross-cutting context
+      intro_description: In transaction organization, tags add supporting meaning such as reimbursement, family, subscriptions, watchlists, or review workflows. A single transaction can have multiple tags.
       new: New tag
       delete_all: Delete all
       tags: Tags

@@ -22,9 +22,19 @@
   </div>
 </header>
 
+<%= render "settings/transaction_organizations/subpage_intro",
+           title: t(".intro_title"),
+           description: t(".intro_description") %>
+
 <div class="bg-container rounded-xl shadow-border-xs p-4">
   <% if @categories.any? %>
-    <div class="space-y-4">
+    <div class="rounded-xl bg-container-inset space-y-4 p-4">
+      <div class="flex items-center gap-1.5 px-1 text-xs font-medium text-secondary uppercase">
+        <p><%= t(".categories") %></p>
+        <span class="text-subdued">&middot;</span>
+        <p><%= @categories.count %></p>
+      </div>
+
       <% if @categories.incomes.any? %>
         <%= render "categories/category_list_group", title: t(".categories_incomes"), categories: @categories.incomes %>
       <% end %>
@@ -36,7 +46,8 @@
   <% else %>
     <div class="flex justify-center items-center py-20">
       <div class="text-center flex flex-col items-center max-w-[500px]">
-        <p class="text-sm text-secondary mb-4"><%= t(".empty") %></p>
+        <p class="text-primary mb-1 font-medium text-sm"><%= t(".empty") %></p>
+        <p class="text-sm text-secondary mb-4"><%= t(".empty_description") %></p>
         <div class="flex items-center gap-2">
           <%= render DS::Button.new(
             text: t(".bootstrap"),

@@ -3,6 +3,9 @@ en:
   rules:
     index:
       title: Rules
+      organization_title: Transaction organization
+      organization_description: Rules are currently the main automation workflow for repeated transaction patterns.
+      organization_cta: Back to transaction organization
       delete_all: Delete all rules
       new_rule: New rule
       ai_warning: AI-enabled rule actions will cost money.  Be sure to filter as narrowly as possible to avoid unnecessary costs.
@@ -11,7 +14,7 @@ en:
       sort_name: Name
       sort_updated_at: Updated At
       no_rules: No rules yet
-      no_rules_description: Set up rules to perform actions to your transactions and other data on every account sync.
+      no_rules_description: Set up rules to automatically organize transactions after each account sync.
     rule:
       if_label: IF
       then_label: THEN

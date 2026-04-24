@@ -20,6 +20,9 @@ zh-CN:
       categories_expenses: 支出分类
       categories_incomes: 收入分类
       empty: 未找到分类
+      empty_description: 您可以先使用推荐的默认分类，也可以从零开始建立适合家庭与投资分析的分类体系。
+      intro_title: 分类是交易的主分析口径
+      intro_description: 在交易整理中，分类用于确定这笔交易属于哪一类，例如餐饮、工资、手续费或股息。它会直接影响后续统计、筛选和分析结果。
       new: 新建分类
     menu:
       loading: 加载中...

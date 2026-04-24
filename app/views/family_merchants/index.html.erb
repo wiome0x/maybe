@@ -9,6 +9,10 @@
   ) %>
 </header>
 
+<%= render "settings/transaction_organizations/subpage_intro",
+           title: t(".intro_title"),
+           description: t(".intro_description") %>
+
 <div class="bg-container rounded-xl shadow-border-xs p-4">
   <% if @family_merchants.any? %>
     <div class="rounded-xl bg-container-inset space-y-1 p-1">
@@ -28,9 +32,11 @@
     <div class="flex justify-center items-center py-20">
       <div class="text-center flex flex-col items-center max-w-[300px]">
         <p class="text-primary mb-1 font-medium text-sm"><%= t(".empty") %></p>
+        <p class="text-sm text-secondary mb-4"><%= t(".empty_description") %></p>
 
         <%= render DS::Link.new(
           text: t(".new"),
+          variant: "primary",
           icon: "plus",
           href: new_family_merchant_path,
           frame: :modal

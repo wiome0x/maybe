@@ -21,6 +21,23 @@
     ) %>
   </div>
 </header>
+<section class="bg-container rounded-xl shadow-border-xs p-4 mb-4">
+  <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+    <div class="space-y-1">
+      <p class="text-xs uppercase tracking-wide text-secondary"><%= t(".organization_title") %></p>
+      <p class="text-sm text-secondary"><%= t(".organization_description") %></p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <%= render DS::Link.new(
+        text: t(".organization_cta"),
+        variant: "secondary",
+        href: settings_transaction_organization_path,
+        icon: "arrow-left"
+      ) %>
+    </div>
+  </div>
+</section>
 <% if self_hosted? %>
   <div class="flex items-center gap-2 mb-2 py-4">
     <%= icon("circle-alert", size: "sm") %>

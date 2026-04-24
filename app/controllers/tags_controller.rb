@@ -2,6 +2,7 @@ class TagsController < ApplicationController
   before_action :set_tag, only: %i[edit update destroy]
 
   def index
+    @breadcrumbs = [ [ "Home", root_path ], [ "Transaction organization", settings_transaction_organization_path ], [ "Tags", nil ] ]
     @tags = Current.family.tags.alphabetically
 
     render layout: "settings"

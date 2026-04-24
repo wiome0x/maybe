@@ -12,6 +12,9 @@ zh-CN:
       placeholder: 标签名称
     index:
       empty: 暂无标签
+      empty_description: 为常见场景建立标签后，可以更灵活地补充家庭、报销、订阅、观察或复盘等横向语义。
+      intro_title: 标签用于补充横向场景
+      intro_description: 在交易整理中，标签用于补充报销、家庭、订阅、观察、复盘等附加语义。一笔交易可以拥有多个标签。
       new: 新建标签
       delete_all: 全部删除
       tags: 标签

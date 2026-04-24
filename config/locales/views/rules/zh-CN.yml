@@ -3,6 +3,9 @@ zh-CN:
   rules:
     index:
       title: 规则
+      organization_title: 交易整理
+      organization_description: 规则是当前阶段最主要的自动整理入口，适合处理重复出现的交易模式。
+      organization_cta: 返回交易整理
       delete_all: 删除所有规则
       new_rule: 新建规则
       ai_warning: 启用 AI 的规则操作会产生费用，请尽量缩小筛选范围以避免不必要的开销。
@@ -11,7 +14,7 @@ zh-CN:
       sort_name: 名称
       sort_updated_at: 更新时间
       no_rules: 暂无规则
-      no_rules_description: 设置规则，在每次账户同步时对交易和其他数据执行操作。
+      no_rules_description: 设置规则，在每次账户同步后自动整理交易数据。
     rule:
       if_label: 如果
       then_label: 则

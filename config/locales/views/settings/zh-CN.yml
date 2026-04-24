@@ -137,12 +137,58 @@ zh-CN:
       rules_label: 规则
       self_hosting_label: 自托管
       tags_label: 标签
+      transaction_organization_label: 交易整理
       transactions_section_title: 交易整理
       whats_new_label: 最新动态
       watchlist_label: 自选管理
     settings_nav_link_large:
       next: 下一步
       previous: 返回
+    transaction_organizations:
+      show:
+        page_title: 交易整理
+        eyebrow: 交易整理
+        title: 统一理解分类、交易方、标签与规则
+        description: 交易整理用于把重复出现的交易自动整理成稳定、可分析的数据结构。当前阶段优先开放规则能力，分类、交易方和标签的独立页面暂不作为一级入口展示。
+        category_label: 分类
+        category_body: 用于确定主分析口径，例如餐饮、工资、手续费、股息。
+        merchant_label: 交易方
+        merchant_body: 用于识别交易是和谁发生的，例如星巴克、招商银行、Interactive Brokers。
+        tag_label: 标签
+        tag_body: 用于补充横向场景，例如报销、家庭、订阅、观察、复盘。
+        status_label: 当前阶段
+        status_body: 当前优先通过规则自动整理交易；分类、交易方、标签的独立页面暂时隐藏，后续会统一整合到交易整理入口下。
+        entrypoints_label: 二级入口
+        entrypoints_title: 从这里进入具体整理能力
+        entrypoints_description: 交易整理作为一级入口统一承接说明；分类、交易方、标签和规则作为二级页面保留，方便逐步过渡到统一结构。
+        rules_label: 规则
+        rules_title: 用规则自动整理交易
+        rules_description: 规则适合处理重复交易。你可以按账户、描述、金额、方向、交易类型、交易方、分类和标签筛选，再自动设置分类、交易方、标签或名称。
+        rules_card_body: 适合为重复交易建立自动整理规则，是当前阶段最主要的整理入口。
+        rules_count:
+          one: 当前已有 %{count} 条规则
+          other: 当前已有 %{count} 条规则
+        rules_cta: 打开规则
+        back_cta: 返回交易整理
+        category_card_body: 用于维护主分析口径，适合查看和调整家庭当前的分类体系。
+        categories_count:
+          one: 当前已有 %{count} 个分类
+          other: 当前已有 %{count} 个分类
+        categories_cta: 查看分类
+        merchant_card_body: 用于维护交易对手方或商户名称，方便后续聚合、搜索和规则命中。
+        merchants_count:
+          one: 当前已有 %{count} 个交易方
+          other: 当前已有 %{count} 个交易方
+        merchants_cta: 查看交易方
+        tag_card_body: 用于维护横向场景标签，适合补充报销、家庭、订阅、观察、复盘等语义。
+        tags_count:
+          one: 当前已有 %{count} 个标签
+          other: 当前已有 %{count} 个标签
+        tags_cta: 查看标签
+        example_label: 示例
+        example_title: 典型用法
+        example_case: 如果交易描述包含 Starbucks，且账户等于信用卡账户，就把这笔交易自动整理进餐饮分类，并追加报销或订阅标签。
+        example_result: 这样做以后，同类交易在同步后会自动归类，后续的筛选、搜索和分析都会更稳定。
     user_avatar_field:
       accepted_formats: JPG 或 PNG，最大 5MB。
       choose: 上传照片

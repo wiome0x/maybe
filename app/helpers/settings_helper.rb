@@ -10,10 +10,7 @@ module SettingsHelper
     { name: "Imports", path: :imports_path },
     { name: "Database", path: :settings_database_path, condition: :admin_user? },
     { name: "API Audit", path: :settings_api_audit_path, condition: :admin_user? },
-    { name: "Tags", path: :tags_path },
-    { name: "Categories", path: :categories_path },
-    { name: "Rules", path: :rules_path },
-    { name: "Merchants", path: :family_merchants_path },
+    { name: "Transaction organization", path: :settings_transaction_organization_path },
     { name: "Watchlist", path: :settings_watchlist_path },
     { name: "What's new", path: :changelog_path },
     { name: "Feedback", path: :feedback_path }

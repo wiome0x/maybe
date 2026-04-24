@@ -12,6 +12,9 @@ zh-CN:
       name_placeholder: 交易方名称
     index:
       empty: 暂无交易方
+      empty_description: 添加常见商户、银行、平台或券商后，交易会更容易被聚合、搜索和规则识别。
+      intro_title: 交易方用于识别交易对象
+      intro_description: 在交易整理中，交易方表示这笔交易和谁发生，例如商户、银行、平台或券商。它适合用于搜索、聚合和规则命中。
       new: 新建交易方
       title: 交易方
     merchant:

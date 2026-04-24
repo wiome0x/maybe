@@ -4,6 +4,7 @@ class CategoriesController < ApplicationController
   before_action :set_transaction, only: :create
 
   def index
+    @breadcrumbs = [ [ "Home", root_path ], [ "Transaction organization", settings_transaction_organization_path ], [ "Categories", nil ] ]
     @categories = Current.family.categories.alphabetically
 
     render layout: "settings"

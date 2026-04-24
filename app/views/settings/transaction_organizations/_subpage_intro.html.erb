@@ -1,0 +1,20 @@
+<%# locals: (title:, description:) %>
+
+<section class="bg-container rounded-xl shadow-border-xs p-4">
+  <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+    <div class="space-y-1">
+      <p class="text-xs uppercase tracking-wide text-secondary"><%= t("settings.transaction_organizations.show.eyebrow") %></p>
+      <h2 class="text-primary text-base font-medium"><%= title %></h2>
+      <p class="text-sm text-secondary"><%= description %></p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <%= render DS::Link.new(
+        text: t("settings.transaction_organizations.show.back_cta"),
+        variant: "secondary",
+        href: settings_transaction_organization_path,
+        icon: "arrow-left"
+      ) %>
+    </div>
+  </div>
+</section>
