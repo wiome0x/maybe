@@ -5,12 +5,9 @@ nav_sections = [
     items: [
       { label: t(".profile_label"), path: settings_profile_path, icon: "circle-user" },
       { label: t(".preferences_label"), path: settings_preferences_path, icon: "bolt" },
-      { label: t(".security_label"), path: settings_security_path, icon: "shield-check" },
-      { label: t(".api_key_label"), path: settings_api_key_path, icon: "key" },
       { label: t(".self_hosting_label"), path: settings_hosting_path, icon: "server", if: self_hosted? },
       { label: t(".billing_label"), path: settings_billing_path, icon: "circle-dollar-sign", if: !self_hosted? },
       { label: t(".accounts_label"), path: accounts_path, icon: "layers" },
-      { label: t(".imports_label"), path: imports_path, icon: "download" },
       { label: t(".database_label"), path: settings_database_path, icon: "database", if: Current.user&.admin? },
       { label: t(".api_audit_label"), path: settings_api_audit_path, icon: "shield-alert", if: Current.user&.admin? }
     ]

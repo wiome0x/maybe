@@ -122,6 +122,8 @@
   </div>
 <% end %>
 
+<%= render "security_section" %>
+
 <% if Current.user.admin? %>
   <%= settings_section title: t(".export") do %>
     <div class="space-y-4">

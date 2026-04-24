@@ -1,0 +1,10 @@
+en:
+  settings:
+    databases:
+      show:
+        imports_title: Imports
+        imports_subtitle: Start a new CSV import here and review your recent import history.
+        new_import: New Import
+        view_imports: View All Imports
+        imports_history: Recent Imports
+        no_imports: No import records yet.

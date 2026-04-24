@@ -12,6 +12,8 @@ en:
         generated_tokens: Generated codes
         title: Require invite code for signup
       show:
+        api_keys_subtitle: Manage API keys for programmatic access in your self-hosted instance.
+        api_keys_title: API Keys
         general: General Settings
         invites: Invite Codes
         title: Self-Hosting

@@ -10,6 +10,8 @@ zh-CN:
         generated_tokens: 已生成的代码
         title: 注册时要求邀请码
       show:
+        api_keys_subtitle: 在自托管环境下管理用于程序化访问的 API 密钥。
+        api_keys_title: API 密钥
         general: 通用设置
         invites: 邀请码
         title: 自托管

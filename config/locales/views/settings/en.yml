@@ -72,6 +72,8 @@ en:
         pending: Pending
         profile_subtitle: Customize how you appear on Maybe
         profile_title: Profile
+        security_title: Security
+        security_subtitle: Manage two-factor authentication and account protection settings
         remove_invitation: Remove Invitation
         remove_member: Remove Member
         save: Save
@@ -124,13 +126,11 @@ en:
     settings_nav:
       accounts_label: Accounts
       api_audit_label: API Audit
-      api_key_label: API Key
       back: Back
       billing_label: Billing
       categories_label: Categories
       feedback_label: Feedback
       general_section_title: General
-      imports_label: Imports
       database_label: Database
       logout: Logout
       merchants_label: Merchants
@@ -138,7 +138,6 @@ en:
       preferences_label: Preferences
       profile_label: Account
       rules_label: Rules
-      security_label: Security
       self_hosting_label: Self hosting
       tags_label: Tags
       transactions_section_title: Transactions

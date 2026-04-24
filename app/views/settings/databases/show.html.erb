@@ -1,5 +1,42 @@
 <%= content_for :page_title, "Database" %>
 
+<%= settings_section title: t(".imports_title"), subtitle: t(".imports_subtitle") do %>
+  <div class="space-y-4">
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <%= render DS::Link.new(
+        text: t(".new_import"),
+        variant: "primary",
+        icon: "plus",
+        href: new_import_path,
+        frame: :modal
+      ) %>
+      <%= render DS::Link.new(
+        text: t(".view_imports"),
+        variant: "secondary",
+        icon: "download",
+        href: imports_path
+      ) %>
+    </div>
+
+    <div class="rounded-xl bg-container-inset p-1">
+      <div class="px-4 py-2 flex items-center justify-between text-xs font-medium text-secondary uppercase">
+        <span><%= t(".imports_history") %></span>
+        <span><%= @imports.size %></span>
+      </div>
+
+      <div class="bg-container rounded-lg shadow-border-xs">
+        <% if @imports.any? %>
+          <%= render partial: "imports/import", collection: @imports.ordered.limit(5), spacer_template: "shared/ruler" %>
+        <% else %>
+          <div class="px-4 py-10 text-center text-sm text-secondary">
+            <%= t(".no_imports") %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
 <%= settings_section title: "Database Tables", subtitle: "View and export data from all tables" do %>
   <div class="space-y-2">
     <div class="bg-container-inset rounded-xl p-1">

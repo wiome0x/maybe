@@ -4,6 +4,7 @@ class Settings::DatabasesController < ApplicationController
   before_action :require_admin
 
   def show
+    @imports = Current.family.imports
     @tables = ActiveRecord::Base.connection.tables.sort.map do |table_name|
       count = ActiveRecord::Base.connection.execute("SELECT COUNT(*) FROM #{ActiveRecord::Base.connection.quote_table_name(table_name)}").first["count"]
       { name: table_name, count: count.to_i }

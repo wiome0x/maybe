@@ -7,6 +7,10 @@
   </div>
 <% end %>
 
+<%= settings_section title: t(".api_keys_title"), subtitle: t(".api_keys_subtitle") do %>
+  <%= render "settings/hostings/api_key_settings" %>
+<% end %>
+
 <%= settings_section title: t(".invites") do %>
   <%= render "settings/hostings/invite_code_settings" %>
 <% end %>

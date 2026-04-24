@@ -8,6 +8,7 @@ class Settings::HostingsController < ApplicationController
   def show
     synth_provider = Provider::Registry.get_provider(:synth)
     @synth_usage = synth_provider&.usage
+    @current_api_key = Current.user.api_keys.active.first
   end
 
   def update

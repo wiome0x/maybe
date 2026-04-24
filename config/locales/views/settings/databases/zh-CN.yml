@@ -1,0 +1,10 @@
+zh-CN:
+  settings:
+    databases:
+      show:
+        imports_title: 导入
+        imports_subtitle: 从这里开始新的 CSV 导入，并查看最近的导入记录。
+        new_import: 新建导入
+        view_imports: 查看全部导入
+        imports_history: 最近导入
+        no_imports: 暂无导入记录。

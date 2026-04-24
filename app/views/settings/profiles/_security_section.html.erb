@@ -1,0 +1,43 @@
+<%= settings_section title: t("settings.profiles.show.security_title"), subtitle: t("settings.profiles.show.security_subtitle") do %>
+  <div class="space-y-4">
+    <div class="p-3 shadow-border-xs bg-container rounded-lg md:flex md:justify-between md:items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-gray-25 flex justify-center items-center">
+          <%= icon "shield-check" %>
+        </div>
+
+        <div class="text-sm space-y-1">
+          <% if Current.user.otp_required? %>
+            <p class="text-primary"><%= t("settings.securities.show.enabled_html") %></p>
+            <p class="text-secondary"><%= t("settings.securities.show.enabled_description") %></p>
+          <% else %>
+            <p class="text-primary"><%= t("settings.securities.show.disabled_html") %></p>
+            <p class="text-secondary"><%= t("settings.securities.show.disabled_description") %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="mt-4 md:mt-0">
+        <% if Current.user.otp_required? %>
+          <%= styled_form_with url: disable_mfa_path, method: :delete, data: { turbo: false } do |f| %>
+            <div class="flex items-center gap-2">
+              <%= f.password_field :password,
+                placeholder: t("settings.securities.show.password_placeholder"),
+                required: true,
+                autocomplete: "current-password",
+                class: "form-field__input text-sm" %>
+              <%= f.submit t("settings.securities.show.disable_mfa"),
+                class: "inline-flex items-center gap-1 font-medium whitespace-nowrap rounded-lg px-3 py-2 text-sm text-inverse bg-red-500 hover:bg-red-600 cursor-pointer" %>
+            </div>
+          <% end %>
+        <% else %>
+          <%= render DS::Link.new(
+            text: t("settings.securities.show.enable_mfa"),
+            variant: "primary",
+            href: new_mfa_path
+          ) %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

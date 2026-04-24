@@ -5,6 +5,11 @@ zh-CN:
       show:
         disable_mfa: 禁用双因素认证
         disable_mfa_confirm: 确定要禁用双因素认证吗？这将降低您的账户安全性。
+        disabled_description: 启用双因素认证，为账户增加一层额外保护。
+        disabled_html: 双因素认证<span class="font-medium text-red-600">未启用</span>
         enable_mfa: 启用双因素认证
+        enabled_description: 您的账户已受到额外安全保护。
+        enabled_html: 双因素认证<span class="font-medium text-green-600">已启用</span>
         mfa_description: 通过要求登录时输入验证器应用的验证码来增强账户安全性
         mfa_title: 双因素认证
+        password_placeholder: 输入当前密码
