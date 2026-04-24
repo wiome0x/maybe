@@ -1,0 +1,120 @@
+---
+zh-CN:
+  periods:
+    last_day:
+      label: 最近一天
+      label_short: 1日
+      comparison_label: 相比昨天
+    current_week:
+      label: 本周至今
+      label_short: 本周
+      comparison_label: 相比本周初
+    last_7_days:
+      label: 最近7天
+      label_short: 7天
+      comparison_label: 相比上周
+    current_month:
+      label: 本月至今
+      label_short: 本月
+      comparison_label: 相比月初
+    last_30_days:
+      label: 最近30天
+      label_short: 30天
+      comparison_label: 相比上月
+    last_90_days:
+      label: 最近90天
+      label_short: 90天
+      comparison_label: 相比上季度
+    current_year:
+      label: 本年至今
+      label_short: 年初至今
+      comparison_label: 相比年初
+    last_365_days:
+      label: 最近365天
+      label_short: 365天
+      comparison_label: 相比一年前
+    last_5_years:
+      label: 最近5年
+      label_short: 5年
+      comparison_label: 相比5年前
+    custom:
+      label: 自定义周期
+      label_short: 自定义
+  accounts:
+    show:
+      tabs:
+        activity: 动态
+        holdings: 持仓
+        overview: 概览
+        reports: 报告
+  investments:
+    tabs:
+      reports:
+        eyebrow: 投资报告
+        coverage_notes: 当前周期的数据覆盖说明
+        trading_turnover_title: 交易额趋势
+        trading_turnover_description: 所选周期内每日买卖成交金额。
+        activity_mix_title: 活动构成
+        activity_mix_description: 观察这一时间窗口里，哪类活动占比最高。
+        largest_activity_bucket: 最大活动类别
+        no_activity: 暂无活动
+        entry_count:
+          one: 1 条记录
+          other: "%{count} 条记录"
+        contribution_curve_title: 资金贡献曲线
+        contribution_curve_description: 外部入金与股息收入的累计变化，已扣除预扣税。
+        cash_vs_holdings_title: 现金与持仓
+        cash_vs_holdings_description: 观察账户在可用现金和已投资资金之间如何变化。
+        cash_balance: 现金余额
+        holdings_value: 持仓价值
+        top_securities_title: 重点标的
+        top_securities_description: 按所选周期的成交额查看最活跃标的。
+        trade_count:
+          one: 1 笔交易
+          other: "%{count} 笔交易"
+        buys: 买入
+        sells: 卖出
+        net_flow: 净流向
+        no_trade_activity: 当前周期没有交易活动。
+        recent_activity_title: 最近活动
+        recent_activity_description: 所选周期内最近发生的交易与现金活动。
+        no_activity_in_period: 当前周期没有活动。
+    reports:
+      title: "%{period}报告"
+      coverage_warnings:
+        missing_forex_counterparty_legs: 外汇行是部分数据，因为 Plaid 对 USD.HKD 这类货币对只暴露单边现金腿。
+        missing_settlement_dates: 无法生成已结算现金口径，因为 Plaid 不返回 settlement date（结算日）。
+      metrics:
+        trading_turnover:
+          label: 交易额
+          note: "%{count} 笔交易"
+        net_buys:
+          label: 净买入
+          note: "%{buys} 笔买入，%{sells} 笔卖出"
+        contributions:
+          label: 净入金
+          note: "%{count} 笔现金入账"
+        income:
+          label: 收益
+          note: "%{count} 笔股息"
+        taxes_fees:
+          label: 税费
+          note: 预扣税与佣金
+        fx_volume:
+          label: 外汇量
+          note: "%{count} 笔外汇现金流水"
+      breakdowns:
+        buys: 买入
+        sells: 卖出
+        deposits: 现金流入
+        dividends: 股息
+        taxes: 税费
+        fx: 外汇
+      activity:
+        buy: 买入 %{ticker}
+        sell: 卖出 %{ticker}
+        deposit: 现金入账
+        dividend: 股息
+        tax: 预扣税
+        fx: 外汇兑换
+        trade_detail: "%{qty} 股，成交价 %{price}"

@@ -36,10 +36,14 @@ class UI::AccountPage < ApplicationComponent
     tabs.find { |tab| tab == @active_tab&.to_sym } || tabs.first
   end
 
+  def tab_label(tab)
+    I18n.t("accounts.show.tabs.#{tab}", default: tab.to_s.humanize)
+  end
+
   def tabs
     case account.accountable_type
     when "Investment"
-      [ :activity, :holdings ]
+      [ :activity, :holdings, :reports ]
     when "Property", "Vehicle", "Loan"
       [ :activity, :overview ]
     else
@@ -51,6 +55,8 @@ class UI::AccountPage < ApplicationComponent
     case tab
     when :activity
       activity_feed
+    when :reports
+      render "#{account.accountable_type.downcase.pluralize}/tabs/#{tab}", account: account, period: chart_period
     when :holdings, :overview
       # Accountable is responsible for implementing the partial in the correct folder
       render "#{account.accountable_type.downcase.pluralize}/tabs/#{tab}", account: account

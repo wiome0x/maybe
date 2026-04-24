@@ -1,0 +1,120 @@
+---
+en:
+  periods:
+    last_day:
+      label: Last Day
+      label_short: 1D
+      comparison_label: vs. yesterday
+    current_week:
+      label: Current Week
+      label_short: WTD
+      comparison_label: vs. start of week
+    last_7_days:
+      label: Last 7 Days
+      label_short: 7D
+      comparison_label: vs. last week
+    current_month:
+      label: Current Month
+      label_short: MTD
+      comparison_label: vs. start of month
+    last_30_days:
+      label: Last 30 Days
+      label_short: 30D
+      comparison_label: vs. last month
+    last_90_days:
+      label: Last 90 Days
+      label_short: 90D
+      comparison_label: vs. last quarter
+    current_year:
+      label: Current Year
+      label_short: YTD
+      comparison_label: vs. start of year
+    last_365_days:
+      label: Last 365 Days
+      label_short: 365D
+      comparison_label: vs. 1 year ago
+    last_5_years:
+      label: Last 5 Years
+      label_short: 5Y
+      comparison_label: vs. 5 years ago
+    custom:
+      label: Custom Period
+      label_short: Custom
+  accounts:
+    show:
+      tabs:
+        activity: Activity
+        holdings: Holdings
+        overview: Overview
+        reports: Reports
+  investments:
+    tabs:
+      reports:
+        eyebrow: Investment Report
+        coverage_notes: Coverage notes for this period
+        trading_turnover_title: Trading Turnover
+        trading_turnover_description: Daily traded value across all buys and sells in the selected period.
+        activity_mix_title: Activity Mix
+        activity_mix_description: Which types of activity dominated this window.
+        largest_activity_bucket: Largest activity bucket
+        no_activity: No activity
+        entry_count:
+          one: 1 entry
+          other: "%{count} entries"
+        contribution_curve_title: Contribution Curve
+        contribution_curve_description: Cumulative external cash plus dividend income, net of withholding tax.
+        cash_vs_holdings_title: Cash Vs Holdings
+        cash_vs_holdings_description: How the account split between deployable cash and invested capital over time.
+        cash_balance: Cash balance
+        holdings_value: Holdings value
+        top_securities_title: Top Securities
+        top_securities_description: Turnover by ticker for the selected period.
+        trade_count:
+          one: 1 trade
+          other: "%{count} trades"
+        buys: Buys
+        sells: Sells
+        net_flow: Net flow
+        no_trade_activity: No trade activity in this period.
+        recent_activity_title: Recent Activity
+        recent_activity_description: Latest transactions and trades inside this report window.
+        no_activity_in_period: No activity in this period.
+    reports:
+      title: "%{period} report"
+      coverage_warnings:
+        missing_forex_counterparty_legs: FX rows are partial because Plaid only exposes one currency leg for pairs like USD.HKD.
+        missing_settlement_dates: Settled-cash style sections are unavailable because Plaid does not return settlement dates.
+      metrics:
+        trading_turnover:
+          label: Trading turnover
+          note: "%{count} trades"
+        net_buys:
+          label: Net buys
+          note: "%{buys} buys, %{sells} sells"
+        contributions:
+          label: Contributions
+          note: "%{count} cash receipts"
+        income:
+          label: Income
+          note: "%{count} dividend items"
+        taxes_fees:
+          label: Taxes + fees
+          note: Withholding and commissions
+        fx_volume:
+          label: FX volume
+          note: "%{count} FX cash movements"
+      breakdowns:
+        buys: Buys
+        sells: Sells
+        deposits: Cash in
+        dividends: Dividends
+        taxes: Taxes
+        fx: FX
+      activity:
+        buy: Buy %{ticker}
+        sell: Sell %{ticker}
+        deposit: Cash receipt
+        dividend: Dividend
+        tax: Withholding tax
+        fx: FX conversion
+        trade_detail: "%{qty} shares at %{price}"
