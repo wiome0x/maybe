@@ -34,11 +34,11 @@ en:
       symbol: Symbol
       price: Price
       change: Change
-      news_label: Reserved
+      news_label: Market news
       news_title: Daily market news
-      news_description: This area is reserved for a future daily market news stream, event highlights, and intraday commentary.
-      news_placeholder_title: News feed not connected yet
-      news_placeholder_body: This section can later show daily headlines, pre-market and after-hours summaries, sector news, and stock-specific catalysts.
+      news_description: Currently combines CNBC intraday market coverage with Seeking Alpha event-driven news for quick context beside the heatmap.
+      news_placeholder_title: News feed is temporarily unavailable
+      news_placeholder_body: No usable RSS items were returned right now. Please try refreshing again later.
     cryptos:
       home: Home
       title: Crypto

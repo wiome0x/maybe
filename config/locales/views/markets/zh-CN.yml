@@ -34,11 +34,11 @@ zh-CN:
       symbol: 标的
       price: 现价
       change: 涨跌幅
-      news_label: 预留区域
+      news_label: 市场消息
       news_title: 每日消息面
-      news_description: 该区域预留给后续的每日市场消息、热点事件和盘中快讯整合。
-      news_placeholder_title: 暂未接入消息面数据
-      news_placeholder_body: 后续可以在这里显示每日要闻、盘前盘后摘要、行业热点和个股异动说明。
+      news_description: 当前聚合 CNBC 盘中市场流和 Seeking Alpha 事件快讯，作为热力图旁边的快速参考。
+      news_placeholder_title: 暂时无法加载消息流
+      news_placeholder_body: 当前未获取到可用 RSS 数据，可稍后刷新重试。
     cryptos:
       home: 首页
       title: 加密货币

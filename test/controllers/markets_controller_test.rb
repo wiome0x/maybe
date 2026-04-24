@@ -22,6 +22,14 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
         low: 207.8
       )
     ])
+    MarketNewsFeed.stubs(:fetch).returns([
+      MarketNewsFeed::Item.new(
+        source: "CNBC",
+        title: "Stocks rally into the close",
+        url: "https://www.cnbc.com/example",
+        published_at: Time.utc(2026, 4, 25, 8, 0, 0)
+      )
+    ])
 
     get market_stocks_heatmap_path
 
@@ -29,5 +37,7 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "embed-widget-stock-heatmap.js"
     assert_includes response.body, "tradingview-widget-container"
     assert_includes response.body, "AAPL"
+    assert_includes response.body, "Stocks rally into the close"
+    assert_includes response.body, "CNBC"
   end
 end

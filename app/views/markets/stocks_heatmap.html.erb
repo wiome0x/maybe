@@ -52,11 +52,44 @@
       <p class="text-sm text-secondary"><%= t(".news_description") %></p>
     </div>
 
-    <div class="rounded-xl border border-dashed border-primary/40 bg-surface-inset min-h-[320px] xl:min-h-[520px] flex items-center justify-center p-6">
-      <div class="text-center space-y-2 max-w-xl">
-        <p class="text-sm font-medium text-primary"><%= t(".news_placeholder_title") %></p>
-        <p class="text-sm text-secondary"><%= t(".news_placeholder_body") %></p>
+    <% if @market_news.any? %>
+      <div class="rounded-xl bg-container-inset p-1 min-h-[320px] xl:min-h-[520px]">
+        <div class="bg-container rounded-lg shadow-border-xs overflow-hidden">
+          <% @market_news.each_with_index do |article, index| %>
+            <div class="px-3 py-3 space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <span class="inline-flex items-center rounded-full bg-surface-inset px-2 py-0.5 text-[11px] font-medium text-secondary">
+                  <%= article.source %>
+                </span>
+
+                <% if article.published_at.present? %>
+                  <span class="text-[11px] text-secondary whitespace-nowrap">
+                    <%= article.published_at.in_time_zone(Current.family&.timezone || "UTC").strftime("%m-%d %H:%M") %>
+                  </span>
+                <% end %>
+              </div>
+
+              <a href="<%= article.url %>"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="block text-sm text-primary leading-relaxed hover:underline">
+                <%= article.title %>
+              </a>
+            </div>
+
+            <% unless index == @market_news.size - 1 %>
+              <%= render "shared/ruler" %>
+            <% end %>
+          <% end %>
+        </div>
       </div>
-    </div>
+    <% else %>
+      <div class="rounded-xl border border-dashed border-primary/40 bg-surface-inset min-h-[320px] xl:min-h-[520px] flex items-center justify-center p-6">
+        <div class="text-center space-y-2 max-w-xl">
+          <p class="text-sm font-medium text-primary"><%= t(".news_placeholder_title") %></p>
+          <p class="text-sm text-secondary"><%= t(".news_placeholder_body") %></p>
+        </div>
+      </div>
+    <% end %>
   </section>
 </div>

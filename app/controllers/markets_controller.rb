@@ -14,6 +14,7 @@ class MarketsController < ApplicationController
   def stocks_heatmap
     @top_gainers = fetch_market_movers("day_gainers")
     @top_losers = fetch_market_movers("day_losers")
+    @market_news = MarketNewsFeed.fetch
     @breadcrumbs = [ [ t(".home"), root_path ], [ t(".title"), nil ] ]
   end
 
