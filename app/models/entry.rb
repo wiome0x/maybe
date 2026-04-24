@@ -13,6 +13,7 @@ class Entry < ApplicationRecord
   validates :date, :name, :amount, :currency, presence: true
   validates :date, uniqueness: { scope: [ :account_id, :entryable_type ] }, if: -> { valuation? }
   validates :date, comparison: { greater_than: -> { min_supported_date } }
+  validates :import_idempotency_key, uniqueness: { scope: :account_id }, allow_nil: true
 
   scope :visible, -> {
     joins(:account).where(accounts: { status: [ "draft", "active" ] })

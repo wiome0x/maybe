@@ -118,8 +118,13 @@ class IbkrImport < Import
     end
 
     def import_trades(trade_rows)
-      trades = trade_rows.map do |row|
+      trades = trade_rows.filter_map do |row|
         mapped = mapped_account_for(row)
+        currency = row.currency.presence || mapped.currency
+        amount = row.signed_amount
+        key = idempotency_key(mapped.id, row.date_iso, amount, currency, row.name, row.entity_type)
+
+        next if entry_exists?(mapped.id, key)
 
         security = find_or_create_security(
           ticker: row.ticker,
@@ -129,39 +134,43 @@ class IbkrImport < Import
         Trade.new(
           security: security,
           qty: row.qty,
-          currency: row.currency.presence || mapped.currency,
+          currency: currency,
           price: row.price,
           entry: Entry.new(
             account: mapped,
             date: row.date_iso,
-            amount: row.signed_amount,
+            amount: amount,
             name: row.name,
-            currency: row.currency.presence || mapped.currency,
-            import: self
+            currency: currency,
+            import: self,
+            import_idempotency_key: key
           )
         )
       end
 
-      Trade.import!(trades, recursive: true)
+      Trade.import!(trades, recursive: true) if trades.any?
     end
 
     def import_cash_entries(cash_rows)
-      transactions = cash_rows.map do |row|
+      transactions = cash_rows.filter_map do |row|
         mapped = mapped_account_for(row)
         currency = row.currency.presence || mapped.currency
 
-        # Deposits are inflows (negative in Maybe convention), withdrawals/taxes are outflows
         amount = row.amount.to_d
         signed = case row.entity_type
         when ENTITY_DEPOSIT
-          amount.negative? ? amount : -amount.abs  # deposits = inflow = negative
+          amount.negative? ? amount : -amount.abs
         when ENTITY_DIVIDEND, ENTITY_GRANT
-          -amount.abs  # income = inflow = negative
+          -amount.abs
         when ENTITY_TAX
-          amount.abs   # tax = outflow = positive
+          amount.abs
         else
           amount
         end
+
+        key = idempotency_key(mapped.id, row.date_iso, signed, currency, row.name, row.entity_type)
+
+        next if entry_exists?(mapped.id, key)
 
         Transaction.new(
           entry: Entry.new(
@@ -170,12 +179,27 @@ class IbkrImport < Import
             amount: signed,
             name: row.name,
             currency: currency,
-            import: self
+            import: self,
+            import_idempotency_key: key
           )
         )
       end
 
-      Transaction.import!(transactions, recursive: true)
+      Transaction.import!(transactions, recursive: true) if transactions.any?
+    end
+
+    # Deterministic key: SHA256 of account + date + amount + currency + name + entity_type
+    def idempotency_key(account_id, date, amount, currency, name, entity_type)
+      Digest::SHA256.hexdigest([ account_id, date.to_s, amount.to_s, currency.to_s, name.to_s, entity_type.to_s ].join("|"))
+    end
+
+    # Check DB directly to avoid loading all entries into memory
+    def entry_exists?(account_id, key)
+      @existing_keys ||= Entry.where(account_id: account_id)
+                              .where.not(import_idempotency_key: nil)
+                              .pluck(:import_idempotency_key)
+                              .to_set
+      @existing_keys.include?(key)
     end
 
     def set_mappings
