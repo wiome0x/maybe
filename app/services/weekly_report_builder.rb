@@ -1,4 +1,6 @@
 class WeeklyReportBuilder
+  ACCOUNT_BREAKDOWN_COLORS = %w[#1D4ED8 #0F766E #B45309 #7C3AED #DC2626 #475569].freeze
+
   def initialize(user:, period:)
     @user = user
     @period = period
@@ -45,7 +47,8 @@ class WeeklyReportBuilder
         name: account.name,
         currency: account.currency,
         subtitle: report.subtitle,
-        summary: metrics.index_by { |metric| metric[:id] }.slice("trading_turnover", "net_buys", "contributions", "income", "taxes_fees"),
+        current_value: convert_amount(account.balance, account.currency, user.family.currency),
+        summary: metrics.index_by { |metric| metric[:id] }.slice("trading_turnover", "net_buys", "income", "taxes_fees"),
         breakdowns: report.breakdowns.map do |row|
           {
             id: row.id,
@@ -57,7 +60,7 @@ class WeeklyReportBuilder
           }
         end,
         turnover_chart_data: report.turnover_chart_data,
-        contribution_series: report.contribution_series.as_json,
+        balance_chart_data: account.balance_series(period: period, view: :balance).as_json,
         top_securities: report.top_securities(limit: 5).map do |row|
           {
             ticker: row.ticker,
@@ -87,14 +90,14 @@ class WeeklyReportBuilder
       top_security = aggregate_top_security(account_sections)
       most_active_account = account_sections.max_by { |section| metric_amount(section, "trading_turnover") }
       family_currency = user.family.currency
-      overview_breakdowns = aggregate_breakdowns(account_sections)
+      account_value_breakdown = aggregate_account_values(account_sections)
 
       {
         account_count: account_sections.count,
         currency: family_currency,
+        current_value: account_sections.sum { |section| section[:current_value].to_d },
         trading_turnover: account_sections.sum { |section| converted_metric_amount(section, "trading_turnover", family_currency) },
         net_buys: account_sections.sum { |section| converted_metric_amount(section, "net_buys", family_currency) },
-        contributions: account_sections.sum { |section| converted_metric_amount(section, "contributions", family_currency) },
         income: account_sections.sum { |section| converted_metric_amount(section, "income", family_currency) },
         taxes_fees: account_sections.sum { |section| converted_metric_amount(section, "taxes_fees", family_currency) },
         most_active_account: most_active_account && {
@@ -102,9 +105,8 @@ class WeeklyReportBuilder
           turnover: converted_metric_amount(most_active_account, "trading_turnover", family_currency)
         },
         top_security: top_security,
-        breakdowns: overview_breakdowns,
-        turnover_series: aggregate_series(account_sections, series_key: :turnover_chart_data, target_currency: family_currency),
-        contribution_series: aggregate_series(account_sections, series_key: :contribution_series, target_currency: family_currency)
+        account_value_breakdown: account_value_breakdown,
+        balance_series: aggregate_series(account_sections, series_key: :balance_chart_data, target_currency: family_currency)
       }
     end
 
@@ -152,6 +154,18 @@ class WeeklyReportBuilder
           amount: rows.sum { |row| convert_amount(row[:amount], row[:currency], user.family.currency) },
           count: rows.sum { |row| row[:count].to_i },
           color: sample[:color]
+        }
+      end.sort_by { |row| -row[:amount] }
+    end
+
+    def aggregate_account_values(account_sections)
+      account_sections.each_with_index.map do |section, index|
+        {
+          id: section[:account_id],
+          label: section[:name],
+          amount: section[:current_value].to_d,
+          count: nil,
+          color: ACCOUNT_BREAKDOWN_COLORS[index % ACCOUNT_BREAKDOWN_COLORS.length]
         }
       end.sort_by { |row| -row[:amount] }
     end

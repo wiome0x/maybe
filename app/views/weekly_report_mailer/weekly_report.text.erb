@@ -5,13 +5,13 @@
 
 <%= t("settings.weekly_reports.shared.overview_title") %>
 <% @report_presenter.overview_metrics.each do |metric| %>
-- <%= metric[:label] %>: <%= format_money(Money.new(metric[:amount].to_d, metric[:currency])) %>
+- <%= metric[:label] %>: <%= metric[:numeric] == false ? metric[:amount] : format_money(Money.new(metric[:amount].to_d, metric[:currency])) %>
 <% end %>
 <% if @report_presenter.payload.dig(:overview, :most_active_account).present? %>
 <%= t("settings.weekly_reports.shared.most_active_account") %>: <%= @report_presenter.payload.dig(:overview, :most_active_account, :name) %> (<%= format_money(Money.new(@report_presenter.payload.dig(:overview, :most_active_account, :turnover).to_d, @report_presenter.overview_currency)) %>)
 <% end %>
 <% if @report_presenter.payload.dig(:overview, :top_security).present? %>
-<%= t("settings.weekly_reports.shared.top_security") %>: <%= @report_presenter.payload.dig(:overview, :top_security, :ticker) %> · <%= @report_presenter.payload.dig(:overview, :top_security, :name) %>
+<%= t("settings.weekly_reports.shared.top_security") %>: <%= @report_presenter.payload.dig(:overview, :top_security, :ticker) %> · <%= @report_presenter.payload.dig(:overview, :top_security, :name) %> (<%= format_money(Money.new(@report_presenter.payload.dig(:overview, :top_security, :turnover).to_d, @report_presenter.overview_currency)) %>)
 <% end %>
 
 <%= t("settings.weekly_reports.shared.accounts_title") %>

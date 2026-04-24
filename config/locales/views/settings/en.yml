@@ -185,22 +185,25 @@ en:
         status: Status
         generated_at: Generated at
         recipient: Recipient
+        account_count: Accounts
+        current_value: Current value
         overview_title: Household-wide overview
+        overview_balance_title: Portfolio value trend
+        overview_balance_description: Combined total portfolio value across the included investment accounts during this report window.
+        overview_allocation_title: Account allocation
+        overview_allocation_description: Where the current household portfolio value is concentrated right now.
         turnover_title: Trading turnover
         turnover_description: Daily traded value aggregated across the investment accounts included in this weekly report.
         activity_mix_title: Activity mix
         activity_mix_description: Which activity buckets dominated this report window.
-        contribution_curve_title: Contribution curve
-        contribution_curve_description: Net external cash and dividend income across all included investment accounts.
-        highlights_title: Highlights
-        highlights_description: Quick readouts for the most active account and most active security in this report.
         largest_activity_bucket: Largest activity bucket
+        largest_account_bucket: Largest account
         no_activity: No activity
         no_chart_data: No chart snapshot was stored for this report.
-        account_eyebrow: Account section
-        account_turnover_description: Daily traded value for this account during the weekly report window.
+        account_eyebrow: Account summary
+        account_balance_title: Account value trend
+        account_balance_description: Total account value changes during the weekly report window.
         account_mix_description: Which activity types dominated this account during the report period.
-        account_contribution_description: Net external cash and dividend income trend for this account.
         top_securities_title: Top securities
         top_securities_description: Highest-turnover tickers inside this account for the selected week.
         recent_activity_title: Recent activity

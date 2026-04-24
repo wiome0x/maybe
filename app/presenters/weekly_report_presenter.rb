@@ -1,5 +1,5 @@
 class WeeklyReportPresenter
-  METRIC_IDS = %w[trading_turnover net_buys contributions income taxes_fees].freeze
+  METRIC_IDS = %w[trading_turnover net_buys income taxes_fees].freeze
 
   def initialize(weekly_report)
     @weekly_report = weekly_report
@@ -31,32 +31,48 @@ class WeeklyReportPresenter
     payload.dig(:overview, :currency).presence || weekly_report.user.family.currency
   end
 
-    def overview_metrics
-      METRIC_IDS.map do |id|
-        {
-          id: id,
-          label: metric_label(id),
-          amount: numeric_amount(payload.dig(:overview, id)),
-          currency: overview_currency,
-          color: metric_color(id),
-          note: nil
+  def overview_metrics
+    [
+      {
+        id: "account_count",
+        label: I18n.t("settings.weekly_reports.shared.account_count"),
+        amount: payload.dig(:overview, :account_count).to_i,
+        currency: nil,
+        color: "#475569",
+        note: nil,
+        numeric: false
+      },
+      {
+        id: "current_value",
+        label: I18n.t("settings.weekly_reports.shared.current_value"),
+        amount: numeric_amount(payload.dig(:overview, :current_value)),
+        currency: overview_currency,
+        color: "#0F766E",
+        note: nil,
+        numeric: true
+      }
+    ] + METRIC_IDS.map do |id|
+      {
+        id: id,
+        label: metric_label(id),
+        amount: numeric_amount(payload.dig(:overview, id)),
+        currency: overview_currency,
+        color: metric_color(id),
+        note: nil,
+        numeric: true
       }
     end
   end
 
   def overview_breakdowns
-    rows = payload.dig(:overview, :breakdowns) || []
+    rows = payload.dig(:overview, :account_value_breakdown) || []
     return rows.map { |row| row.merge(amount: numeric_amount(row[:amount])) } if rows.any?
 
     summary_to_breakdowns(overview_metrics)
   end
 
   def overview_turnover_series
-    payload.dig(:overview, :turnover_series)
-  end
-
-  def overview_contribution_series
-    payload.dig(:overview, :contribution_series)
+    payload.dig(:overview, :balance_series)
   end
 
   def accounts
@@ -68,41 +84,40 @@ class WeeklyReportPresenter
   end
 
   private
-    def metric_label(id)
-      I18n.t("investments.reports.metrics.#{id}.label")
-    end
+  def metric_label(id)
+    I18n.t("investments.reports.metrics.#{id}.label")
+  end
 
-    def metric_color(id)
+  def metric_color(id)
+    {
+      "trading_turnover" => "#0F766E",
+      "net_buys" => "#1D4ED8",
+      "income" => "#B45309",
+      "taxes_fees" => "#B91C1C"
+    }.fetch(id, "#475569")
+  end
+
+  def summary_to_breakdowns(metrics)
+    metrics.filter { |metric| metric[:numeric] != false && metric[:amount].positive? }.map do |metric|
       {
-        "trading_turnover" => "#0F766E",
-        "net_buys" => "#1D4ED8",
-        "contributions" => "#15803D",
-        "income" => "#B45309",
-        "taxes_fees" => "#B91C1C"
-      }.fetch(id, "#475569")
+        id: metric[:id],
+        label: metric[:label],
+        amount: numeric_amount(metric[:amount]),
+        color: metric[:color],
+        count: nil
+      }
     end
+  end
 
-    def summary_to_breakdowns(metrics)
-      metrics.filter { |metric| metric[:amount].positive? }.map do |metric|
-        {
-          id: metric[:id],
-          label: metric[:label],
-          amount: numeric_amount(metric[:amount]),
-          color: metric[:color],
-          count: nil
-        }
-      end
+  def numeric_amount(value)
+    if value.is_a?(Money)
+      value.amount
+    elsif value.respond_to?(:dig)
+      (value.dig(:amount) || value.dig("amount") || value).to_d
+    else
+      value.to_d
     end
-
-    def numeric_amount(value)
-      if value.is_a?(Money)
-        value.amount
-      elsif value.respond_to?(:dig)
-        (value.dig(:amount) || value.dig("amount") || value).to_d
-      else
-        value.to_d
-      end
-    end
+  end
 
   class AccountSection
     def initialize(data)
@@ -128,8 +143,15 @@ class WeeklyReportPresenter
     end
 
     def metrics
-      list = data[:metrics] || []
-      list.select { |metric| METRIC_IDS.include?(metric[:id].to_s) }.map do |metric|
+      [
+        {
+          id: "current_value",
+          label: I18n.t("settings.weekly_reports.shared.current_value"),
+          amount: numeric_amount(data[:current_value]),
+          color: "#0F766E",
+          note: nil
+        }
+      ] + (data[:metrics] || []).select { |metric| METRIC_IDS.include?(metric[:id].to_s) }.map do |metric|
         metric.merge(amount: numeric_amount(metric[:amount]))
       end
     end
@@ -150,11 +172,7 @@ class WeeklyReportPresenter
     end
 
     def turnover_chart_data
-      data[:turnover_chart_data]
-    end
-
-    def contribution_series
-      data[:contribution_series]
+      data[:balance_chart_data].presence || data[:turnover_chart_data]
     end
 
     def top_securities
@@ -178,14 +196,14 @@ class WeeklyReportPresenter
     end
 
     private
-      def numeric_amount(value)
-        if value.is_a?(Money)
-          value.amount
-        elsif value.respond_to?(:dig)
-          (value.dig(:amount) || value.dig("amount") || value).to_d
-        else
-          value.to_d
-        end
+    def numeric_amount(value)
+      if value.is_a?(Money)
+        value.amount
+      elsif value.respond_to?(:dig)
+        (value.dig(:amount) || value.dig("amount") || value).to_d
+      else
+        value.to_d
       end
+    end
   end
 end
