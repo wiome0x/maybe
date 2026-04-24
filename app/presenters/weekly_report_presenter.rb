@@ -75,6 +75,14 @@ class WeeklyReportPresenter
     payload.dig(:overview, :balance_series)
   end
 
+  def overview_multi_balance_series
+    payload.dig(:overview, :multi_balance_series)
+  end
+
+  def use_multi_account_balance_chart?
+    accounts.size > 1 && overview_multi_balance_series.present?
+  end
+
   def accounts
     (payload[:accounts] || []).map { |section| AccountSection.new(section) }
   end
@@ -142,13 +150,21 @@ class WeeklyReportPresenter
       data[:currency]
     end
 
+    def color
+      data[:chart_color]
+    end
+
+    def current_value
+      numeric_amount(data[:current_value])
+    end
+
     def metrics
       [
         {
           id: "current_value",
           label: I18n.t("settings.weekly_reports.shared.current_value"),
-          amount: numeric_amount(data[:current_value]),
-          color: "#0F766E",
+          amount: current_value,
+          color: color || "#0F766E",
           note: nil
         }
       ] + (data[:metrics] || []).select { |metric| METRIC_IDS.include?(metric[:id].to_s) }.map do |metric|

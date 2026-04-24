@@ -53,7 +53,16 @@
           <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.overview_balance_description") %></p>
         </div>
 
-        <% if presenter.overview_turnover_series.present? %>
+        <% if presenter.use_multi_account_balance_chart? %>
+          <div class="h-64">
+            <div
+              id="<%= dom_id(presenter.weekly_report, :overview_balance_chart_multi) %>"
+              class="w-full h-full"
+              data-controller="multi-series-chart"
+              data-multi-series-chart-data-value="<%= presenter.overview_multi_balance_series.to_json %>"
+              data-multi-series-chart-x-axis-date-format-value="%b %d"></div>
+          </div>
+        <% elsif presenter.overview_turnover_series.present? %>
           <div class="h-64">
             <div
               id="<%= dom_id(presenter.weekly_report, :overview_turnover_chart) %>"

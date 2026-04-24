@@ -7,7 +7,9 @@ class WeeklyReportBuilder
   end
 
   def build
-    account_sections = investment_accounts.map { |account| build_account_section(account) }
+    account_sections = investment_accounts.each_with_index.map do |account, index|
+      build_account_section(account, chart_color: ACCOUNT_BREAKDOWN_COLORS[index % ACCOUNT_BREAKDOWN_COLORS.length])
+    end
 
     {
       generated_at: Time.current.iso8601,
@@ -30,7 +32,7 @@ class WeeklyReportBuilder
       user.family.accounts.visible.where(accountable_type: "Investment").alphabetically
     end
 
-    def build_account_section(account)
+    def build_account_section(account, chart_color:)
       report = Account::InvestmentReport.new(account, period: period)
       metrics = report.metrics.map do |metric|
         {
@@ -46,6 +48,7 @@ class WeeklyReportBuilder
         account_id: account.id,
         name: account.name,
         currency: account.currency,
+        chart_color: chart_color,
         subtitle: report.subtitle,
         current_value: convert_amount(account.balance, account.currency, user.family.currency),
         summary: metrics.index_by { |metric| metric[:id] }.slice("trading_turnover", "net_buys", "income", "taxes_fees"),
@@ -106,7 +109,8 @@ class WeeklyReportBuilder
         },
         top_security: top_security,
         account_value_breakdown: account_value_breakdown,
-        balance_series: aggregate_series(account_sections, series_key: :balance_chart_data, target_currency: family_currency)
+        balance_series: aggregate_series(account_sections, series_key: :balance_chart_data, target_currency: family_currency),
+        multi_balance_series: build_multi_balance_series(account_sections, target_currency: family_currency)
       }
     end
 
@@ -159,15 +163,46 @@ class WeeklyReportBuilder
     end
 
     def aggregate_account_values(account_sections)
-      account_sections.each_with_index.map do |section, index|
+      account_sections.map do |section|
         {
           id: section[:account_id],
           label: section[:name],
           amount: section[:current_value].to_d,
           count: nil,
-          color: ACCOUNT_BREAKDOWN_COLORS[index % ACCOUNT_BREAKDOWN_COLORS.length]
+          color: section[:chart_color]
         }
       end.sort_by { |row| -row[:amount] }
+    end
+
+    def build_multi_balance_series(account_sections, target_currency:)
+      total_series = aggregate_series(account_sections, series_key: :balance_chart_data, target_currency: target_currency)
+      return nil unless total_series.present?
+
+      {
+        start_date: total_series[:start_date],
+        end_date: total_series[:end_date],
+        series: [
+          {
+            id: "total",
+            label: I18n.t("settings.weekly_reports.shared.total_value"),
+            color: "#111827",
+            stroke_width: 3,
+            values: total_series[:values]
+          },
+          *account_sections.filter_map do |section|
+            series = section[:balance_chart_data]
+            next unless series.present?
+
+            {
+              id: section[:account_id],
+              label: section[:name],
+              color: section[:chart_color],
+              stroke_width: 2,
+              values: series[:values] || series["values"] || []
+            }
+          end
+        ]
+      }
     end
 
     def aggregate_series(account_sections, series_key:, target_currency:)

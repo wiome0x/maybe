@@ -184,6 +184,7 @@ zh-CN:
         recipient: 收件地址
         account_count: 账户数
         current_value: 当前总资产
+        total_value: 总资产
         overview_title: 全局总览
         overview_balance_title: 资产规模趋势
         overview_balance_description: 查看本周内全部证券账户合并后的总资产变化。

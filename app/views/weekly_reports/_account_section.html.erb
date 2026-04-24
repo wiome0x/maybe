@@ -20,81 +20,57 @@
         <% end %>
       </div>
 
-      <div class="grid gap-4 2xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,0.95fr)]">
-        <div class="bg-container-inset rounded-xl p-4 space-y-4">
-          <div>
-            <p class="text-sm font-medium text-primary"><%= t("settings.weekly_reports.shared.account_balance_title") %></p>
-            <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.account_balance_description") %></p>
-          </div>
-
-          <% if account.turnover_chart_data.present? %>
-            <div class="h-56">
-              <div
-                id="weekly_report_account_<%= account.id %>_turnover_chart"
-                class="w-full h-full"
-                data-controller="time-series-chart"
-                data-time-series-chart-data-value="<%= account.turnover_chart_data.to_json %>"
-                data-time-series-chart-x-axis-activity-dates-only-value="true"
-                data-time-series-chart-x-axis-date-format-value="%b %d"
-                data-time-series-chart-use-annotations-value="true"></div>
-            </div>
-          <% else %>
-            <div class="rounded-xl bg-container p-5 text-sm text-secondary"><%= t("settings.weekly_reports.shared.no_chart_data") %></div>
-          <% end %>
+      <div class="bg-container-inset rounded-xl p-4 space-y-4">
+        <div>
+          <p class="text-sm font-medium text-primary"><%= t("settings.weekly_reports.shared.activity_mix_title") %></p>
+          <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.account_mix_description") %></p>
         </div>
 
-        <div class="bg-container-inset rounded-xl p-4 space-y-4">
-          <div>
-            <p class="text-sm font-medium text-primary"><%= t("settings.weekly_reports.shared.activity_mix_title") %></p>
-            <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.account_mix_description") %></p>
-          </div>
+        <% if account.breakdowns.any? %>
+          <div class="relative h-[18rem]" data-controller="donut-chart" data-donut-chart-segments-value="<%= account.breakdowns.map { |row| { id: row[:id], amount: row[:amount].to_f, color: row[:color] } }.to_json %>" data-donut-chart-segment-height-value="6" data-donut-chart-segment-opacity-value="0.92">
+            <div data-donut-chart-target="chartContainer" class="absolute inset-0 pointer-events-none"></div>
 
-          <% if account.breakdowns.any? %>
-            <div class="relative h-[18rem]" data-controller="donut-chart" data-donut-chart-segments-value="<%= account.breakdowns.map { |row| { id: row[:id], amount: row[:amount].to_f, color: row[:color] } }.to_json %>" data-donut-chart-segment-height-value="6" data-donut-chart-segment-opacity-value="0.92">
-              <div data-donut-chart-target="chartContainer" class="absolute inset-0 pointer-events-none"></div>
-
-              <div data-donut-chart-target="contentContainer" class="flex h-full items-center justify-center">
-                <% largest = account.breakdowns.max_by { |row| row[:amount].to_d } %>
-                <div data-donut-chart-target="defaultContent" class="flex max-w-[14rem] flex-col items-center text-center">
-                  <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.largest_activity_bucket") %></p>
-                  <p class="mt-2 text-3xl font-medium text-primary"><%= largest ? largest[:label] : t("settings.weekly_reports.shared.no_activity") %></p>
-                  <% if largest %>
-                    <p class="mt-1 text-sm text-secondary"><%= format_money(Money.new(largest[:amount], account.currency)) %></p>
-                  <% end %>
-                </div>
-
-                <% account.breakdowns.each do |row| %>
-                  <div id="segment_<%= row[:id] %>" class="hidden">
-                    <div class="flex max-w-[14rem] flex-col items-center text-center">
-                      <p class="text-sm text-secondary"><%= row[:label] %></p>
-                      <p class="mt-2 text-3xl font-medium text-primary"><%= format_money(Money.new(row[:amount], account.currency)) %></p>
-                      <% if row[:count].present? %>
-                        <p class="mt-1 text-sm" style="color: <%= row[:color] %>"><%= t("settings.weekly_reports.shared.entry_count", count: row[:count]) %></p>
-                      <% end %>
-                    </div>
-                  </div>
+            <div data-donut-chart-target="contentContainer" class="flex h-full items-center justify-center">
+              <% largest = account.breakdowns.max_by { |row| row[:amount].to_d } %>
+              <div data-donut-chart-target="defaultContent" class="flex max-w-[14rem] flex-col items-center text-center">
+                <p class="text-sm text-secondary"><%= t("settings.weekly_reports.shared.largest_activity_bucket") %></p>
+                <p class="mt-2 text-3xl font-medium text-primary"><%= largest ? largest[:label] : t("settings.weekly_reports.shared.no_activity") %></p>
+                <% if largest %>
+                  <p class="mt-1 text-sm text-secondary"><%= format_money(Money.new(largest[:amount], account.currency)) %></p>
                 <% end %>
               </div>
-            </div>
 
-            <div class="grid gap-2 sm:grid-cols-2">
               <% account.breakdowns.each do |row| %>
-                <div class="rounded-lg bg-container px-3 py-2">
-                  <div class="flex items-center gap-2">
-                    <span class="h-2.5 w-2.5 rounded-full" style="background-color: <%= row[:color] %>"></span>
-                    <p class="text-sm font-medium text-primary"><%= row[:label] %></p>
+                <div id="segment_<%= row[:id] %>" class="hidden">
+                  <div class="flex max-w-[14rem] flex-col items-center text-center">
+                    <p class="text-sm text-secondary"><%= row[:label] %></p>
+                    <p class="mt-2 text-3xl font-medium text-primary"><%= format_money(Money.new(row[:amount], account.currency)) %></p>
+                    <% if row[:count].present? %>
+                      <p class="mt-1 text-sm" style="color: <%= row[:color] %>"><%= t("settings.weekly_reports.shared.entry_count", count: row[:count]) %></p>
+                    <% end %>
                   </div>
-                  <p class="mt-2 text-lg font-medium text-primary"><%= format_money(Money.new(row[:amount], account.currency), precision: 0) %></p>
-                  <% if row[:count].present? %>
-                    <p class="text-xs text-secondary"><%= t("settings.weekly_reports.shared.entry_count", count: row[:count]) %></p>
-                  <% end %>
                 </div>
               <% end %>
             </div>
-          <% else %>
-            <div class="rounded-xl bg-container p-5 text-sm text-secondary"><%= t("settings.weekly_reports.shared.no_activity") %></div>
-          <% end %>
-        </div>
+          </div>
+
+          <div class="grid gap-2 sm:grid-cols-2">
+            <% account.breakdowns.each do |row| %>
+              <div class="rounded-lg bg-container px-3 py-2">
+                <div class="flex items-center gap-2">
+                  <span class="h-2.5 w-2.5 rounded-full" style="background-color: <%= row[:color] %>"></span>
+                  <p class="text-sm font-medium text-primary"><%= row[:label] %></p>
+                </div>
+                <p class="mt-2 text-lg font-medium text-primary"><%= format_money(Money.new(row[:amount], account.currency), precision: 0) %></p>
+                <% if row[:count].present? %>
+                  <p class="text-xs text-secondary"><%= t("settings.weekly_reports.shared.entry_count", count: row[:count]) %></p>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="rounded-xl bg-container p-5 text-sm text-secondary"><%= t("settings.weekly_reports.shared.no_activity") %></div>
+        <% end %>
       </div>
 
       <div class="bg-container-inset rounded-xl p-4 space-y-4">

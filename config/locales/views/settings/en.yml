@@ -187,6 +187,7 @@ en:
         recipient: Recipient
         account_count: Accounts
         current_value: Current value
+        total_value: Total value
         overview_title: Household-wide overview
         overview_balance_title: Portfolio value trend
         overview_balance_description: Combined total portfolio value across the included investment accounts during this report window.

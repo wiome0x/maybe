@@ -21,8 +21,11 @@ class WeeklyReportBuilderTest < ActiveSupport::TestCase
     assert payload.dig(:accounts, 0, :current_value).present?
     assert_equal "NVDA", payload.dig(:accounts, 0, :top_securities, 0, :ticker)
     assert payload.dig(:overview, :balance_series).present?
+    assert payload.dig(:overview, :multi_balance_series, :series).present?
+    assert_equal "total", payload.dig(:overview, :multi_balance_series, :series, 0, :id)
     assert payload.dig(:overview, :account_value_breakdown).present?
     assert payload.dig(:accounts, 0, :balance_chart_data).present?
+    assert payload.dig(:accounts, 0, :chart_color).present?
     assert_nil payload.dig(:overview, :contribution_series)
     assert_nil payload.dig(:accounts, 0, :contribution_series)
   end
