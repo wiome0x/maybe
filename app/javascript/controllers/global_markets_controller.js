@@ -1,8 +1,54 @@
 import { Controller } from "@hotwired/stimulus";
 import { geoEquirectangular } from "d3-geo";
 
+// Trading sessions: open/close in local exchange time, expressed as UTC offsets (standard time)
+// We account for DST manually per region where needed.
+const SESSIONS = [
+  {
+    name: "美股",
+    tz: "America/New_York",
+    openH: 9, openM: 30,
+    closeH: 16, closeM: 0,
+    // Mon–Fri only
+  },
+  {
+    name: "沪深",
+    tz: "Asia/Shanghai",
+    openH: 9, openM: 30,
+    closeH: 15, closeM: 0,
+    // Morning: 9:30–11:30, Afternoon: 13:00–15:00
+    lunchBreak: { startH: 11, startM: 30, endH: 13, endM: 0 },
+  },
+  {
+    name: "港股",
+    tz: "Asia/Hong_Kong",
+    openH: 9, openM: 30,
+    closeH: 16, closeM: 0,
+    lunchBreak: { startH: 12, startM: 0, endH: 13, endM: 0 },
+  },
+  {
+    name: "日经",
+    tz: "Asia/Tokyo",
+    openH: 9, openM: 0,
+    closeH: 15, closeM: 30,
+    lunchBreak: { startH: 11, startM: 30, endH: 12, endM: 30 },
+  },
+  {
+    name: "英股",
+    tz: "Europe/London",
+    openH: 8, openM: 0,
+    closeH: 16, closeM: 30,
+  },
+  {
+    name: "德股",
+    tz: "Europe/Berlin",
+    openH: 9, openM: 0,
+    closeH: 17, closeM: 30,
+  },
+];
+
 export default class extends Controller {
-  static targets = ["map"];
+  static targets = ["map", "sessions"];
 
   MARKETS = [
     { name: "道琼斯", symbol: "^DJI", lon: -74.0, lat: 40.7, dx: -68, dy: -98, compactDx: -52, compactDy: -82, align: "center" },
@@ -28,6 +74,10 @@ export default class extends Controller {
     this.loadMarkets();
     this.refreshTimer = setInterval(() => this.loadMarkets(), 60000);
 
+    // Update session clocks every minute
+    this.renderSessions();
+    this.sessionTimer = setInterval(() => this.renderSessions(), 60000);
+
     this.resizeObserver = new ResizeObserver(() => {
       this.prepareOverlay();
       this.renderMarkets(this.latestPriceMap || {});
@@ -37,8 +87,130 @@ export default class extends Controller {
 
   disconnect() {
     clearInterval(this.refreshTimer);
+    clearInterval(this.sessionTimer);
     this.resizeObserver?.disconnect();
   }
+
+  // ─── Session clock rendering ──────────────────────────────────────────────
+
+  renderSessions() {
+    if (!this.hasSessionsTarget) return;
+
+    const now = new Date();
+    const html = SESSIONS.map((session) => this.#sessionBadge(session, now)).join("");
+    this.sessionsTarget.innerHTML = html;
+  }
+
+  #sessionBadge(session, now) {
+    const { open, minutesUntilOpen, minutesUntilClose, inLunch } = this.#sessionStatus(session, now);
+
+    let dotColor, label, sublabel;
+
+    if (open && !inLunch) {
+      // 盘中
+      dotColor = "#16a34a";
+      label = session.name;
+      sublabel = `收盘 ${this.#fmtMins(minutesUntilClose)}`;
+    } else if (inLunch) {
+      // 午休
+      dotColor = "#f59e0b";
+      label = session.name;
+      sublabel = `午休 ${this.#fmtMins(minutesUntilClose)}后开`;
+    } else {
+      // 休市
+      dotColor = "#9ca3af";
+      label = session.name;
+      sublabel = minutesUntilOpen != null
+        ? `${this.#fmtMins(minutesUntilOpen)}后开盘`
+        : "休市";
+    }
+
+    return `
+      <div class="flex items-center gap-1.5 rounded-full border border-black/[0.07] bg-white/80 px-2.5 py-1 backdrop-blur-sm shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
+        <span class="h-1.5 w-1.5 rounded-full shrink-0" style="background:${dotColor}; box-shadow: 0 0 0 2px ${dotColor}22"></span>
+        <span class="text-[11px] font-medium text-slate-700 whitespace-nowrap">${label}</span>
+        <span class="text-[10px] text-slate-400 whitespace-nowrap">${sublabel}</span>
+      </div>
+    `;
+  }
+
+  /**
+   * Returns session status relative to `now`.
+   * All times are computed in the exchange's local timezone.
+   */
+  #sessionStatus(session, now) {
+    // Get local time in exchange timezone
+    const localStr = now.toLocaleString("en-US", { timeZone: session.tz, hour12: false,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", weekday: "short" });
+
+    // Parse: "Mon, 04/25/2026, 09:35"
+    const parts = localStr.match(/(\w+),\s+(\d+)\/(\d+)\/(\d+),\s+(\d+):(\d+)/);
+    if (!parts) return { open: false };
+
+    const [, weekday, month, day, year, hourStr, minStr] = parts;
+    const hour = parseInt(hourStr === "24" ? "0" : hourStr, 10);
+    const minute = parseInt(minStr, 10);
+    const dayOfWeek = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(weekday);
+
+    // Weekend = closed
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      // Find minutes until Monday open
+      const daysUntilMon = dayOfWeek === 6 ? 2 : 1;
+      const minsUntilOpen = daysUntilMon * 24 * 60
+        - (hour * 60 + minute)
+        + (session.openH * 60 + session.openM);
+      return { open: false, minutesUntilOpen: minsUntilOpen };
+    }
+
+    const nowMins = hour * 60 + minute;
+    const openMins = session.openH * 60 + session.openM;
+    const closeMins = session.closeH * 60 + session.closeM;
+
+    // Lunch break check
+    let inLunch = false;
+    let lunchEndMins = null;
+    if (session.lunchBreak) {
+      const lbStart = session.lunchBreak.startH * 60 + session.lunchBreak.startM;
+      const lbEnd = session.lunchBreak.endH * 60 + session.lunchBreak.endM;
+      if (nowMins >= lbStart && nowMins < lbEnd) {
+        inLunch = true;
+        lunchEndMins = lbEnd - nowMins;
+      }
+    }
+
+    if (nowMins >= openMins && nowMins < closeMins) {
+      return {
+        open: true,
+        inLunch,
+        minutesUntilClose: inLunch ? lunchEndMins : (closeMins - nowMins),
+      };
+    }
+
+    // Before open today
+    if (nowMins < openMins) {
+      return { open: false, minutesUntilOpen: openMins - nowMins };
+    }
+
+    // After close — next trading day open
+    const minsUntilTomorrow = 24 * 60 - nowMins + openMins;
+    // If tomorrow is Saturday, add 2 more days
+    const nextDayOfWeek = (dayOfWeek + 1) % 7;
+    const extraDays = nextDayOfWeek === 6 ? 2 : nextDayOfWeek === 0 ? 1 : 0;
+    return { open: false, minutesUntilOpen: minsUntilTomorrow + extraDays * 24 * 60 };
+  }
+
+  /** Format minutes into "Xh Ym" or "Ym" */
+  #fmtMins(totalMins) {
+    if (totalMins == null || totalMins < 0) return "";
+    const h = Math.floor(totalMins / 60);
+    const m = totalMins % 60;
+    if (h > 0 && m > 0) return `${h}h${m}m`;
+    if (h > 0) return `${h}h`;
+    return `${m}m`;
+  }
+
+  // ─── Map rendering (unchanged) ────────────────────────────────────────────
 
   async loadMarkets() {
     try {

@@ -4,6 +4,7 @@
   <div class="pointer-events-none absolute inset-x-[-8%] top-14 h-[82%] rounded-[999px] bg-[radial-gradient(circle_at_center,rgba(227,233,252,0.5)_0%,rgba(238,242,253,0.2)_48%,rgba(255,255,255,0)_76%)] blur-2xl"></div>
 
   <div class="relative flex items-start justify-between gap-4">
+    <%# 左侧标题 %>
     <div class="space-y-1.5">
       <div class="flex items-center gap-1.5 text-secondary">
         <%= icon "globe", size: "sm" %>
@@ -12,9 +13,11 @@
       <p class="max-w-[24rem] text-xs leading-5 text-secondary md:text-sm"><%= t("pages.dashboard.global_markets.subtitle") %></p>
     </div>
 
-    <%= link_to market_stocks_path, class: "shrink-0 flex h-14 w-14 items-center justify-center rounded-full border border-tertiary/60 bg-white/90 text-secondary shadow-[0_10px_30px_rgba(17,24,39,0.12)] backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:text-primary" do %>
-      <%= icon "external-link", size: "md" %>
-    <% end %>
+    <%# 右侧：主要市场交易时间状态 %>
+    <div data-global-markets-target="sessions"
+         class="hidden md:flex flex-wrap justify-end gap-x-3 gap-y-2 max-w-[420px] shrink-0 pt-0.5">
+      <%# JS 动态填充 %>
+    </div>
   </div>
 
   <div class="relative -mx-3 mt-4 min-h-[320px] md:-mx-5 md:mt-2 md:min-h-[440px]">
