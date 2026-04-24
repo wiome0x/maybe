@@ -80,7 +80,8 @@
           <div class="col-span-1"><%= t(".col_status") %></div>
           <div class="col-span-1 text-right"><%= t(".col_code") %></div>
           <div class="col-span-2 text-right"><%= t(".col_response_time") %></div>
-          <div class="col-span-2 text-right"><%= t(".col_requested_at") %></div>
+          <div class="col-span-1 text-right"><%= t(".col_requested_at") %></div>
+          <div class="col-span-1 text-right"><%= t(".col_actions") %></div>
         </div>
 
         <div class="bg-container rounded-lg shadow-border-xs">
@@ -114,8 +115,17 @@
               </div>
               <div class="col-span-1 text-right"><%= @audit_mode == "plaid" ? log.http_status : log.response_code %></div>
               <div class="col-span-2 text-right"><%= @audit_mode == "plaid" ? log.duration_ms&.round(1) : log.response_time_ms&.round(1) %> ms</div>
-              <div class="col-span-2 text-right text-secondary">
+              <div class="col-span-1 text-right text-secondary">
                 <%= log.requested_at.in_time_zone(@display_timezone).strftime("%Y-%m-%d %H:%M:%S %Z") %>
+              </div>
+              <div class="col-span-1 flex justify-end">
+                <%= render DS::Link.new(
+                  text: t(".view_details"),
+                  variant: "ghost",
+                  size: :sm,
+                  href: log_settings_api_audit_path(id: log.id, audit_mode: @audit_mode),
+                  data: { turbo_frame: "drawer", turbo_prefetch: false }
+                ) %>
               </div>
             </div>
             <% if idx < @logs.size - 1 %>

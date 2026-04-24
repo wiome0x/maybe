@@ -73,7 +73,9 @@ Rails.application.routes.draw do
         get :export_table
       end
     end
-    resource :api_audit, only: [ :show ]
+    resource :api_audit, only: [ :show ] do
+      get :log, on: :collection
+    end
   end
 
   get "markets/stocks", to: "markets#stocks", as: :market_stocks

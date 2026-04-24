@@ -1,9 +1,9 @@
 class Settings::ApiAuditsController < ApplicationController
   layout "settings"
   before_action :require_admin
+  before_action :set_audit_mode
 
   def show
-    @audit_mode = params[:audit_mode] == "plaid" ? "plaid" : "api"
     @display_timezone = Current.family&.timezone.presence || Time.zone.name
     @period_days = parse_period
     @start_date = @period_days.days.ago.to_date
@@ -20,10 +20,29 @@ class Settings::ApiAuditsController < ApplicationController
     @pagy, @logs = pagy(logs_scope, limit: 50)
   end
 
+  def log
+    @log = audit_log_model.find(params[:id])
+    @display_timezone = Current.family&.timezone.presence || Time.zone.name
+  end
+
   private
+
+    helper_method :formatted_audit_payload
+
+    def formatted_audit_payload(payload)
+      return nil if payload.blank?
+
+      JSON.pretty_generate(payload.as_json)
+    rescue StandardError
+      payload.to_s
+    end
 
     def audit_log_model
       @audit_mode == "plaid" ? PlaidApiLog : ApiRequestLog
+    end
+
+    def set_audit_mode
+      @audit_mode = params[:audit_mode] == "plaid" ? "plaid" : "api"
     end
 
     def require_admin

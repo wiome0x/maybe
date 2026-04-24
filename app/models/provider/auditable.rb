@@ -24,6 +24,9 @@ module Provider::Auditable
         http_method: "POST",
         request_status: status,
         response_time_ms: response_time_ms,
+        request_payload: {},
+        response_payload: {},
+        error_payload: {},
         error_message: error_message,
         requested_at: Time.current
       )

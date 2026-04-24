@@ -6,8 +6,8 @@ class Settings::DatabasesController < ApplicationController
   def show
     @tables = ActiveRecord::Base.connection.tables.sort.map do |table_name|
       count = ActiveRecord::Base.connection.execute("SELECT COUNT(*) FROM #{ActiveRecord::Base.connection.quote_table_name(table_name)}").first["count"]
-      { name: table_name, count: count }
-    end
+      { name: table_name, count: count.to_i }
+    end.select { |table| table[:count].positive? }
   end
 
   def table

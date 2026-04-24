@@ -10,34 +10,40 @@
       </div>
 
       <div class="bg-container rounded-lg shadow-border-xs">
-        <% @tables.each_with_index do |table, idx| %>
-          <div class="px-4 py-3 grid grid-cols-12 items-center text-sm">
-            <div class="col-span-6">
-              <p class="font-medium text-primary font-mono"><%= table[:name] %></p>
+        <% if @tables.any? %>
+          <% @tables.each_with_index do |table, idx| %>
+            <div class="px-4 py-3 grid grid-cols-12 items-center text-sm">
+              <div class="col-span-6">
+                <p class="font-medium text-primary font-mono"><%= table[:name] %></p>
+              </div>
+              <div class="col-span-3 text-right">
+                <p class="text-secondary"><%= number_with_delimiter(table[:count]) %></p>
+              </div>
+              <div class="col-span-3 flex items-center justify-end gap-2">
+                <%= render DS::Link.new(
+                  text: "View",
+                  variant: "ghost",
+                  icon: "eye",
+                  size: :sm,
+                  href: table_settings_database_path(table: table[:name])
+                ) %>
+                <%= render DS::Link.new(
+                  text: "CSV",
+                  variant: "ghost",
+                  icon: "download",
+                  size: :sm,
+                  href: export_table_settings_database_path(table: table[:name])
+                ) %>
+              </div>
             </div>
-            <div class="col-span-3 text-right">
-              <p class="text-secondary"><%= number_with_delimiter(table[:count]) %></p>
-            </div>
-            <div class="col-span-3 flex items-center justify-end gap-2">
-              <%= render DS::Link.new(
-                text: "View",
-                variant: "ghost",
-                icon: "eye",
-                size: :sm,
-                href: table_settings_database_path(table: table[:name])
-              ) %>
-              <%= render DS::Link.new(
-                text: "CSV",
-                variant: "ghost",
-                icon: "download",
-                size: :sm,
-                href: export_table_settings_database_path(table: table[:name])
-              ) %>
-            </div>
-          </div>
-          <% if idx < @tables.size - 1 %>
-            <%= render "shared/ruler" %>
+            <% if idx < @tables.size - 1 %>
+              <%= render "shared/ruler" %>
+            <% end %>
           <% end %>
+        <% else %>
+          <div class="px-4 py-10 text-center text-sm text-secondary">
+            No tables with data.
+          </div>
         <% end %>
       </div>
     </div>

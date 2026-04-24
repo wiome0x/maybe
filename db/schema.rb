@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_08_090000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_24_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -118,6 +118,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_08_090000) do
     t.datetime "requested_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "request_payload", default: {}, null: false
+    t.jsonb "response_payload", default: {}, null: false
+    t.jsonb "error_payload", default: {}, null: false
     t.index ["provider_name", "requested_at"], name: "idx_api_request_logs_provider_requested_at"
     t.index ["request_status"], name: "idx_api_request_logs_status"
     t.index ["requested_at"], name: "idx_api_request_logs_requested_at"

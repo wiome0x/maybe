@@ -1,7 +1,6 @@
 <% mobile_nav_items = [
   { name: t("layouts.application.home"), path: root_path, icon: "pie-chart", icon_custom: false, active: page_active?(root_path) },
   { name: t("layouts.application.transactions"), path: transactions_path, icon: "credit-card", icon_custom: false, active: page_active?(transactions_path) },
-  { name: t("layouts.application.budgets"), path: budgets_path, icon: "map", icon_custom: false, active: page_active?(budgets_path) },
   { name: t("layouts.application.stocks"), path: market_stocks_path, icon: "trending-up", icon_custom: false, active: page_active?(market_stocks_path) },
   { name: t("layouts.application.crypto"), path: market_cryptos_path, icon: "bitcoin", icon_custom: false, active: page_active?(market_cryptos_path) },
   { name: t("layouts.application.data_tracking"), path: data_tracking_path, icon: "database", icon_custom: false, active: page_active?(data_tracking_path) },

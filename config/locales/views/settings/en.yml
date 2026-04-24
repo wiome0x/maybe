@@ -107,7 +107,19 @@ en:
         col_code: Code
         col_response_time: Response Time
         col_requested_at: Requested At
+        col_actions: Actions
         no_logs: No logs found
+        view_details: View details
+        detail_overview: Overview
+        request_section: Request
+        response_section: Response
+        error_section: Error
+        no_request_payload: No request payload recorded.
+        no_response_payload: No response payload recorded.
+        no_error_payload: No error payload recorded.
+        error_message: Error message
+        plaid_request_id: Plaid request ID
+        webhook_event: Webhook event
     settings_nav:
       accounts_label: Accounts
       api_audit_label: API Audit

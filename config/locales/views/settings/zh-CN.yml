@@ -104,7 +104,19 @@ zh-CN:
         col_code: 状态码
         col_response_time: 响应时间
         col_requested_at: 请求时间
+        col_actions: 操作
         no_logs: 暂无日志
+        view_details: 查看详情
+        detail_overview: 概览
+        request_section: 请求内容
+        response_section: 响应内容
+        error_section: 错误信息
+        no_request_payload: 当前没有记录请求内容。
+        no_response_payload: 当前没有记录响应内容。
+        no_error_payload: 当前没有记录错误内容。
+        error_message: 错误消息
+        plaid_request_id: Plaid 请求 ID
+        webhook_event: Webhook 事件
     settings_nav:
       accounts_label: 账户
       api_audit_label: API 审计
