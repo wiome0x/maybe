@@ -1,5 +1,6 @@
 class Settings::WatchlistsController < ApplicationController
   layout "settings"
+  before_action :ensure_watchlist_defaults, only: :show
 
   def show
     @stock_items = Current.family.watchlist_items.stocks.ordered
@@ -32,6 +33,10 @@ class Settings::WatchlistsController < ApplicationController
   end
 
   private
+    def ensure_watchlist_defaults
+      WatchlistItem.seed_defaults_for(Current.family)
+    end
+
     def watchlist_params
       params.require(:watchlist_item).permit(:symbol, :name, :item_type)
     end

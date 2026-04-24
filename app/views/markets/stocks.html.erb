@@ -78,6 +78,16 @@
         </div>
       <% end %>
     </div>
+  <% elsif @watchlist.any? %>
+    <div class="bg-container rounded-xl shadow-border-xs p-4">
+      <div class="flex justify-center items-center py-20">
+        <div class="text-center space-y-2">
+          <p class="text-sm text-primary font-medium"><%= t(".unavailable") %></p>
+          <p class="text-sm text-secondary"><%= t(".unavailable_hint") %></p>
+          <%= render DS::Link.new(text: t(".manage"), href: settings_watchlist_path, variant: "primary") %>
+        </div>
+      </div>
+    </div>
   <% else %>
     <div class="bg-container rounded-xl shadow-border-xs p-4">
       <div class="flex justify-center items-center py-20">

@@ -10,8 +10,13 @@ en:
       title: Price Trends
       ticker: Ticker
       ticker_placeholder: "e.g. AAPL"
+      ticker_list_title: Ticker Tags
+      ticker_list_subtitle: Search by ticker, English name, or Chinese name
+      quick_group_title: Magnificent 7
+      quick_group_subtitle: Jump between major US tech names
       start_date: Start Date
       end_date: End Date
       search: Search
       empty_title: No trend data
       empty_subtitle: Enter a ticker symbol and click Search to view price history.
+      range_summary: "%{start_date} to %{end_date} · %{points} trading days"

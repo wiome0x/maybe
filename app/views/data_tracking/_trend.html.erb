@@ -3,13 +3,19 @@
        data-trend-chart-prices-value="<%= @prices.map { |p| { date: p.date.iso8601, close: p.close.to_f } }.to_json %>"
        class="rounded-lg bg-container-inset p-4">
     <% if @prices.any? %>
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <p class="text-sm font-medium text-primary"><%= @selected_ticker %></p>
+          <p class="text-xs text-secondary"><%= t(".range_summary", start_date: l(@prices.first.date), end_date: l(@prices.last.date), points: @prices.size) %></p>
+        </div>
+      </div>
       <div data-trend-chart-target="canvas" class="h-64"></div>
     <% else %>
       <div class="flex justify-center items-center py-16">
         <div class="text-center space-y-2">
           <%= icon "line-chart", size: "lg", class: "text-secondary mx-auto" %>
-          <p class="text-sm text-primary font-medium">No trend data</p>
-          <p class="text-sm text-secondary">No historical price data found for this ticker.</p>
+          <p class="text-sm text-primary font-medium"><%= t(".empty_title") %></p>
+          <p class="text-sm text-secondary"><%= t(".empty_subtitle") %></p>
         </div>
       </div>
     <% end %>

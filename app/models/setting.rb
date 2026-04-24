@@ -3,6 +3,7 @@ class Setting < RailsSettings::Base
   cache_prefix { "v1" }
 
   field :synth_api_key, type: :string, default: ENV["SYNTH_API_KEY"]
+  field :finnhub_api_key, type: :string, default: ENV["FINNHUB_API_KEY"]
   field :openai_access_token, type: :string, default: ENV["OPENAI_ACCESS_TOKEN"]
   field :site_name, type: :string, default: ENV["APP_NAME"]
   field :site_logo_url, type: :string, default: ENV["APP_LOGO_URL"]

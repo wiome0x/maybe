@@ -5,8 +5,8 @@ class MarketsController < ApplicationController
   INDICES_CACHE_TTL = 10.minutes
 
   def stocks
-    watchlist = Current.family.watchlist_items.stocks.ordered
-    @quotes = fetch_stock_quotes(watchlist)
+    @watchlist = Current.family.watchlist_items.stocks.ordered
+    @quotes, @quotes_error = fetch_stock_quotes(@watchlist)
     @breadcrumbs = [ [ t(".home"), root_path ], [ t(".title"), nil ] ]
   end
 
@@ -89,14 +89,18 @@ class MarketsController < ApplicationController
     end
 
     def fetch_stock_quotes(watchlist)
-      return [] if watchlist.empty?
+      return [ [], nil ] if watchlist.empty?
       symbols = watchlist.pluck(:symbol)
-      provider = Provider::Finnhub.new
-      result = provider.fetch_market_data(symbols)
-      result.success? ? result.data : []
+      primary_result = Provider::Finnhub.new.fetch_market_data(symbols)
+      return [ primary_result.data, nil ] if primary_result.success?
+
+      fallback_result = Provider::YahooFinance.new.fetch_market_data(symbols)
+      return [ fallback_result.data, nil ] if fallback_result.success?
+
+      [ [], primary_result.error || fallback_result.error ]
     rescue => e
       Rails.logger.warn("Failed to fetch stock quotes: #{e.message}")
-      []
+      [ [], e ]
     end
 
     def fetch_crypto_quotes(watchlist)

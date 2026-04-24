@@ -21,6 +21,8 @@ en:
       chart: Chart
       empty: No stocks in your watchlist
       empty_hint: Add stocks in Settings → Watchlist to track them here.
+      unavailable: Your watchlist exists, but quotes are currently unavailable
+      unavailable_hint: The stock data provider may be unavailable, or the US stocks API key is not configured. The page will automatically try a fallback source.
       manage: Manage Watchlist
     stocks_heatmap:
       home: Home

@@ -21,6 +21,8 @@ zh-CN:
       chart: 图表
       empty: 自选列表为空
       empty_hint: 在设置 → 自选管理中添加股票。
+      unavailable: 自选股票已存在，但当前无法加载行情
+      unavailable_hint: 可能是行情源暂时不可用，或美股行情 API 未配置。页面会自动尝试备用数据源。
       manage: 管理自选
     stocks_heatmap:
       home: 首页

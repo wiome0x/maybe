@@ -10,8 +10,13 @@ zh-CN:
       title: 价格趋势
       ticker: 代码
       ticker_placeholder: "例如 AAPL"
+      ticker_list_title: 代码标签
+      ticker_list_subtitle: 支持代码、英文名和中文名搜索
+      quick_group_title: 七姐妹快捷查看
+      quick_group_subtitle: 一键切换热门美股科技股
       start_date: 开始日期
       end_date: 结束日期
       search: 搜索
       empty_title: 暂无趋势数据
       empty_subtitle: 输入代码并点击搜索即可查看价格历史。
+      range_summary: "%{start_date} 到 %{end_date} · %{points} 个交易日"

@@ -49,7 +49,7 @@ class Provider::Finnhub < Provider
 
   private
     def api_key
-      ENV["FINNHUB_API_KEY"].presence || Setting.get("finnhub_api_key")
+      ENV["FINNHUB_API_KEY"].presence || Setting.finnhub_api_key
     end
 
     def get(path, params = {})
