@@ -30,28 +30,60 @@ class Provider::Binance < Provider
     with_provider_response do
       raw_balances = balances || call(:account).fetch("balances", [])
 
-      assets = raw_balances
-                 .select { |b| b["free"].to_d + b["locked"].to_d > 0 }
-                 .map    { |b| b["asset"].to_s.upcase }
-                 .reject { |a| STABLE_QUOTE_ASSETS.include?(a) }
+      # Strategy: query all non-stable assets that have ever appeared in the account,
+      # regardless of current balance. Users may have sold everything (balance=0) but
+      # still have trade history we need to import.
+      all_assets = raw_balances
+                     .map    { |b| b["asset"].to_s.upcase }
+                     .reject { |a| STABLE_QUOTE_ASSETS.include?(a) }
+                     .reject { |a| a.blank? }
+                     .uniq
+
+      # Also include assets from any previously stored trade history (incremental syncs)
+      prior_assets = Array(broker_connection&.raw_transactions_payload)
+                       .filter_map { |t| extract_base_asset(t["symbol"].to_s.upcase) }
+                       .reject     { |a| STABLE_QUOTE_ASSETS.include?(a) }
+
+      assets = (all_assets + prior_assets).uniq
 
       if assets.empty?
-        log_no_op(method_name: "fetch_trade_history", note: "no non-stable assets in account")
+        log_no_op(method_name: "fetch_trade_history", note: "no assets found in account")
         []
       else
         kwargs = {}
         kwargs[:startTime] = (since.to_time.to_i * 1000) if since
 
-        assets.flat_map do |asset|
-          QUOTE_ASSETS.filter_map do |quote|
-            symbol = "#{asset}#{quote}"
-            result = call(:my_trades, symbol: symbol, **kwargs)
-            result.empty? ? nil : result
+        # Phase 1: probe with USDT only to discover which assets have any trade history.
+        # Avoids making N×14 requests for every asset in the account (can be 700+).
+        usdt_results = {}
+        assets.each do |asset|
+          begin
+            trades = call(:my_trades, symbol: "#{asset}USDT", **kwargs)
+            usdt_results[asset] = trades if trades.any?
           rescue Binance::ClientError
-            # Symbol pair doesn't exist on Binance — expected, skip silently.
-            nil
+            # pair doesn't exist — skip
           end
-        end.flatten
+        end
+
+        traded_assets = usdt_results.keys
+
+        if traded_assets.empty?
+          log_no_op(method_name: "fetch_trade_history", note: "no trades found via USDT probe")
+          []
+        else
+          # Phase 2: for assets with USDT trades, also check remaining quote pairs.
+          other_results = traded_assets.flat_map do |asset|
+            QUOTE_ASSETS.reject { |q| q == "USDT" }.filter_map do |quote|
+              symbol = "#{asset}#{quote}"
+              result = call(:my_trades, symbol: symbol, **kwargs)
+              result.empty? ? nil : result
+            rescue Binance::ClientError
+              nil
+            end
+          end
+
+          (usdt_results.values.flatten + other_results).flatten
+        end
       end
     end
   end
@@ -177,5 +209,15 @@ class Provider::Binance < Provider
       when Array then value.map { |v| redact_hash(v) }
       else value
       end
+    end
+
+    # Strips the quote asset suffix from a symbol to get the base asset.
+    # e.g. "BTCUSDT" -> "BTC", "ETHBTC" -> "ETH"
+    def extract_base_asset(symbol)
+      quote = QUOTE_ASSETS.find { |q| symbol.end_with?(q) }
+      return nil unless quote
+
+      base = symbol.delete_suffix(quote)
+      base.present? ? base : nil
     end
 end
