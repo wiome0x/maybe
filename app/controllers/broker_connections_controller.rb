@@ -25,6 +25,7 @@ class BrokerConnectionsController < ApplicationController
     )
 
     @broker_connection.save!
+    activate_account_if_draft!(@account)
     redirect_to account_path(@account), notice: "Binance account connected successfully."
   rescue Provider::Error => e
     @error_message = e.message
@@ -54,6 +55,7 @@ class BrokerConnectionsController < ApplicationController
     )
 
     @broker_connection.save!
+    activate_account_if_draft!(@account)
     redirect_to account_path(@account), notice: "Charles Schwab account connected successfully."
   rescue Provider::Error, ActiveRecord::RecordInvalid => e
     redirect_to accounts_path, alert: "Failed to connect Schwab account: #{e.message}"
@@ -106,6 +108,8 @@ class BrokerConnectionsController < ApplicationController
       )
     end
 
+    activate_account_if_draft!(@broker_connection.account)
+
     redirect_to account_path(@broker_connection.account), notice: "Broker connection reauthorized successfully."
   rescue Provider::Error => e
     redirect_to reauth_broker_connection_path(@broker_connection), alert: "Reauthorization failed: #{e.message}"
@@ -127,7 +131,7 @@ class BrokerConnectionsController < ApplicationController
     end
 
     def broker_connection_account_id
-      broker_connection_attributes.fetch(:account_id)
+      broker_connection_attributes[:account_id].presence || params.fetch(:account_id)
     end
 
     def broker_connection_api_key
@@ -140,5 +144,9 @@ class BrokerConnectionsController < ApplicationController
 
     def reconnect_params
       params.require(:broker_connection).permit(:api_key, :api_secret)
+    end
+
+    def activate_account_if_draft!(account)
+      account.activate! if account.draft?
     end
 end

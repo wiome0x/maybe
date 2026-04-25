@@ -22,7 +22,8 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
       name: "New Crypto Account",
       balance: 0,
       currency: "USD",
-      accountable: Crypto.create!
+      accountable: Crypto.create!,
+      status: "draft"
     )
 
     Provider::Binance.any_instance.expects(:validate_credentials!).once
@@ -39,6 +40,7 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to account_path(fresh_account)
     assert_equal "Binance account connected successfully.", flash[:notice]
+    assert_equal "active", fresh_account.reload.status
   end
 
   # ---------------------------------------------------------------------------
@@ -83,7 +85,8 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
       name: "New Investment Account",
       balance: 0,
       currency: "USD",
-      accountable: Investment.create!
+      accountable: Investment.create!,
+      status: "draft"
     )
 
     Provider::Schwab.expects(:exchange_code).with(code: "auth_code_123").returns({
@@ -99,6 +102,7 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to account_path(fresh_account)
     assert_equal "Charles Schwab account connected successfully.", flash[:notice]
+    assert_equal "active", fresh_account.reload.status
   end
 
   # ---------------------------------------------------------------------------
