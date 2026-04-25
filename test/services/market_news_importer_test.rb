@@ -44,4 +44,13 @@ class MarketNewsImporterTest < ActiveSupport::TestCase
     assert_equal "Updated headline", MarketNewsArticle.first.title
     assert_equal "更新后的标题", MarketNewsArticle.first.translated_title
   end
+
+  test "marketwatch feed list includes realtime and bulletin streams" do
+    urls = MarketNewsFeed::FEEDS.select { |feed| feed[:source] == "MarketWatch" }.map { |feed| feed[:url] }
+
+    assert_includes urls, "https://feeds.content.dowjones.io/public/rss/mw_topstories"
+    assert_includes urls, "https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines"
+    assert_includes urls, "https://feeds.content.dowjones.io/public/rss/mw_marketpulse"
+    assert_includes urls, "https://feeds.content.dowjones.io/public/rss/mw_bulletins"
+  end
 end

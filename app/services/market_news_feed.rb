@@ -21,6 +21,18 @@ class MarketNewsFeed
     {
       source: "MarketWatch",
       url: "https://feeds.content.dowjones.io/public/rss/mw_topstories"
+    },
+    {
+      source: "MarketWatch",
+      url: "https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines"
+    },
+    {
+      source: "MarketWatch",
+      url: "https://feeds.content.dowjones.io/public/rss/mw_marketpulse"
+    },
+    {
+      source: "MarketWatch",
+      url: "https://feeds.content.dowjones.io/public/rss/mw_bulletins"
     }
   ].freeze
 

@@ -37,7 +37,7 @@ en:
       change: Change
       news_label: Market news
       news_title: Daily market news
-      news_description: Currently combines CNBC intraday market coverage with Seeking Alpha event-driven news for quick context beside the heatmap.
+      news_description: Currently combines CNBC intraday market coverage, Seeking Alpha event-driven news, SEC releases, and multiple MarketWatch RSS streams for quick context beside the heatmap.
       news_filter_all: All
       news_filter_cnbc: CNBC
       news_filter_seeking_alpha: Seeking Alpha
@@ -51,7 +51,7 @@ en:
       title: Market News
       news_label: Market news
       news_title: Daily market news
-      news_description: Currently combines CNBC intraday market coverage with Seeking Alpha event-driven news in a dedicated news tab alongside the heatmap.
+      news_description: Currently combines CNBC intraday market coverage, Seeking Alpha event-driven news, SEC releases, and multiple MarketWatch RSS streams in a dedicated news tab alongside the heatmap.
       summary_feed_label: Feed
       summary_items_label: Items
       news_count: "%{count} articles"
