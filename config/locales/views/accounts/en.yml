@@ -51,6 +51,8 @@ en:
         navigate: Navigate
         close: Close
       method_selector:
+        connect_binance: Connect Binance directly
+        connect_schwab: Connect Charles Schwab directly
         connected_entry: Link account
         connected_entry_locked: Link account with MFA
         connected_entry_eu: Link EU account

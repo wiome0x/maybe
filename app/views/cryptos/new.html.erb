@@ -1,6 +1,8 @@
 <% if params[:step] == "method_select" %>
   <%= render "accounts/new/method_selector",
              path: new_crypto_path(return_to: params[:return_to]),
+             direct_connect_path: connect_cryptos_path(return_to: params[:return_to]),
+             direct_connect_text: t("accounts.new.method_selector.connect_binance"),
              show_us_link: @show_us_link,
              show_eu_link: @show_eu_link,
              accountable_type: "Crypto" %>

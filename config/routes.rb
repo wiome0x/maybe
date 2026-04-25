@@ -210,7 +210,9 @@ Rails.application.routes.draw do
   end
 
   resources :depositories, only: %i[new create edit update]
-  resources :investments, only: %i[new create edit update]
+  resources :investments, only: %i[new create edit update] do
+    post :connect, on: :collection
+  end
   resources :properties, only: %i[new create edit update] do
     member do
       get :balances
@@ -223,7 +225,9 @@ Rails.application.routes.draw do
   resources :vehicles, only: %i[new create edit update]
   resources :credit_cards, only: %i[new create edit update]
   resources :loans, only: %i[new create edit update]
-  resources :cryptos, only: %i[new create edit update]
+  resources :cryptos, only: %i[new create edit update] do
+    post :connect, on: :collection
+  end
   resources :other_assets, only: %i[new create edit update]
   resources :other_liabilities, only: %i[new create edit update]
 

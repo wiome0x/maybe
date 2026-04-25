@@ -51,6 +51,8 @@ zh-CN:
         navigate: 导航
         close: 关闭
       method_selector:
+        connect_binance: 直接连接 Binance
+        connect_schwab: 直接连接 Charles Schwab
         connected_entry: 关联账户
         connected_entry_locked: 启用 MFA 后关联账户
         connected_entry_eu: 关联欧洲账户
