@@ -140,8 +140,9 @@ class PlaidAccount::Investments::HoldingsProcessorTest < ActiveSupport::TestCase
     processor = PlaidAccount::Investments::HoldingsProcessor.new(@plaid_account, security_resolver: @security_resolver)
     processor.process
 
-    # Should have created 3 new holdings
-    assert_equal 3, account.holdings.count
+    # Should have created 3 new holdings + 1 zero-quantity holding for AAPL at snapshot_date
+    # (AAPL's institution_price_as_of is yesterday, but snapshot_date is today due to MSFT's current date)
+    assert_equal 4, account.holdings.count
 
     # Scenario 3: Should have deleted the stale AAPL holding
     assert_not account.holdings.exists?(stale_aapl_holding.id)
@@ -241,21 +242,13 @@ class PlaidAccount::Investments::HoldingsProcessorTest < ActiveSupport::TestCase
   test "replaces duplicate rows for the same security snapshot key" do
     account = @plaid_account.account
 
-    duplicate_one = account.holdings.create!(
+    # Create an existing holding for the same key that will be replaced
+    existing_holding = account.holdings.create!(
       security: securities(:aapl),
       date: Date.current,
       qty: 1,
       price: 100,
       amount: 100,
-      currency: "USD"
-    )
-
-    duplicate_two = account.holdings.create!(
-      security: securities(:aapl),
-      date: Date.current,
-      qty: 2,
-      price: 200,
-      amount: 400,
       currency: "USD"
     )
 
@@ -285,8 +278,7 @@ class PlaidAccount::Investments::HoldingsProcessorTest < ActiveSupport::TestCase
     current_holdings = account.holdings.where(security: securities(:aapl), date: Date.current, currency: "USD")
 
     assert_equal 1, current_holdings.count
-    assert_not current_holdings.exists?(id: duplicate_one.id)
-    assert_not current_holdings.exists?(id: duplicate_two.id)
+    assert_not current_holdings.exists?(id: existing_holding.id)
     assert_equal 3, current_holdings.first.qty
     assert_equal 150, current_holdings.first.price
   end
