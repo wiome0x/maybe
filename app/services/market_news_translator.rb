@@ -7,7 +7,7 @@ class MarketNewsTranslator
 
   def self.translate_items(items, locale:)
     return items unless locale.to_s.start_with?("zh")
-    return items if api_key.blank?
+    return items if azure_config_missing?
 
     items.map do |item|
       translated_title = translate_text(item.title)
@@ -22,45 +22,60 @@ class MarketNewsTranslator
     return normalized if normalized.blank?
 
     Rails.cache.fetch(cache_key(normalized), expires_in: CACHE_TTL) do
-      request_translation(normalized) || normalized
+      request_translation_with_azure(normalized) || normalized
     end
   rescue => e
     Rails.logger.warn("Market news translation failed: #{e.class}: #{e.message}")
     normalized
   end
 
-  def self.request_translation(text)
-    uri = URI("https://api-free.deepl.com/v2/translate")
+  def self.request_translation_with_azure(text)
+    uri = URI("#{azure_endpoint}/translate")
+    uri.query = URI.encode_www_form(
+      "api-version" => "3.0",
+      "to" => "zh-Hans"
+    )
+
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.open_timeout = 2
     http.read_timeout = 5
 
     request = Net::HTTP::Post.new(uri)
-    request["Authorization"] = "DeepL-Auth-Key #{api_key}"
+    request["Ocp-Apim-Subscription-Key"] = azure_key
+    request["Ocp-Apim-Subscription-Region"] = azure_region
     request["Content-Type"] = "application/json"
-    request.body = {
-      text: [ text ],
-      target_lang: "ZH",
-      preserve_formatting: true
-    }.to_json
+    request.body = [ { Text: text } ].to_json
 
     response = http.request(request)
     unless response.is_a?(Net::HTTPSuccess)
-      Rails.logger.warn("DeepL translation failed: HTTP #{response.code}")
+      Rails.logger.warn("Azure translation failed: HTTP #{response.code}")
       return nil
     end
 
-    JSON.parse(response.body).dig("translations", 0, "text")&.strip
+    JSON.parse(response.body).dig(0, "translations", 0, "text")&.strip
   end
 
   def self.cache_key(text)
-    "markets/news_translation:v1:#{Digest::SHA256.hexdigest(text)}"
+    "markets/news_translation:v2:#{Digest::SHA256.hexdigest(text)}"
   end
 
-  def self.api_key
-    ENV["DEEPL_API_KEY"].presence
+  def self.azure_key
+    ENV["AZURE_TRANSLATOR_KEY"].presence
   end
 
-  private_class_method :request_translation, :cache_key, :api_key
+  def self.azure_endpoint
+    ENV["AZURE_TRANSLATOR_ENDPOINT"].presence&.chomp("/")
+  end
+
+  def self.azure_region
+    ENV["AZURE_TRANSLATOR_REGION"].presence
+  end
+
+  def self.azure_config_missing?
+    azure_key.blank? || azure_endpoint.blank? || azure_region.blank?
+  end
+
+  private_class_method :request_translation_with_azure, :cache_key,
+    :azure_key, :azure_endpoint, :azure_region, :azure_config_missing?
 end
