@@ -1,0 +1,119 @@
+<section class="bg-container rounded-xl shadow-border-xs p-4 space-y-3 h-full">
+  <div class="flex flex-col gap-3 border-b border-alpha-black-100 pb-3 md:flex-row md:items-end md:justify-between">
+    <div class="space-y-1">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary"><%= t(".news_title") %></p>
+      <p class="text-sm text-secondary"><%= t(".news_description") %></p>
+    </div>
+
+    <div class="inline-flex items-center gap-2 rounded-full border border-alpha-black-100 bg-surface-inset px-3 py-1.5 text-[11px] text-secondary">
+      <span class="inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+      <span><%= t(".news_count", count: @market_news.size) %></span>
+    </div>
+  </div>
+
+  <nav class="flex flex-wrap items-center gap-2">
+    <%= render DS::Link.new(
+      text: t(".news_filter_all"),
+      href: market_stocks_news_path,
+      variant: @market_news_source == "all" ? "primary" : "ghost"
+    ) %>
+    <%= render DS::Link.new(
+      text: t(".news_filter_cnbc"),
+      href: market_stocks_news_path(news_source: "cnbc"),
+      variant: @market_news_source == "cnbc" ? "primary" : "ghost"
+    ) %>
+    <%= render DS::Link.new(
+      text: t(".news_filter_seeking_alpha"),
+      href: market_stocks_news_path(news_source: "seeking_alpha"),
+      variant: @market_news_source == "seeking_alpha" ? "primary" : "ghost"
+    ) %>
+    <%= render DS::Link.new(
+      text: t(".news_filter_sec"),
+      href: market_stocks_news_path(news_source: "sec"),
+      variant: @market_news_source == "sec" ? "primary" : "ghost"
+    ) %>
+    <%= render DS::Link.new(
+      text: t(".news_filter_marketwatch"),
+      href: market_stocks_news_path(news_source: "marketwatch"),
+      variant: @market_news_source == "marketwatch" ? "primary" : "ghost"
+    ) %>
+  </nav>
+
+  <% if @market_news.any? %>
+    <div class="rounded-xl border border-alpha-black-100 bg-container-inset p-1 min-h-[320px] xl:min-h-[720px]">
+      <div class="bg-container rounded-lg shadow-border-xs overflow-hidden h-full overflow-y-auto">
+        <% @market_news.each_with_index do |article, index| %>
+          <% source_styles =
+            case article.source
+            when "CNBC"
+              {
+                badge: "border-[#c7d2fe] bg-[#eef2ff] text-[#3730a3]",
+                accent: "bg-[#4f46e5]"
+              }
+            when "Seeking Alpha"
+              {
+                badge: "border-[#bfdbfe] bg-[#eff6ff] text-[#1d4ed8]",
+                accent: "bg-[#2563eb]"
+              }
+            when "SEC"
+              {
+                badge: "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]",
+                accent: "bg-[#16a34a]"
+              }
+            when "MarketWatch"
+              {
+                badge: "border-[#fecaca] bg-[#fef2f2] text-[#b91c1c]",
+                accent: "bg-[#dc2626]"
+              }
+            else
+              {
+                badge: "border-alpha-black-100 bg-surface-inset text-secondary",
+                accent: "bg-gray-400"
+              }
+            end %>
+          <div class="px-3 py-3 md:px-4 md:py-3.5 space-y-2">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="inline-flex h-2 w-2 rounded-full shrink-0 <%= source_styles[:accent] %>"></span>
+                <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold <%= source_styles[:badge] %>">
+                  <%= article.source %>
+                </span>
+              </div>
+
+              <% if article.published_at.present? %>
+                <span class="text-[11px] font-medium text-secondary whitespace-nowrap">
+                  <%= article.published_at.in_time_zone(Current.family&.timezone || "UTC").strftime("%m-%d %H:%M") %>
+                </span>
+              <% end %>
+            </div>
+
+            <a href="<%= article.url %>"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="group block space-y-1">
+              <% if article.translated_title.present? %>
+                <p class="text-sm font-medium text-primary leading-relaxed group-hover:underline"><%= article.translated_title %></p>
+                <p class="text-xs leading-relaxed text-secondary"><%= article.title %></p>
+              <% else %>
+                <p class="text-sm font-medium text-primary leading-relaxed group-hover:underline"><%= article.title %></p>
+              <% end %>
+            </a>
+          </div>
+
+          <% unless index == @market_news.size - 1 %>
+            <%= render "shared/ruler" %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="rounded-xl border border-dashed border-primary/40 bg-surface-inset min-h-[320px] xl:min-h-[720px] flex items-center justify-center p-6">
+      <div class="text-center space-y-2 max-w-xl">
+        <p class="text-sm font-medium text-primary"><%= t(".news_placeholder_title") %></p>
+        <p class="text-sm text-secondary">
+          <%= @market_news_source == "all" ? t(".news_placeholder_body") : t(".news_placeholder_filtered_body") %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+</section>

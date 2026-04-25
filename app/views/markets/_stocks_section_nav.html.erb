@@ -9,4 +9,9 @@
     href: market_stocks_heatmap_path,
     variant: current_page?(market_stocks_heatmap_path) ? "primary" : "ghost"
   ) %>
+  <%= render DS::Link.new(
+    text: t("markets.stocks.section_nav.news"),
+    href: market_stocks_news_path,
+    variant: current_page?(market_stocks_news_path) ? "primary" : "ghost"
+  ) %>
 </nav>

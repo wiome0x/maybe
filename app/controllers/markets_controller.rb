@@ -30,9 +30,11 @@ class MarketsController < ApplicationController
   def stocks_heatmap
     @top_gainers = fetch_market_movers("day_gainers")
     @top_losers = fetch_market_movers("day_losers")
-    @market_news_source = params[:news_source].presence_in(%w[all cnbc seeking_alpha]) || "all"
-    @market_news = filter_market_news(MarketNewsFeed.fetch, @market_news_source)
-    @market_news = MarketNewsTranslator.translate_items(@market_news, locale: I18n.locale)
+    @breadcrumbs = [ [ t(".home"), root_path ], [ t(".title"), nil ] ]
+  end
+
+  def stocks_news
+    load_market_news
     @breadcrumbs = [ [ t(".home"), root_path ], [ t(".title"), nil ] ]
   end
 
@@ -415,8 +417,18 @@ class MarketsController < ApplicationController
         items.select { |item| item.source == "CNBC" }
       when "seeking_alpha"
         items.select { |item| item.source == "Seeking Alpha" }
+      when "sec"
+        items.select { |item| item.source == "SEC" }
+      when "marketwatch"
+        items.select { |item| item.source == "MarketWatch" }
       else
         items
       end
+    end
+
+    def load_market_news
+      @market_news_source = params[:news_source].presence_in(%w[all cnbc seeking_alpha sec marketwatch]) || "all"
+      @market_news = filter_market_news(MarketNewsFeed.fetch, @market_news_source)
+      @market_news = MarketNewsTranslator.translate_items(@market_news, locale: I18n.locale)
     end
 end

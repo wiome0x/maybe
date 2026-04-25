@@ -13,12 +13,20 @@ class MarketNewsFeed
     {
       source: "Seeking Alpha",
       url: "https://seekingalpha.com/market_currents.xml"
+    },
+    {
+      source: "SEC",
+      url: "https://www.sec.gov/news/pressreleases.rss"
+    },
+    {
+      source: "MarketWatch",
+      url: "https://feeds.content.dowjones.io/public/rss/mw_topstories"
     }
   ].freeze
 
-  CACHE_KEY = "markets/news_feed:v1".freeze
+  CACHE_KEY = "markets/news_feed:v2".freeze
   CACHE_TTL = 10.minutes
-  ITEM_LIMIT = 8
+  ITEM_LIMIT = 12
 
   def self.fetch
     Rails.cache.fetch(CACHE_KEY, expires_in: CACHE_TTL) do
@@ -69,8 +77,10 @@ class MarketNewsFeed
     http.read_timeout = 5
 
     request = Net::HTTP::Get.new(uri)
-    request["User-Agent"] = "Mozilla/5.0"
+    request["User-Agent"] = "MaybeApp/1.0 contact@mindcont.com"
     request["Accept"] = "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8"
+    request["From"] = "contact@mindcont.com" if uri.host.include?("sec.gov")
+    request["Referer"] = "https://www.sec.gov/" if uri.host.include?("sec.gov")
 
     http.request(request)
   end
