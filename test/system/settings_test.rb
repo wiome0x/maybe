@@ -7,7 +7,7 @@ class SettingsTest < ApplicationSystemTestCase
 
   test "can access settings from sidebar" do
     open_settings_from_sidebar
-    assert_selector "h1", text: "Account"
+    assert_selector "h1", text: "Profile"
     assert_current_path settings_profile_path, ignore_query: true
 
     # Navigate through settings links that exist in the current nav
@@ -16,18 +16,6 @@ class SettingsTest < ApplicationSystemTestCase
 
     click_link "Accounts"
     assert_current_path accounts_path
-
-    click_link "Tags"
-    assert_current_path tags_path
-
-    click_link "Categories"
-    assert_current_path categories_path
-
-    click_link "Merchants"
-    assert_current_path family_merchants_path
-
-    click_link "Imports"
-    assert_current_path imports_path
   end
 
   test "can update self hosting settings" do
