@@ -3,6 +3,8 @@ require "test_helper"
 class MarketNewsImporterTest < ActiveSupport::TestCase
   setup do
     MarketNewsArticle.delete_all
+    BarkNotification.delete_all
+    BarkNotificationSubscription.delete_all
   end
 
   test "imports and upserts fetched market news" do
@@ -43,6 +45,43 @@ class MarketNewsImporterTest < ActiveSupport::TestCase
     assert_equal 1, MarketNewsArticle.count
     assert_equal "Updated headline", MarketNewsArticle.first.title
     assert_equal "更新后的标题", MarketNewsArticle.first.translated_title
+  end
+
+  test "queues bark notifications for subscribed users" do
+    user = users(:family_admin)
+    user.create_bark_notification_subscription!(
+      enabled: true,
+      device_key: "abc123",
+      push_categories: [ "market_news" ],
+      delivery_frequency: "realtime",
+      timezone: "Asia/Shanghai"
+    )
+
+    now = Time.utc(2026, 4, 25, 9, 0, 0)
+    feed = stub
+    translator = stub
+    items = [
+      MarketNewsFeed::Item.new(
+        source: "Bloomberg",
+        title: "Treasuries climb",
+        url: "https://www.bloomberg.com/example",
+        published_at: Time.utc(2026, 4, 25, 8, 0, 0),
+        translated_title: nil
+      )
+    ]
+    translated_items = [ items.first.with(translated_title: "美债走高") ]
+
+    feed.expects(:fetch).with(force_refresh: true).returns(items)
+    translator.expects(:translate_items).with(items, locale: :"zh-CN").returns(translated_items)
+
+    assert_difference -> { BarkNotification.count }, 1 do
+      MarketNewsImporter.new(feed: feed, translator: translator, now: now).import
+    end
+
+    notification = BarkNotification.order(:created_at).last
+    assert_equal user, notification.user
+    assert_equal "market_news", notification.category
+    assert_equal "美债走高", notification.title
   end
 
   test "marketwatch feed list includes realtime and bulletin streams" do

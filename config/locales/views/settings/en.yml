@@ -137,6 +137,7 @@ en:
       other_section_title: More
       preferences_label: Preferences
       profile_label: Profile
+      bark_notification_label: Bark push
       weekly_report_label: Weekly report
       rules_label: Rules
       self_hosting_label: Self hosting
@@ -145,6 +146,41 @@ en:
       transactions_section_title: Transaction Setup
       whats_new_label: What's new
       watchlist_label: Watchlist
+    bark_notification_settings:
+      update:
+        success: Bark push settings updated
+      test:
+        title: Maybe Bark test
+        body: Bark push is configured and working.
+        success: Test Bark push sent
+        missing_configuration: Save a valid Bark server URL and device key first
+        failure: "Test Bark push failed: %{error}"
+      show:
+        page_title: Bark push
+        subscription_title: Bark push notifications
+        subscription_subtitle: Deliver market news and report updates to your iPhone through Bark.
+        enabled_label: Enable Bark push
+        enabled_hint: Maybe will queue eligible updates and send them using your Bark configuration.
+        server_url: Bark server URL
+        device_key: Device key
+        delivery_frequency: Delivery frequency
+        digest_hour: Daily digest hour
+        timezone: Timezone
+        group_name: Notification group
+        sound: Sound
+        icon: Icon URL
+        categories_title: Push categories
+        categories_hint: Choose which types of updates should be routed through Bark.
+        save: Save
+        send_test: Send test push
+        categories:
+          market_news: Market news
+          weekly_report: Weekly report
+          system_alerts: System alerts
+        frequencies:
+          realtime: Real-time
+          hourly_digest: Hourly digest
+          daily_digest: Daily digest
     weekly_report_settings:
       update:
         success: Weekly report settings updated

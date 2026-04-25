@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_25_120000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_25_132000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -151,6 +151,45 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_25_120000) do
     t.index ["account_id", "date", "currency"], name: "index_account_balances_on_account_id_date_currency_unique", unique: true
     t.index ["account_id", "date"], name: "index_balances_on_account_id_and_date", order: { date: :desc }
     t.index ["account_id"], name: "index_balances_on_account_id"
+  end
+
+  create_table "bark_notification_subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.boolean "enabled", default: false, null: false
+    t.string "server_url", default: "https://api.day.app", null: false
+    t.string "device_key"
+    t.string "push_categories", default: [], null: false, array: true
+    t.string "delivery_frequency", default: "realtime", null: false
+    t.integer "digest_hour", default: 8, null: false
+    t.string "timezone", null: false
+    t.string "group_name"
+    t.string "sound"
+    t.string "icon"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_bark_notification_subscriptions_on_user_id", unique: true
+  end
+
+  create_table "bark_notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "category", null: false
+    t.string "source_key", null: false
+    t.string "title", null: false
+    t.text "body", null: false
+    t.text "target_url"
+    t.datetime "scheduled_for", null: false
+    t.string "batch_key", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "delivered_at"
+    t.text "error_message"
+    t.jsonb "payload", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["scheduled_for"], name: "index_bark_notifications_on_scheduled_for"
+    t.index ["status"], name: "index_bark_notifications_on_status"
+    t.index ["user_id", "batch_key", "status"], name: "index_bark_notifications_on_user_id_and_batch_key_and_status"
+    t.index ["user_id", "source_key"], name: "index_bark_notifications_on_user_id_and_source_key", unique: true
+    t.index ["user_id"], name: "index_bark_notifications_on_user_id"
   end
 
   create_table "budget_categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -961,6 +1000,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_25_120000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_keys", "users"
   add_foreign_key "balances", "accounts", on_delete: :cascade
+  add_foreign_key "bark_notification_subscriptions", "users"
+  add_foreign_key "bark_notifications", "users"
   add_foreign_key "budget_categories", "budgets"
   add_foreign_key "budget_categories", "categories"
   add_foreign_key "budgets", "families"

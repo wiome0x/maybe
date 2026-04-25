@@ -7,6 +7,8 @@ class User < ApplicationRecord
   has_many :chats, dependent: :destroy
   has_many :api_keys, dependent: :destroy
   has_many :mobile_devices, dependent: :destroy
+  has_one :bark_notification_subscription, dependent: :destroy
+  has_many :bark_notifications, dependent: :destroy
   has_one :weekly_report_subscription, dependent: :destroy
   has_many :weekly_reports, dependent: :destroy
   has_many :invitations, foreign_key: :inviter_id, dependent: :destroy

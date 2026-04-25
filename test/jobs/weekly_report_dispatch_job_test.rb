@@ -3,6 +3,8 @@ require "test_helper"
 class WeeklyReportDispatchJobTest < ActiveJob::TestCase
   setup do
     @user = users(:family_admin)
+    BarkNotification.delete_all
+    BarkNotificationSubscription.delete_all
     @subscription = weekly_report_subscriptions(:family_admin)
     @subscription.update!(
       enabled: true,
@@ -56,5 +58,24 @@ class WeeklyReportDispatchJobTest < ActiveJob::TestCase
     end
 
     assert_equal "skipped", WeeklyReport.order(:created_at).last.status
+  end
+
+  test "queues bark notification when weekly report is sent" do
+    @user.create_bark_notification_subscription!(
+      enabled: true,
+      device_key: "abc123",
+      push_categories: [ "weekly_report" ],
+      delivery_frequency: "realtime",
+      timezone: "America/New_York"
+    )
+    reference_time = Time.find_zone!("America/New_York").local(2026, 4, 20, 8, 0, 0)
+
+    assert_difference -> { BarkNotification.count }, 1 do
+      WeeklyReportDispatchJob.perform_now(reference_time: reference_time)
+    end
+
+    notification = BarkNotification.order(:created_at).last
+    assert_equal "weekly_report", notification.category
+    assert_match "Weekly report ready", notification.title
   end
 end

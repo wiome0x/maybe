@@ -57,6 +57,9 @@ Rails.application.routes.draw do
   namespace :settings do
     resource :profile, only: [ :show, :destroy ]
     resource :preferences, only: :show
+    resource :bark_notification, only: %i[show update], controller: "bark_notification_settings" do
+      post :test, on: :collection
+    end
     resource :weekly_report, only: %i[show update], controller: "weekly_report_settings"
     resources :weekly_report_deliveries, path: "weekly_reports", only: %i[index show], controller: "weekly_reports"
     resource :transaction_organization, only: :show

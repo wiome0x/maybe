@@ -1,4 +1,6 @@
 class MarketNewsImporter
+  require "digest"
+
   def initialize(feed: MarketNewsFeed, translator: MarketNewsTranslator, now: Time.current)
     @feed = feed
     @translator = translator
@@ -27,6 +29,8 @@ class MarketNewsImporter
       unique_by: :index_market_news_articles_on_source_and_url
     )
 
+    enqueue_bark_notifications(translated_items)
+
     translated_items.count
   rescue => e
     Rails.logger.warn("Market news import failed: #{e.class}: #{e.message}")
@@ -35,4 +39,31 @@ class MarketNewsImporter
 
   private
     attr_reader :feed, :translator, :now
+
+    def enqueue_bark_notifications(items)
+      BarkNotificationSubscription.enabled.includes(:user).find_each do |subscription|
+        next unless subscription.configured?
+        next unless subscription.wants_category?("market_news")
+
+        items.each do |item|
+          display_title = item.translated_title.presence || item.title
+          body = "#{item.source} · #{item.title}"
+
+          BarkNotificationScheduler.enqueue!(
+            user: subscription.user,
+            category: "market_news",
+            title: display_title,
+            body: body,
+            target_url: item.url,
+            source_key: "market_news:#{Digest::SHA256.hexdigest(item.url)}",
+            occurred_at: item.published_at || now,
+            payload: {
+              source: item.source,
+              published_at: item.published_at&.iso8601,
+              translated_title: item.translated_title
+            }
+          )
+        end
+      end
+    end
 end
