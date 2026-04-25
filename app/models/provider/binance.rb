@@ -1,13 +1,13 @@
-require "net/http"
-require "openssl"
+require "binance"
 
 class Provider::Binance < Provider
-  BASE_URL = "https://api.binance.com".freeze
-  REDACTED_KEYS = %w[signature X-MBX-APIKEY api_key api_secret].freeze
-
-  # Quote assets used to build symbol pairs (e.g. BTCUSDT, ETHBTC)
-  QUOTE_ASSETS = %w[USDT USDC BUSD FDUSD BTC ETH BNB EUR TRY BRL AUD RUB GBP USD].freeze
+  # Quote assets used to build symbol pairs (e.g. BTCUSDT, ETHBTC).
+  # Stable quotes are excluded when enumerating assets to fetch trades for.
+  QUOTE_ASSETS        = %w[USDT USDC BUSD FDUSD BTC ETH BNB EUR TRY BRL AUD RUB GBP USD].freeze
   STABLE_QUOTE_ASSETS = %w[USDT USDC BUSD FDUSD USD].freeze
+
+  # Keys that must never appear in audit logs
+  REDACTED_KEYS = %w[signature X-MBX-APIKEY api_key api_secret key secret].freeze
 
   Error = Class.new(Provider::Error)
 
@@ -19,7 +19,7 @@ class Provider::Binance < Provider
 
   def fetch_account_data
     with_provider_response do
-      get("/api/v3/account", signed: true)
+      call(:account)
     end
   end
 
@@ -28,7 +28,7 @@ class Provider::Binance < Provider
   # redundant /api/v3/account request.
   def fetch_trade_history(since: nil, balances: nil)
     with_provider_response do
-      raw_balances = balances || get("/api/v3/account", signed: true).fetch("balances", [])
+      raw_balances = balances || call(:account).fetch("balances", [])
 
       assets = raw_balances
                  .select { |b| b["free"].to_d + b["locked"].to_d > 0 }
@@ -39,16 +39,16 @@ class Provider::Binance < Provider
         log_no_op(method_name: "fetch_trade_history", note: "no non-stable assets in account")
         []
       else
-        params = {}
-        params[:startTime] = (since.to_time.to_i * 1000) if since
+        kwargs = {}
+        kwargs[:startTime] = (since.to_time.to_i * 1000) if since
 
         assets.flat_map do |asset|
           QUOTE_ASSETS.filter_map do |quote|
             symbol = "#{asset}#{quote}"
-            result = get("/api/v3/myTrades", params: params.merge(symbol: symbol), signed: true)
+            result = call(:my_trades, symbol: symbol, **kwargs)
             result.empty? ? nil : result
-          rescue Error
-            # Symbol pair doesn't exist on Binance — expected, already logged inside get().
+          rescue Binance::ClientError
+            # Symbol pair doesn't exist on Binance — expected, skip silently.
             nil
           end
         end.flatten
@@ -58,102 +58,113 @@ class Provider::Binance < Provider
 
   def validate_credentials!
     with_provider_response do
-      get("/api/v3/account", signed: true)
+      call(:account)
     end
   end
 
   private
     attr_reader :api_key, :api_secret, :broker_connection
 
-    # Override from Provider::Auditable — provides broker_connection_id for audit rows.
     def audit_broker_connection_id
       broker_connection&.id
     end
 
-    def get(path, params: {}, signed: false)
-      uri = URI("#{BASE_URL}#{path}")
-      request_params = params.deep_dup
-
-      if signed
-        request_params[:timestamp] = (Time.current.to_f * 1000).to_i
-        request_params[:signature] = sign(URI.encode_www_form(request_params))
-      end
-
-      uri.query = URI.encode_www_form(request_params) if request_params.any?
-
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      http.open_timeout = 5
-      http.read_timeout = 10
-
-      request = Net::HTTP::Get.new(uri)
-      request["X-MBX-APIKEY"] = api_key
-      request["Accept"] = "application/json"
-
+    # Calls a Binance::Spot method, logs the result, and returns the parsed data.
+    # All SDK calls go through here so every HTTP interaction is audited.
+    # Returns string-keyed Hash so callers and the Processor work consistently.
+    def call(method, **kwargs)
       started_at = Time.current
-      response = http.request(request)
-      elapsed_ms = ((Time.current - started_at) * 1000).round
 
-      parsed_body = parse_json(response.body)
-      redacted_payload = redact_hash(parsed_body)
-      redacted_request = { path: path, params: redact_hash(request_params) }
+      begin
+        raw = client.public_send(method, **kwargs)
+        elapsed_ms = ((Time.current - started_at) * 1000).round
 
-      case response.code.to_i
-      when 200
+        # SDK returns symbolized Hash; stringify for consistent storage and Processor access
+        data = deep_stringify(raw)
+
         log_http_request(
-          path: path, http_method: "GET",
-          response_code: 200, status: "success",
-          request_payload: redacted_request,
-          response_payload: redacted_payload,
+          path:             sdk_path(method, kwargs),
+          http_method:      "GET",
+          response_code:    200,
+          status:           "success",
+          request_payload:  redact_hash({ method: method, params: kwargs }),
+          response_payload: redact_hash(data),
           response_time_ms: elapsed_ms
         )
-        parsed_body
-      when 401, 403
-        msg = "Binance auth error: invalid API key or signature"
+
+        data  # return string-keyed form
+      rescue Binance::ClientError => e
+        elapsed_ms = ((Time.current - started_at) * 1000).round
+        body   = e.response&.dig(:body) || {}
+        parsed = body.is_a?(String) ? (JSON.parse(body) rescue { "raw" => body }) : body
+        code   = parsed["code"] || parsed[:code]
+        msg    = build_error_message(e.response&.dig(:status), code, parsed["msg"] || parsed[:msg])
+
         log_http_request(
-          path: path, http_method: "GET",
-          response_code: response.code.to_i, status: "error",
-          request_payload: redacted_request,
-          response_payload: redacted_payload,
-          error_message: msg, response_time_ms: elapsed_ms
+          path:             sdk_path(method, kwargs),
+          http_method:      "GET",
+          response_code:    e.response&.dig(:status),
+          status:           "error",
+          request_payload:  redact_hash({ method: method, params: kwargs }),
+          response_payload: redact_hash(deep_stringify(parsed)),
+          error_message:    msg,
+          response_time_ms: elapsed_ms
         )
+
         raise Error.new(msg)
-      when 418, 429
-        msg = "Binance rate limit exceeded: #{response.code}"
+      rescue Binance::ServerError => e
+        elapsed_ms = ((Time.current - started_at) * 1000).round
+        msg = "Binance server error: #{e.message}"
+
         log_http_request(
-          path: path, http_method: "GET",
-          response_code: response.code.to_i, status: "error",
-          request_payload: redacted_request,
-          response_payload: redacted_payload,
-          error_message: msg, response_time_ms: elapsed_ms
+          path:             sdk_path(method, kwargs),
+          http_method:      "GET",
+          response_code:    500,
+          status:           "error",
+          request_payload:  redact_hash({ method: method, params: kwargs }),
+          response_payload: {},
+          error_message:    msg,
+          response_time_ms: elapsed_ms
         )
-        raise Error.new(msg)
-      else
-        code = parsed_body["code"]
-        msg = if %w[-2014 -2015].include?(code.to_s)
-          "Binance auth error: #{parsed_body['msg']}"
-        else
-          "Binance API error: HTTP #{response.code} - #{parsed_body['msg']}"
-        end
-        log_http_request(
-          path: path, http_method: "GET",
-          response_code: response.code.to_i, status: "error",
-          request_payload: redacted_request,
-          response_payload: redacted_payload,
-          error_message: msg, response_time_ms: elapsed_ms
-        )
+
         raise Error.new(msg)
       end
     end
 
-    def sign(query_string)
-      OpenSSL::HMAC.hexdigest("SHA256", api_secret, query_string)
+    def client
+      @client ||= ::Binance::Spot.new(key: api_key, secret: api_secret, timeout: 10)
     end
 
-    def parse_json(body)
-      JSON.parse(body)
-    rescue JSON::ParserError
-      { "raw_body" => body.to_s }
+    def build_error_message(http_status, binance_code, binance_msg)
+      case http_status
+      when 401, 403
+        "Binance auth error: invalid API key or signature"
+      when 418, 429
+        "Binance rate limit exceeded: HTTP #{http_status}"
+      else
+        if %w[-2014 -2015].include?(binance_code.to_s)
+          "Binance auth error: #{binance_msg}"
+        else
+          "Binance API error: HTTP #{http_status} - #{binance_msg}"
+        end
+      end
+    end
+
+    # Maps SDK method name to a human-readable path for audit logs
+    def sdk_path(method, kwargs)
+      case method
+      when :account    then "/api/v3/account"
+      when :my_trades  then "/api/v3/myTrades?symbol=#{kwargs[:symbol]}"
+      else "/api/v3/#{method}"
+      end
+    end
+
+    def deep_stringify(value)
+      case value
+      when Hash  then value.transform_keys(&:to_s).transform_values { |v| deep_stringify(v) }
+      when Array then value.map { |v| deep_stringify(v) }
+      else value
+      end
     end
 
     def redact_hash(value)
@@ -163,10 +174,8 @@ class Provider::Binance < Provider
           next if REDACTED_KEYS.include?(key.to_s)
           acc[key] = redact_hash(nested_value)
         end
-      when Array
-        value.map { |item| redact_hash(item) }
-      else
-        value
+      when Array then value.map { |v| redact_hash(v) }
+      else value
       end
     end
 end

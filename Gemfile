@@ -68,6 +68,9 @@ gem "rack-attack", "~> 6.6"
 gem "faraday"
 gem "faraday-retry"
 gem "faraday-multipart"
+
+# Broker connectors
+gem "binance-connector-ruby"
 gem "inline_svg"
 gem "octokit"
 gem "pagy"
