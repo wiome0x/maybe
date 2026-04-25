@@ -8,6 +8,7 @@ class MarketNewsImporterTest < ActiveSupport::TestCase
   test "imports and upserts fetched market news" do
     now = Time.utc(2026, 4, 25, 9, 0, 0)
     feed = stub
+    translator = stub
     items = [
       MarketNewsFeed::Item.new(
         source: "CNBC",
@@ -17,19 +18,30 @@ class MarketNewsImporterTest < ActiveSupport::TestCase
         translated_title: nil
       )
     ]
-
-    feed.expects(:fetch).with(force_refresh: true).twice.returns(items, [
+    translated_items = [
+      items.first.with(translated_title: "开盘走强")
+    ]
+    updated_items = [
       items.first.with(title: "Updated headline")
-    ])
+    ]
+    updated_translated_items = [
+      updated_items.first.with(translated_title: "更新后的标题")
+    ]
 
-    importer = MarketNewsImporter.new(feed: feed, now: now)
+    feed.expects(:fetch).with(force_refresh: true).twice.returns(items, updated_items)
+    translator.expects(:translate_items).with(items, locale: :"zh-CN").returns(translated_items)
+    translator.expects(:translate_items).with(updated_items, locale: :"zh-CN").returns(updated_translated_items)
+
+    importer = MarketNewsImporter.new(feed: feed, translator: translator, now: now)
 
     assert_equal 1, importer.import
     assert_equal 1, MarketNewsArticle.count
     assert_equal "Opening bell rally", MarketNewsArticle.first.title
+    assert_equal "开盘走强", MarketNewsArticle.first.translated_title
 
     assert_equal 1, importer.import
     assert_equal 1, MarketNewsArticle.count
     assert_equal "Updated headline", MarketNewsArticle.first.title
+    assert_equal "更新后的标题", MarketNewsArticle.first.translated_title
   end
 end

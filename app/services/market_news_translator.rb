@@ -61,15 +61,15 @@ class MarketNewsTranslator
   end
 
   def self.azure_key
-    ENV["AZURE_TRANSLATOR_KEY"].presence
+    ENV["AZURE_TRANSLATOR_KEY"]&.strip.presence
   end
 
   def self.azure_endpoint
-    ENV["AZURE_TRANSLATOR_ENDPOINT"].presence&.chomp("/")
+    ENV["AZURE_TRANSLATOR_ENDPOINT"]&.strip.presence&.chomp("/")
   end
 
   def self.azure_region
-    ENV["AZURE_TRANSLATOR_REGION"].presence
+    ENV["AZURE_TRANSLATOR_REGION"]&.strip.presence
   end
 
   def self.azure_config_missing?

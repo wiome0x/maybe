@@ -21,7 +21,7 @@ class MarketNewsArticle < ApplicationRecord
       title: title,
       url: url,
       published_at: published_at,
-      translated_title: nil
+      translated_title: translated_title
     )
   end
 end

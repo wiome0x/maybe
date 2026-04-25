@@ -51,11 +51,22 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
         translated_title: nil
       )
     ]
-    MarketNewsFeed.stubs(:fetch).returns(filtered_items)
-    MarketNewsTranslator.stubs(:translate_items).returns([
-      filtered_items.first.with(translated_title: "CNBC 中文标题"),
-      filtered_items.last
-    ])
+    MarketNewsArticle.create!(
+      source: "CNBC",
+      title: "CNBC headline",
+      translated_title: "CNBC 中文标题",
+      url: "https://www.cnbc.com/example",
+      published_at: Time.utc(2026, 4, 25, 8, 0, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.create!(
+      source: "Seeking Alpha",
+      title: "Seeking Alpha headline",
+      url: "https://seekingalpha.com/example",
+      published_at: Time.utc(2026, 4, 25, 7, 30, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.stubs(:refresh_if_stale!)
 
     get market_stocks_news_path
 
@@ -84,8 +95,21 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
         translated_title: nil
       )
     ]
-    MarketNewsFeed.stubs(:fetch).returns(filtered_items)
-    MarketNewsTranslator.stubs(:translate_items).returns(filtered_items.select { |item| item.source == "CNBC" })
+    MarketNewsArticle.create!(
+      source: "CNBC",
+      title: "CNBC headline",
+      url: "https://www.cnbc.com/example",
+      published_at: Time.utc(2026, 4, 25, 8, 0, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.create!(
+      source: "Seeking Alpha",
+      title: "Seeking Alpha headline",
+      url: "https://seekingalpha.com/example",
+      published_at: Time.utc(2026, 4, 25, 7, 30, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.stubs(:refresh_if_stale!)
 
     get market_stocks_news_path(news_source: "cnbc")
 
@@ -112,8 +136,21 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
         translated_title: nil
       )
     ]
-    MarketNewsFeed.stubs(:fetch).returns(items)
-    MarketNewsTranslator.stubs(:translate_items).returns(items.select { |item| item.source == "SEC" })
+    MarketNewsArticle.create!(
+      source: "SEC",
+      title: "SEC enforcement headline",
+      url: "https://www.sec.gov/example",
+      published_at: Time.utc(2026, 4, 25, 6, 0, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.create!(
+      source: "MarketWatch",
+      title: "MarketWatch headline",
+      url: "https://www.marketwatch.com/example",
+      published_at: Time.utc(2026, 4, 25, 5, 30, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.stubs(:refresh_if_stale!)
 
     get market_stocks_news_path(news_source: "sec")
 
