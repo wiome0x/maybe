@@ -104,7 +104,9 @@ export default class extends Controller {
   #sessionBadge(session, now) {
     const { open, minutesUntilOpen, minutesUntilClose, inLunch } = this.#sessionStatus(session, now);
 
-    let dotColor, statusText, timeText;
+    let dotColor;
+    let statusText;
+    let timeText;
 
     if (open && !inLunch) {
       dotColor = "#16a34a";
@@ -147,8 +149,8 @@ export default class extends Controller {
     if (!parts) return { open: false };
 
     const [, weekday, month, day, year, hourStr, minStr] = parts;
-    const hour = parseInt(hourStr === "24" ? "0" : hourStr, 10);
-    const minute = parseInt(minStr, 10);
+    const hour = Number.parseInt(hourStr === "24" ? "0" : hourStr, 10);
+    const minute = Number.parseInt(minStr, 10);
     const dayOfWeek = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(weekday);
 
     // Weekend = closed
