@@ -1,4 +1,5 @@
 <section class="bg-container rounded-xl shadow-border-xs p-4 space-y-3 h-full">
+  <% news_index_path = @public_markets ? public_market_stocks_news_path : market_stocks_news_path %>
   <div class="flex flex-col gap-3 border-b border-alpha-black-100 pb-3 md:flex-row md:items-end md:justify-between">
     <div class="space-y-1">
       <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary"><%= t(".news_title") %></p>
@@ -14,37 +15,37 @@
   <nav class="flex flex-wrap items-center gap-2">
     <%= render DS::Link.new(
       text: t(".news_filter_all"),
-      href: market_stocks_news_path,
+      href: news_index_path,
       variant: @market_news_source == "all" ? "primary" : "ghost"
     ) %>
     <%= render DS::Link.new(
       text: t(".news_filter_cnbc"),
-      href: market_stocks_news_path(news_source: "cnbc"),
+      href: @public_markets ? public_market_stocks_news_path(news_source: "cnbc") : market_stocks_news_path(news_source: "cnbc"),
       variant: @market_news_source == "cnbc" ? "primary" : "ghost"
     ) %>
     <%= render DS::Link.new(
       text: t(".news_filter_seeking_alpha"),
-      href: market_stocks_news_path(news_source: "seeking_alpha"),
+      href: @public_markets ? public_market_stocks_news_path(news_source: "seeking_alpha") : market_stocks_news_path(news_source: "seeking_alpha"),
       variant: @market_news_source == "seeking_alpha" ? "primary" : "ghost"
     ) %>
     <%= render DS::Link.new(
       text: t(".news_filter_sec"),
-      href: market_stocks_news_path(news_source: "sec"),
+      href: @public_markets ? public_market_stocks_news_path(news_source: "sec") : market_stocks_news_path(news_source: "sec"),
       variant: @market_news_source == "sec" ? "primary" : "ghost"
     ) %>
     <%= render DS::Link.new(
       text: t(".news_filter_bloomberg"),
-      href: market_stocks_news_path(news_source: "bloomberg"),
+      href: @public_markets ? public_market_stocks_news_path(news_source: "bloomberg") : market_stocks_news_path(news_source: "bloomberg"),
       variant: @market_news_source == "bloomberg" ? "primary" : "ghost"
     ) %>
     <%= render DS::Link.new(
       text: t(".news_filter_marketwatch"),
-      href: market_stocks_news_path(news_source: "marketwatch"),
+      href: @public_markets ? public_market_stocks_news_path(news_source: "marketwatch") : market_stocks_news_path(news_source: "marketwatch"),
       variant: @market_news_source == "marketwatch" ? "primary" : "ghost"
     ) %>
     <%= render DS::Link.new(
       text: t(".news_filter_fed"),
-      href: market_stocks_news_path(news_source: "fed"),
+      href: @public_markets ? public_market_stocks_news_path(news_source: "fed") : market_stocks_news_path(news_source: "fed"),
       variant: @market_news_source == "fed" ? "primary" : "ghost"
     ) %>
   </nav>

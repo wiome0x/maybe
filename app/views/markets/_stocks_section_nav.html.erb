@@ -1,17 +1,21 @@
 <nav class="flex items-center gap-2">
-  <%= render DS::Link.new(
-    text: t("markets.stocks.section_nav.news"),
-    href: market_stocks_news_path,
-    variant: current_page?(market_stocks_news_path) ? "primary" : "ghost"
-  ) %>
+  <% heatmap_path = @public_markets ? public_market_stocks_heatmap_path : market_stocks_heatmap_path %>
+  <% news_path = @public_markets ? public_market_stocks_news_path : market_stocks_news_path %>
   <%= render DS::Link.new(
     text: t("markets.stocks.section_nav.heatmap"),
-    href: market_stocks_heatmap_path,
-    variant: current_page?(market_stocks_heatmap_path) ? "primary" : "ghost"
+    href: heatmap_path,
+    variant: current_page?(heatmap_path) ? "primary" : "ghost"
   ) %>
+  <% if !@public_markets && Current.user %>
+    <%= render DS::Link.new(
+      text: t("markets.stocks.section_nav.watchlist"),
+      href: market_stocks_path,
+      variant: current_page?(market_stocks_path) ? "primary" : "ghost"
+    ) %>
+  <% end %>
   <%= render DS::Link.new(
-    text: t("markets.stocks.section_nav.watchlist"),
-    href: market_stocks_path,
-    variant: current_page?(market_stocks_path) ? "primary" : "ghost"
+    text: t("markets.stocks.section_nav.news"),
+    href: news_path,
+    variant: current_page?(news_path) ? "primary" : "ghost"
   ) %>
 </nav>

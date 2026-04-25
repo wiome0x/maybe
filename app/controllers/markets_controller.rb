@@ -350,6 +350,8 @@ class MarketsController < ApplicationController
     end
 
     def ensure_watchlist_defaults
+      return unless Current.family
+
       WatchlistItem.seed_defaults_for(Current.family)
     end
 

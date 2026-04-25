@@ -1,7 +1,7 @@
 <div class="space-y-4 pb-20">
   <header class="space-y-3">
     <h1 class="text-xl font-medium text-primary"><%= t(".title") %></h1>
-    <%= render "stocks_section_nav" %>
+    <%= render "markets/stocks_section_nav" %>
   </header>
 
   <div class="bg-container rounded-xl shadow-border-xs p-4 space-y-4">
@@ -34,12 +34,12 @@
   </div>
 
   <section class="grid gap-4 xl:grid-cols-2 xl:items-start">
-    <%= render "movers_table",
+    <%= render "markets/movers_table",
                title: t(".top_gainers_title"),
                quotes: @top_gainers,
                empty_message: t(".movers_unavailable") %>
 
-    <%= render "movers_table",
+    <%= render "markets/movers_table",
                title: t(".top_losers_title"),
                quotes: @top_losers,
                empty_message: t(".movers_unavailable") %>
