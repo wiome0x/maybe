@@ -143,6 +143,9 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should fall back to cached index quotes when live sources are empty" do
+    original_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache.lookup_store(:memory_store)
+
     Rails.cache.write(MarketsController::INDICES_CACHE_KEY, {
       "^DJI" => { price: 49_100.0, change_percent: 0.42 }
     }, expires_in: 10.minutes)
@@ -158,6 +161,8 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_equal 49_100.0, body.dig("^DJI", "price")
     assert_equal 0.42, body.dig("^DJI", "change_percent")
+  ensure
+    Rails.cache = original_cache
   end
 
   test "should return china index quotes from eastmoney fallback" do
