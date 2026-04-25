@@ -43,6 +43,31 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "active", fresh_account.reload.status
   end
 
+  test "create with return_to redirects back to the provided local path" do
+    fresh_account = Account.create!(
+      family: @family,
+      name: "Return Path Crypto Account",
+      balance: 0,
+      currency: "USD",
+      accountable: Crypto.create!,
+      status: "draft"
+    )
+
+    Provider::Binance.any_instance.expects(:validate_credentials!).once
+
+    post broker_connections_url, params: {
+      return_to: accounts_path,
+      broker_connection: {
+        account_id: fresh_account.id,
+        api_key: "valid_key",
+        api_secret: "valid_secret"
+      }
+    }
+
+    assert_redirected_to accounts_path
+    assert_equal "active", fresh_account.reload.status
+  end
+
   # ---------------------------------------------------------------------------
   # create (Binance) — invalid credentials
   # Validates: Requirement 7 (AC 6)
@@ -102,6 +127,31 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to account_path(fresh_account)
     assert_equal "Charles Schwab account connected successfully.", flash[:notice]
+    assert_equal "active", fresh_account.reload.status
+  end
+
+  test "schwab_callback honors return_to from signed onboarding state" do
+    fresh_account = Account.create!(
+      family: @family,
+      name: "Return Path Investment Account",
+      balance: 0,
+      currency: "USD",
+      accountable: Investment.create!,
+      status: "draft"
+    )
+
+    state = BrokerOnboarding.new(session: {}).authorization_state_for(account: fresh_account, return_to: accounts_path)
+
+    Provider::Schwab.expects(:exchange_code).with(code: "auth_code_123").returns({
+      access_token: "access_abc",
+      refresh_token: "refresh_xyz",
+      expires_in: 3600,
+      broker_account_id: "schwab-acct-001"
+    })
+
+    get auth_schwab_callback_url, params: { code: "auth_code_123", state: state }
+
+    assert_redirected_to accounts_path
     assert_equal "active", fresh_account.reload.status
   end
 

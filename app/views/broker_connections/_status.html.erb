@@ -13,7 +13,7 @@
 
         <div class="flex flex-col gap-2">
           <% if account.crypto? %>
-            <%= link_to new_broker_connection_path(account_id: account.id),
+            <%= link_to new_broker_connection_path(account_id: account.id, return_to: account_path(account)),
                         data: { turbo_frame: :modal },
                         class: "flex items-center gap-2 rounded-lg border border-primary px-4 py-2.5 text-sm text-primary hover:bg-container-inset transition-colors" do %>
               <%= icon("link-2", size: "sm") %>
@@ -22,7 +22,7 @@
           <% end %>
 
           <% if account.investment? %>
-            <%= link_to new_broker_connection_path(account_id: account.id),
+            <%= link_to new_broker_connection_path(account_id: account.id, return_to: account_path(account)),
                         data: { turbo_frame: :modal },
                         class: "flex items-center gap-2 rounded-lg border border-primary px-4 py-2.5 text-sm text-primary hover:bg-container-inset transition-colors" do %>
               <%= icon("link-2", size: "sm") %>
@@ -45,7 +45,7 @@
           </div>
         </div>
 
-        <%= link_to reauth_broker_connection_path(broker_connection),
+        <%= link_to reauth_broker_connection_path(broker_connection, return_to: account_path(account)),
                     data: { turbo_frame: :modal },
                     class: "shrink-0 flex items-center gap-1.5 rounded-lg border border-primary px-3 py-1.5 text-sm text-primary hover:bg-container-inset transition-colors" do %>
           <%= icon("refresh-cw", size: "sm") %>

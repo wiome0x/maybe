@@ -12,6 +12,7 @@
         <%= styled_form_with url: reconnect_broker_connection_path(@broker_connection),
                              method: :post,
                              class: "space-y-4" do |form| %>
+          <%= hidden_field_tag :return_to, @return_to if @return_to.present? %>
           <div class="form-field">
             <div class="form-field__header">
               <label class="form-field__label" for="broker_connection_api_key">API Key</label>
@@ -53,6 +54,11 @@
                     class: "flex items-center justify-center gap-2 w-full rounded-lg bg-surface px-4 py-2.5 text-sm font-medium text-white hover:bg-surface-hover transition-colors" do %>
           <%= icon("link-2", size: "sm") %>
           Continue to Charles Schwab
+        <% end %>
+
+        <%= link_to @return_to.presence || account_path(@account),
+                    class: "flex items-center justify-center w-full rounded-lg border border-primary px-4 py-2.5 text-sm text-primary hover:bg-container-inset transition-colors" do %>
+          Cancel
         <% end %>
       </div>
     <% end %>

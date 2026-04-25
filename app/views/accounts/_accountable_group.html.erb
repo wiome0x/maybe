@@ -1,7 +1,9 @@
 <%# locals: (account_group:, mobile: false, all_tab: false, open: nil, **args) %>
 
 <div id="<%= account_group.dom_id(tab: all_tab ? :all : nil, mobile: mobile) %>">
-  <% is_open = open.nil? ? account_group.accounts.any? { |account| page_active?(account_path(account)) } : open %>
+  <% visible_accounts = account_group.accounts.reject(&:broker_setup_pending?) %>
+  <% if visible_accounts.any? %>
+  <% is_open = open.nil? ? visible_accounts.any? { |account| page_active?(account_path(account)) } : open %>
   <%= render DS::Disclosure.new(align: :left, open: is_open) do |disclosure| %>
     <% disclosure.with_summary_content do %>
       <div class="flex items-center gap-3">
@@ -22,7 +24,7 @@
     <% end %>
 
     <div class="space-y-1">
-      <% account_group.accounts.each do |account| %>
+      <% visible_accounts.each do |account| %>
         <%= link_to account_path(account),
                   class: class_names(
                     "block flex items-center gap-2 px-3 py-2 rounded-lg",
@@ -61,5 +63,6 @@
       class: "justify-start"
     ) %>
     </div>
+  <% end %>
   <% end %>
 </div>

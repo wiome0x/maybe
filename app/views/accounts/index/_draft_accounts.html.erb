@@ -1,0 +1,54 @@
+<%# locals: (accounts:) %>
+
+<% if accounts.any? %>
+  <details class="group bg-container-inset p-4 rounded-xl">
+    <summary class="flex items-center gap-2 cursor-pointer focus-visible:outline-hidden">
+      <%= icon("chevron-right", class: "group-open:transform group-open:rotate-90") %>
+
+      <div class="flex items-center justify-center h-8 w-8 rounded-full bg-black/5">
+        <%= icon("clock-3") %>
+      </div>
+
+      <span class="text-sm font-medium text-secondary">
+        Setup in progress (<%= accounts.size %>)
+      </span>
+    </summary>
+
+    <div class="space-y-1 mt-4">
+      <div class="bg-container rounded-lg shadow-border-xs">
+        <% accounts.each_with_index do |account, index| %>
+          <div class="p-4 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <%= render "accounts/logo", account: account, size: "md" %>
+
+              <div>
+                <p class="text-sm font-medium text-primary"><%= account.name %></p>
+                <p class="text-xs text-secondary"><%= account.accountable.display_name %> setup has not been completed yet.</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <%= render DS::Link.new(
+                text: "Continue setup",
+                href: new_broker_connection_path(account_id: account.id, return_to: accounts_path),
+                variant: :outline,
+                frame: :modal
+              ) %>
+
+              <%= button_to account_path(account),
+                            method: :delete,
+                            data: { turbo_frame: :_top, turbo_confirm: "Delete this unfinished account setup?" },
+                            class: "text-sm font-medium text-link hover:underline cursor-pointer" do %>
+                Delete
+              <% end %>
+            </div>
+          </div>
+
+          <% unless index == accounts.size - 1 %>
+            <%= render "shared/ruler" %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </details>
+<% end %>

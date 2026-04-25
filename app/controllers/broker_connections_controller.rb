@@ -3,10 +3,13 @@ class BrokerConnectionsController < ApplicationController
 
   def new
     @account = Current.family.accounts.find(params[:account_id])
+    @return_to = broker_onboarding.prepare_return_to!(account: @account, incoming_return_to: params[:return_to], fallback: account_path(@account))
+    @schwab_authorization_url = Provider::Schwab.authorization_url(state: broker_onboarding.authorization_state_for(account: @account, return_to: @return_to)) if @account.investment?
   end
 
   def create
     @account = Current.family.accounts.find(broker_connection_account_id)
+    @return_to = broker_onboarding.prepare_return_to!(account: @account, incoming_return_to: params[:return_to], fallback: account_path(@account))
 
     provider = Provider::Binance.new(
       api_key: broker_connection_api_key,
@@ -26,7 +29,7 @@ class BrokerConnectionsController < ApplicationController
 
     @broker_connection.save!
     activate_account_if_draft!(@account)
-    redirect_to account_path(@account), notice: "Binance account connected successfully."
+    redirect_to broker_onboarding.success_path_for(account: @account, fallback: account_path(@account)), notice: "Binance account connected successfully."
   rescue Provider::Error => e
     @error_message = e.message
     @api_key = broker_connection_api_key
@@ -40,8 +43,10 @@ class BrokerConnectionsController < ApplicationController
   def schwab_callback
     code = params[:code]
     result = Provider::Schwab.exchange_code(code: code)
+    state_data = broker_onboarding.resolve_state(params[:state])
 
-    @account = Current.family.accounts.find(params[:state] || params[:account_id])
+    @account = Current.family.accounts.find(state_data[:account_id] || params[:account_id] || params[:state])
+    broker_onboarding.prepare_return_to!(account: @account, incoming_return_to: state_data[:return_to], fallback: account_path(@account))
 
     @broker_connection = @account.build_broker_connection(
       family: Current.family,
@@ -56,7 +61,7 @@ class BrokerConnectionsController < ApplicationController
 
     @broker_connection.save!
     activate_account_if_draft!(@account)
-    redirect_to account_path(@account), notice: "Charles Schwab account connected successfully."
+    redirect_to broker_onboarding.success_path_for(account: @account, fallback: account_path(@account)), notice: "Charles Schwab account connected successfully."
   rescue Provider::Error, ActiveRecord::RecordInvalid => e
     redirect_to accounts_path, alert: "Failed to connect Schwab account: #{e.message}"
   end
@@ -73,9 +78,10 @@ class BrokerConnectionsController < ApplicationController
 
   def reauth
     @account = @broker_connection.account
+    @return_to = broker_onboarding.prepare_return_to!(account: @account, incoming_return_to: params[:return_to], fallback: account_path(@account))
 
     if @broker_connection.schwab?
-      @schwab_authorization_url = Provider::Schwab.authorization_url(state: @broker_connection.id)
+      @schwab_authorization_url = Provider::Schwab.authorization_url(state: broker_onboarding.authorization_state_for(account: @account, return_to: @return_to))
       render :reauth
     else
       render :reauth
@@ -83,6 +89,8 @@ class BrokerConnectionsController < ApplicationController
   end
 
   def reconnect
+    @return_to = broker_onboarding.prepare_return_to!(account: @broker_connection.account, incoming_return_to: params[:return_to], fallback: account_path(@broker_connection.account))
+
     if @broker_connection.binance?
       provider = Provider::Binance.new(
         api_key: reconnect_params[:api_key],
@@ -110,9 +118,9 @@ class BrokerConnectionsController < ApplicationController
 
     activate_account_if_draft!(@broker_connection.account)
 
-    redirect_to account_path(@broker_connection.account), notice: "Broker connection reauthorized successfully."
+    redirect_to broker_onboarding.success_path_for(account: @broker_connection.account, fallback: account_path(@broker_connection.account)), notice: "Broker connection reauthorized successfully."
   rescue Provider::Error => e
-    redirect_to reauth_broker_connection_path(@broker_connection), alert: "Reauthorization failed: #{e.message}"
+    redirect_to reauth_broker_connection_path(@broker_connection, return_to: @return_to), alert: "Reauthorization failed: #{e.message}"
   end
 
   private
@@ -148,5 +156,9 @@ class BrokerConnectionsController < ApplicationController
 
     def activate_account_if_draft!(account)
       account.activate! if account.draft?
+    end
+
+    def broker_onboarding
+      @broker_onboarding ||= BrokerOnboarding.new(session: session)
     end
 end

@@ -2,17 +2,13 @@ class CryptosController < ApplicationController
   include AccountableResource
 
   def connect
-    @account = Current.family.accounts.create!(
-      name: "Binance",
-      balance: 0,
-      cash_balance: 0,
-      currency: Current.family.currency,
-      accountable: Crypto.new,
-      status: "draft"
+    @account = broker_onboarding.start_direct_connection!(
+      family: Current.family,
+      accountable_type: Crypto,
+      account_name: "Binance"
     )
-    @account.lock_saved_attributes!
 
-    redirect_to new_broker_connection_path(account_id: @account.id), notice: t("accounts.create.success", type: "Crypto")
+    redirect_to new_broker_connection_path(account_id: @account.id, return_to: params[:return_to]), notice: t("accounts.create.success", type: "Crypto")
   rescue ActiveRecord::RecordInvalid => e
     redirect_to new_crypto_path(step: "method_select", return_to: params[:return_to]), alert: e.message
   end
@@ -29,4 +25,9 @@ class CryptosController < ApplicationController
     @error_message = e.message
     render :new, status: :unprocessable_entity
   end
+
+  private
+    def broker_onboarding
+      @broker_onboarding ||= BrokerOnboarding.new(session: session)
+    end
 end

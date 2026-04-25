@@ -25,6 +25,10 @@ class Account < ApplicationRecord
   scope :liabilities, -> { where(classification: "liability") }
   scope :alphabetically, -> { order(:name) }
   scope :manual, -> { where(plaid_account_id: nil) }
+  scope :broker_setup_pending, -> {
+    left_joins(:broker_connection)
+      .where(status: "draft", accountable_type: %w[Crypto Investment], broker_connections: { id: nil })
+  }
 
   has_one_attached :logo
 
@@ -147,6 +151,10 @@ class Account < ApplicationRecord
 
   def first_valuation_amount
     first_valuation&.amount_money || balance_money
+  end
+
+  def broker_setup_pending?
+    draft? && accountable_type.in?(%w[Crypto Investment]) && broker_connection.nil?
   end
 
   # Get short version of the subtype label

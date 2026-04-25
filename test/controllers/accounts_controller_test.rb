@@ -11,6 +11,25 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "index groups unfinished broker setup accounts separately" do
+    Account.create!(
+      family: @user.family,
+      name: "Pending Binance Setup",
+      balance: 0,
+      cash_balance: 0,
+      currency: "USD",
+      accountable: Crypto.create!,
+      status: "draft"
+    )
+
+    get accounts_url
+
+    assert_response :success
+    assert_includes response.body, "Setup in progress"
+    assert_includes response.body, "Pending Binance Setup"
+    assert_includes response.body, "Continue setup"
+  end
+
   test "should get show" do
     get account_url(@account)
     assert_response :success

@@ -3,7 +3,8 @@ class AccountsController < ApplicationController
   include Periodable
 
   def index
-    @manual_accounts = family.accounts.manual.visible.alphabetically
+    @draft_accounts = family.accounts.manual.broker_setup_pending.alphabetically
+    @manual_accounts = family.accounts.manual.visible.where.not(id: @draft_accounts.select(:id)).alphabetically
     @plaid_items = family.plaid_items.ordered
     @hidden_accounts = family.accounts.hidden.alphabetically
 

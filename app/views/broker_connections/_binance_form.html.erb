@@ -1,4 +1,4 @@
-<%# locals: (account:, api_key: nil) %>
+<%# locals: (account:, api_key: nil, return_to: nil) %>
 
 <div class="space-y-4">
   <p class="text-sm text-secondary">
@@ -11,6 +11,7 @@
                        data: { turbo: false },
                        class: "space-y-4" do |form| %>
     <%= hidden_field_tag "broker_connection[account_id]", account.id %>
+    <%= hidden_field_tag :return_to, return_to if return_to.present? %>
 
     <div class="form-field">
       <div class="form-field__header">
@@ -47,7 +48,7 @@
       </button>
 
       <%= link_to "Skip for now",
-                  account_path(account),
+                  return_to.presence || account_path(account),
                   class: "flex items-center justify-center w-full rounded-lg border border-primary px-4 py-2.5 text-sm text-primary hover:bg-container-inset transition-colors" %>
     </div>
   <% end %>
