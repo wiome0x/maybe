@@ -1,23 +1,13 @@
 <header class="flex justify-between items-center text-primary font-medium">
   <h1 class="text-xl"><%= t(".accounts") %></h1>
-  <div class="flex items-center gap-5">
-    <div class="flex items-center gap-2">
-      <%= icon(
-            "refresh-cw",
-            as_button: true,
-            size: "sm",
-            href: sync_all_accounts_path,
-            disabled: Current.family.syncing?,
-            frame: :_top
-          ) %>
-      <%= render DS::Link.new(
-        text: "New account",
-        href: new_account_path(return_to: accounts_path),
-        variant: "primary",
-        icon: "plus",
-        frame: :modal
-      ) %>
-    </div>
+  <div class="flex items-center gap-2">
+    <%= render DS::Link.new(
+      text: "New account",
+      href: new_account_path(return_to: accounts_path),
+      variant: "primary",
+      icon: "plus",
+      frame: :modal
+    ) %>
   </div>
 </header>
 

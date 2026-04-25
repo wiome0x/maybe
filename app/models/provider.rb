@@ -1,4 +1,6 @@
 class Provider
+  include Provider::Auditable
+
   Response = Data.define(:success?, :data, :error)
 
   class Error < StandardError
@@ -43,7 +45,6 @@ class Provider
       )
     end
 
-    # Override to set class-level error transformation for methods using `with_provider_response`
     def default_error_transformer(error)
       if error.is_a?(Faraday::Error)
         self.class::Error.new(
@@ -54,6 +55,4 @@ class Provider
         self.class::Error.new(error.message)
       end
     end
-
-    prepend Provider::Auditable
 end

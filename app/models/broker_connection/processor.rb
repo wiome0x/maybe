@@ -27,7 +27,7 @@ class BrokerConnection::Processor
       binance_balances.each do |balance|
         asset = balance["asset"].to_s.upcase
         qty = total_balance_for(balance)
-        next if asset.blank?
+        next if asset.blank? || qty <= 0
 
         security = find_or_create_security!(asset)
         price = estimated_price_for(asset)

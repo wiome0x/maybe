@@ -16,7 +16,8 @@ class BrokerConnectionsController < ApplicationController
       api_secret: broker_connection_api_secret
     )
 
-    provider.validate_credentials!
+    validation_result = provider.validate_credentials!
+    raise validation_result.error unless validation_result.success?
 
     @broker_connection = @account.build_broker_connection(
       family: Current.family,
@@ -28,6 +29,11 @@ class BrokerConnectionsController < ApplicationController
     )
 
     @broker_connection.save!
+
+    # Back-fill broker_connection_id on the validation audit row so it's traceable.
+    ApiRequestLog.where(broker_connection_id: nil, provider_name: "binance")
+                 .order(requested_at: :desc).limit(1)
+                 .update_all(broker_connection_id: @broker_connection.id)
     @broker_connection.sync_later
     activate_account_if_draft!(@account)
     redirect_to broker_onboarding.success_path_for(account: @account, fallback: account_path(@account)), notice: "Binance account connected successfully."
@@ -96,9 +102,11 @@ class BrokerConnectionsController < ApplicationController
     if @broker_connection.binance?
       provider = Provider::Binance.new(
         api_key: reconnect_params[:api_key],
-        api_secret: reconnect_params[:api_secret]
+        api_secret: reconnect_params[:api_secret],
+        broker_connection: @broker_connection
       )
-      provider.validate_credentials!
+      validation_result = provider.validate_credentials!
+      raise Provider::Error, validation_result.error.message unless validation_result.success?
 
       @broker_connection.update!(
         api_key: reconnect_params[:api_key],

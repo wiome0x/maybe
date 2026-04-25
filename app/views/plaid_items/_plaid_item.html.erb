@@ -55,12 +55,6 @@
             href: edit_plaid_item_path(plaid_item),
             frame: "modal"
           ) %>
-        <% elsif Rails.env.development? %>
-          <%= icon(
-            "refresh-cw",
-            as_button: true,
-            href: sync_plaid_item_path(plaid_item)
-          ) %>
         <% end %>
 
         <%= render DS::Menu.new do |menu| %>

@@ -6,6 +6,12 @@ import_market_data:
   args:
     mode: "full"
     clear_cache: false
+
+sync_broker_connections:
+  cron: "0 6 * * *" # 6:00 AM UTC daily — after overnight market settlement
+  class: "ScheduledBrokerSyncJob"
+  queue: "scheduled"
+  description: "Daily sync of all active broker connections (Binance, Schwab) to refresh balances and trade history"
   
 clean_syncs:
   cron: "0 * * * *" # every hour

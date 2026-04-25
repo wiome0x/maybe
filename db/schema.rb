@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_25_150000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_25_161000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -121,9 +121,13 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_25_150000) do
     t.jsonb "request_payload", default: {}, null: false
     t.jsonb "response_payload", default: {}, null: false
     t.jsonb "error_payload", default: {}, null: false
+    t.uuid "broker_connection_id"
+    t.uuid "sync_id"
+    t.index ["broker_connection_id"], name: "index_api_request_logs_on_broker_connection_id"
     t.index ["provider_name", "requested_at"], name: "idx_api_request_logs_provider_requested_at"
     t.index ["request_status"], name: "idx_api_request_logs_status"
     t.index ["requested_at"], name: "idx_api_request_logs_requested_at"
+    t.index ["sync_id"], name: "index_api_request_logs_on_sync_id"
   end
 
   create_table "balances", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

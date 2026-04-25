@@ -40,6 +40,32 @@
         </p>
       <% end %>
 
+      <%# Manual sync button — logic varies by connection type %>
+      <% unless account.draft? || account.pending_deletion? %>
+        <% if account.plaid_account&.plaid_item.present? %>
+          <%# Plaid account: sync the whole PlaidItem so all linked accounts refresh together %>
+          <% plaid_item = account.plaid_account.plaid_item %>
+          <%= button_to sync_plaid_item_path(plaid_item),
+                        method: :post,
+                        disabled: plaid_item.syncing?,
+                        title: plaid_item.syncing? ? "Syncing..." : "Sync now",
+                        data: { turbo_frame: :_top },
+                        class: "cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed" do %>
+            <%= icon("refresh-cw", size: "sm", class: plaid_item.syncing? ? "animate-spin" : "") %>
+          <% end %>
+        <% else %>
+          <%# Manual or BrokerConnection account: POST to account sync (controller handles broker vs plain) %>
+          <%= button_to sync_account_path(account),
+                        method: :post,
+                        disabled: account.syncing? || account.broker_connection&.syncing?,
+                        title: (account.syncing? || account.broker_connection&.syncing?) ? "Syncing..." : "Sync now",
+                        data: { turbo_frame: :_top },
+                        class: "cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed" do %>
+            <%= icon("refresh-cw", size: "sm", class: (account.syncing? || account.broker_connection&.syncing?) ? "animate-spin" : "") %>
+          <% end %>
+        <% end %>
+      <% end %>
+
       <% if account.draft? %>
         <%= render DS::Link.new(
           text: "Complete setup",

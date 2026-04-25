@@ -7,6 +7,8 @@ class Provider::Schwab < Provider
 
   Error = Class.new(Provider::Error)
 
+  REDACTED_KEYS = %w[access_token refresh_token authorization token].freeze
+
   def initialize(access_token:, refresh_token: nil, broker_connection: nil)
     @access_token = access_token
     @refresh_token = refresh_token
@@ -52,26 +54,9 @@ class Provider::Schwab < Provider
   private
     attr_reader :access_token, :refresh_token, :broker_connection
 
-    def log_api_request(status:, error_message: nil, response_time_ms: nil)
-      audit_context = @last_audit_context || {}
-
-      ApiRequestLog.create!(
-        provider_name: provider_name_for_audit,
-        endpoint: audit_context[:path] || caller_method_name,
-        http_method: audit_context[:http_method] || "GET",
-        request_status: status,
-        response_code: audit_context[:response_code],
-        response_time_ms: response_time_ms,
-        request_payload: audit_context[:request_payload] || {},
-        response_payload: status == "success" ? (audit_context[:response_payload] || {}) : {},
-        error_payload: status == "error" ? (audit_context[:response_payload] || {}) : {},
-        error_message: error_message,
-        requested_at: Time.current
-      )
-    rescue => e
-      Rails.logger.error("Failed to log API request: #{e.message}")
-    ensure
-      @last_audit_context = nil
+    # Override from Provider::Auditable — provides broker_connection_id for audit rows.
+    def audit_broker_connection_id
+      broker_connection&.id
     end
 
     def broker_account_id
@@ -91,16 +76,15 @@ class Provider::Schwab < Provider
       request["Authorization"] = "Bearer #{access_token}"
       request["Accept"] = "application/json"
 
+      started_at = Time.current
       response = http.request(request)
+      elapsed_ms = ((Time.current - started_at) * 1000).round
+
       handle_response!(
         response,
-        path: path,
-        http_method: "GET",
-        request_payload: {
-          path: path,
-          params: redact_hash(params),
-          broker_account_id: broker_account_id
-        }
+        path: path, http_method: "GET",
+        request_payload: { path: path, params: redact_hash(params), broker_account_id: broker_account_id },
+        response_time_ms: elapsed_ms
       )
     end
 
@@ -118,40 +102,73 @@ class Provider::Schwab < Provider
       request["Accept"] = "application/json"
       request.body = URI.encode_www_form(body)
 
+      started_at = Time.current
       response = http.request(request)
+      elapsed_ms = ((Time.current - started_at) * 1000).round
+
       handle_response!(
         response,
-        path: uri.path,
-        http_method: "POST",
-        request_payload: {
-          path: uri.path,
-          body: redact_hash(body),
-          broker_account_id: broker_account_id
-        }
+        path: uri.path, http_method: "POST",
+        request_payload: { path: uri.path, body: redact_hash(body), broker_account_id: broker_account_id },
+        response_time_ms: elapsed_ms
       )
     end
 
-    def handle_response!(response, path:, http_method:, request_payload:)
+    def handle_response!(response, path:, http_method:, request_payload:, response_time_ms: nil)
       parsed_body = parse_json(response.body)
-      @last_audit_context = {
-        path: path,
-        http_method: http_method,
-        response_code: response.code.to_i,
-        request_payload: request_payload,
-        response_payload: redact_hash(parsed_body)
-      }
+      redacted_payload = redact_hash(parsed_body)
+      code = response.code.to_i
 
-      case response.code.to_i
+      case code
       when 200
+        log_http_request(
+          path: path, http_method: http_method,
+          response_code: code, status: "success",
+          request_payload: request_payload,
+          response_payload: redacted_payload,
+          response_time_ms: response_time_ms
+        )
         parsed_body
       when 401
-        raise Error.new("Schwab token expired: requires refresh")
+        msg = "Schwab token expired: requires refresh"
+        log_http_request(
+          path: path, http_method: http_method,
+          response_code: code, status: "error",
+          request_payload: request_payload,
+          response_payload: redacted_payload,
+          error_message: msg, response_time_ms: response_time_ms
+        )
+        raise Error.new(msg)
       when 403
-        raise Error.new("Schwab auth error: requires_reauth")
+        msg = "Schwab auth error: requires_reauth"
+        log_http_request(
+          path: path, http_method: http_method,
+          response_code: code, status: "error",
+          request_payload: request_payload,
+          response_payload: redacted_payload,
+          error_message: msg, response_time_ms: response_time_ms
+        )
+        raise Error.new(msg)
       when 500..599
-        raise Error.new("Schwab server error: HTTP #{response.code}")
+        msg = "Schwab server error: HTTP #{code}"
+        log_http_request(
+          path: path, http_method: http_method,
+          response_code: code, status: "error",
+          request_payload: request_payload,
+          response_payload: redacted_payload,
+          error_message: msg, response_time_ms: response_time_ms
+        )
+        raise Error.new(msg)
       else
-        raise Error.new("Schwab API error: HTTP #{response.code}")
+        msg = "Schwab API error: HTTP #{code}"
+        log_http_request(
+          path: path, http_method: http_method,
+          response_code: code, status: "error",
+          request_payload: request_payload,
+          response_payload: redacted_payload,
+          error_message: msg, response_time_ms: response_time_ms
+        )
+        raise Error.new(msg)
       end
     end
 
@@ -165,8 +182,7 @@ class Provider::Schwab < Provider
       case value
       when Hash
         value.each_with_object({}) do |(key, nested_value), acc|
-          next if key.to_s.match?(/token|authorization|secret/i)
-
+          next if REDACTED_KEYS.any? { |k| key.to_s.match?(/#{k}/i) }
           acc[key] = redact_hash(nested_value)
         end
       when Array
