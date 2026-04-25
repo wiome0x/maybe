@@ -37,12 +37,14 @@ en:
       change: Change
       news_label: Market news
       news_title: Daily market news
-      news_description: Currently combines CNBC intraday market coverage, Seeking Alpha event-driven news, SEC releases, and multiple MarketWatch RSS streams for quick context beside the heatmap.
+      news_description: Currently combines CNBC intraday market coverage, Seeking Alpha event-driven news, SEC releases, Bloomberg markets coverage, multiple MarketWatch RSS streams, and key Federal Reserve updates for quick context beside the heatmap.
       news_filter_all: All
       news_filter_cnbc: CNBC
       news_filter_seeking_alpha: Seeking Alpha
       news_filter_sec: SEC
+      news_filter_bloomberg: Bloomberg
       news_filter_marketwatch: MarketWatch
+      news_filter_fed: Fed
       news_placeholder_title: News feed is temporarily unavailable
       news_placeholder_body: No usable RSS items were returned right now. Please try refreshing again later.
       news_placeholder_filtered_body: No items are available for the selected source right now. Try another source or refresh later.
@@ -51,7 +53,7 @@ en:
       title: Market News
       news_label: Market news
       news_title: Daily market news
-      news_description: Currently combines CNBC intraday market coverage, Seeking Alpha event-driven news, SEC releases, and multiple MarketWatch RSS streams in a dedicated news tab alongside the heatmap.
+      news_description: Currently combines CNBC intraday market coverage, Seeking Alpha event-driven news, SEC releases, Bloomberg markets coverage, multiple MarketWatch RSS streams, and key Federal Reserve updates in a dedicated news tab alongside the heatmap.
       summary_feed_label: Feed
       summary_items_label: Items
       news_count: "%{count} articles"
@@ -59,7 +61,9 @@ en:
       news_filter_cnbc: CNBC
       news_filter_seeking_alpha: Seeking Alpha
       news_filter_sec: SEC
+      news_filter_bloomberg: Bloomberg
       news_filter_marketwatch: MarketWatch
+      news_filter_fed: Fed
       news_placeholder_title: News feed is temporarily unavailable
       news_placeholder_body: No usable RSS items were returned right now. Please try refreshing again later.
       news_placeholder_filtered_body: No items are available for the selected source right now. Try another source or refresh later.

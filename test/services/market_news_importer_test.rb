@@ -53,4 +53,14 @@ class MarketNewsImporterTest < ActiveSupport::TestCase
     assert_includes urls, "https://feeds.content.dowjones.io/public/rss/mw_marketpulse"
     assert_includes urls, "https://feeds.content.dowjones.io/public/rss/mw_bulletins"
   end
+
+  test "feed list includes bloomberg and fed sources" do
+    bloomberg_urls = MarketNewsFeed::FEEDS.select { |feed| feed[:source] == "Bloomberg" }.map { |feed| feed[:url] }
+    fed_urls = MarketNewsFeed::FEEDS.select { |feed| feed[:source] == "Fed" }.map { |feed| feed[:url] }
+
+    assert_includes bloomberg_urls, "https://feeds.bloomberg.com/markets/news.rss"
+    assert_includes fed_urls, "https://www.federalreserve.gov/feeds/press_monetary.xml"
+    assert_includes fed_urls, "https://www.federalreserve.gov/feeds/speeches.xml"
+    assert_includes fed_urls, "https://www.federalreserve.gov/feeds/press_all.xml"
+  end
 end

@@ -419,15 +419,19 @@ class MarketsController < ApplicationController
         items.select { |item| item.source == "Seeking Alpha" }
       when "sec"
         items.select { |item| item.source == "SEC" }
+      when "bloomberg"
+        items.select { |item| item.source == "Bloomberg" }
       when "marketwatch"
         items.select { |item| item.source == "MarketWatch" }
+      when "fed"
+        items.select { |item| item.source == "Fed" }
       else
         items
       end
     end
 
     def load_market_news
-      @market_news_source = params[:news_source].presence_in(%w[all cnbc seeking_alpha sec marketwatch]) || "all"
+      @market_news_source = params[:news_source].presence_in(%w[all cnbc seeking_alpha sec bloomberg marketwatch fed]) || "all"
       MarketNewsArticle.refresh_if_stale!
       @market_news = filter_market_news(MarketNewsArticle.latest_feed, @market_news_source)
     end

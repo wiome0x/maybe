@@ -136,6 +136,56 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "MarketWatch headline"
   end
 
+  test "should filter stocks news by bloomberg source" do
+    MarketNewsArticle.delete_all
+    MarketNewsArticle.create!(
+      source: "Bloomberg",
+      title: "Bloomberg markets headline",
+      url: "https://www.bloomberg.com/example",
+      published_at: Time.utc(2026, 4, 25, 6, 0, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.create!(
+      source: "Fed",
+      title: "Fed policy headline",
+      url: "https://www.federalreserve.gov/example",
+      published_at: Time.utc(2026, 4, 25, 5, 30, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.stubs(:refresh_if_stale!)
+
+    get market_stocks_news_path(news_source: "bloomberg")
+
+    assert_response :success
+    assert_includes response.body, "Bloomberg markets headline"
+    assert_not_includes response.body, "Fed policy headline"
+  end
+
+  test "should filter stocks news by fed source" do
+    MarketNewsArticle.delete_all
+    MarketNewsArticle.create!(
+      source: "Bloomberg",
+      title: "Bloomberg markets headline",
+      url: "https://www.bloomberg.com/example",
+      published_at: Time.utc(2026, 4, 25, 6, 0, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.create!(
+      source: "Fed",
+      title: "Fed policy headline",
+      url: "https://www.federalreserve.gov/example",
+      published_at: Time.utc(2026, 4, 25, 5, 30, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.stubs(:refresh_if_stale!)
+
+    get market_stocks_news_path(news_source: "fed")
+
+    assert_response :success
+    assert_includes response.body, "Fed policy headline"
+    assert_not_includes response.body, "Bloomberg markets headline"
+  end
+
   test "should return index quotes from stooq fallback when yahoo is unavailable" do
     MarketsController.any_instance.stubs(:fetch_indices_quotes_from_yahoo).returns({})
     MarketsController.any_instance.stubs(:fetch_indices_quotes_from_eastmoney).returns({})

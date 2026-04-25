@@ -19,6 +19,10 @@ class MarketNewsFeed
       url: "https://www.sec.gov/news/pressreleases.rss"
     },
     {
+      source: "Bloomberg",
+      url: "https://feeds.bloomberg.com/markets/news.rss"
+    },
+    {
       source: "MarketWatch",
       url: "https://feeds.content.dowjones.io/public/rss/mw_topstories"
     },
@@ -33,6 +37,18 @@ class MarketNewsFeed
     {
       source: "MarketWatch",
       url: "https://feeds.content.dowjones.io/public/rss/mw_bulletins"
+    },
+    {
+      source: "Fed",
+      url: "https://www.federalreserve.gov/feeds/press_monetary.xml"
+    },
+    {
+      source: "Fed",
+      url: "https://www.federalreserve.gov/feeds/speeches.xml"
+    },
+    {
+      source: "Fed",
+      url: "https://www.federalreserve.gov/feeds/press_all.xml"
     }
   ].freeze
 

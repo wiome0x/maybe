@@ -37,12 +37,14 @@ zh-CN:
       change: 涨跌幅
       news_label: 市场消息
       news_title: 每日消息面
-      news_description: 当前聚合 CNBC 盘中市场流、Seeking Alpha 事件快讯、SEC 公告，以及多条 MarketWatch RSS 流，作为热力图旁边的快速参考。
+      news_description: 当前聚合 CNBC 盘中市场流、Seeking Alpha 事件快讯、SEC 公告、Bloomberg 市场新闻、多条 MarketWatch RSS 流，以及美联储关键更新，作为热力图旁边的快速参考。
       news_filter_all: 全部
       news_filter_cnbc: CNBC
       news_filter_seeking_alpha: Seeking Alpha
       news_filter_sec: SEC
+      news_filter_bloomberg: Bloomberg
       news_filter_marketwatch: MarketWatch
+      news_filter_fed: 美联储
       news_placeholder_title: 暂时无法加载消息流
       news_placeholder_body: 当前未获取到可用 RSS 数据，可稍后刷新重试。
       news_placeholder_filtered_body: 当前筛选来源下暂无可用消息，可切换来源或稍后刷新。
@@ -51,7 +53,7 @@ zh-CN:
       title: 市场新闻
       news_label: 市场消息
       news_title: 每日消息面
-      news_description: 当前聚合 CNBC 盘中市场流、Seeking Alpha 事件快讯、SEC 公告，以及多条 MarketWatch RSS 流，作为热力图配套的独立新闻页。
+      news_description: 当前聚合 CNBC 盘中市场流、Seeking Alpha 事件快讯、SEC 公告、Bloomberg 市场新闻、多条 MarketWatch RSS 流，以及美联储关键更新，作为热力图配套的独立新闻页。
       summary_feed_label: 来源
       summary_items_label: 数量
       news_count: "%{count} 条消息"
@@ -59,7 +61,9 @@ zh-CN:
       news_filter_cnbc: CNBC
       news_filter_seeking_alpha: Seeking Alpha
       news_filter_sec: SEC
+      news_filter_bloomberg: Bloomberg
       news_filter_marketwatch: MarketWatch
+      news_filter_fed: 美联储
       news_placeholder_title: 暂时无法加载消息流
       news_placeholder_body: 当前未获取到可用 RSS 数据，可稍后刷新重试。
       news_placeholder_filtered_body: 当前筛选来源下暂无可用消息，可切换来源或稍后刷新。

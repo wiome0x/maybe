@@ -33,9 +33,19 @@
       variant: @market_news_source == "sec" ? "primary" : "ghost"
     ) %>
     <%= render DS::Link.new(
+      text: t(".news_filter_bloomberg"),
+      href: market_stocks_news_path(news_source: "bloomberg"),
+      variant: @market_news_source == "bloomberg" ? "primary" : "ghost"
+    ) %>
+    <%= render DS::Link.new(
       text: t(".news_filter_marketwatch"),
       href: market_stocks_news_path(news_source: "marketwatch"),
       variant: @market_news_source == "marketwatch" ? "primary" : "ghost"
+    ) %>
+    <%= render DS::Link.new(
+      text: t(".news_filter_fed"),
+      href: market_stocks_news_path(news_source: "fed"),
+      variant: @market_news_source == "fed" ? "primary" : "ghost"
     ) %>
   </nav>
 
@@ -64,6 +74,16 @@
               {
                 badge: "border-[#fecaca] bg-[#fef2f2] text-[#b91c1c]",
                 accent: "bg-[#dc2626]"
+              }
+            when "Bloomberg"
+              {
+                badge: "border-[#fde68a] bg-[#fffbeb] text-[#b45309]",
+                accent: "bg-[#f59e0b]"
+              }
+            when "Fed"
+              {
+                badge: "border-[#c7d2fe] bg-[#eef2ff] text-[#3730a3]",
+                accent: "bg-[#4338ca]"
               }
             else
               {
