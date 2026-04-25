@@ -25,18 +25,18 @@ class BarkNotificationDispatcherTest < ActiveSupport::TestCase
     user.create_bark_notification_subscription!(
       enabled: true,
       device_key: "abc123",
-      push_categories: [ "market_news" ],
+      push_categories: [ "weekly_report" ],
       delivery_frequency: "realtime",
       timezone: "Asia/Shanghai"
     )
 
     BarkNotificationScheduler.enqueue!(
       user: user,
-      category: "market_news",
-      title: "Fed signals pause",
-      body: "Fed officials kept rates unchanged",
-      target_url: "https://example.com/fed",
-      source_key: "market_news:fed-pause",
+      category: "weekly_report",
+      title: "Weekly report ready",
+      body: "Your weekly report is ready",
+      target_url: "https://example.com/reports/weekly",
+      source_key: "weekly_report:2026-04-25",
       occurred_at: Time.utc(2026, 4, 25, 2, 0, 0)
     )
 
@@ -44,7 +44,7 @@ class BarkNotificationDispatcherTest < ActiveSupport::TestCase
 
     assert_equal 1, dispatched
     assert_equal 1, FakeNotifier.deliveries.size
-    assert_equal "Fed signals pause", FakeNotifier.deliveries.first[:title]
+    assert_equal "Weekly report ready", FakeNotifier.deliveries.first[:title]
     assert_equal "sent", BarkNotification.first.status
   end
 
@@ -88,7 +88,7 @@ class BarkNotificationDispatcherTest < ActiveSupport::TestCase
     user.create_bark_notification_subscription!(
       enabled: true,
       device_key: "abc123",
-      push_categories: [ "market_news" ],
+      push_categories: [ "weekly_report" ],
       delivery_frequency: "hourly_digest",
       timezone: "Asia/Shanghai"
     )
@@ -96,18 +96,18 @@ class BarkNotificationDispatcherTest < ActiveSupport::TestCase
     occurred_at = Time.utc(2026, 4, 25, 1, 20, 0)
     BarkNotificationScheduler.enqueue!(
       user: user,
-      category: "market_news",
-      title: "First headline",
+      category: "weekly_report",
+      title: "First report update",
       body: "First body",
-      source_key: "market_news:first",
+      source_key: "weekly_report:first",
       occurred_at: occurred_at
     )
     BarkNotificationScheduler.enqueue!(
       user: user,
-      category: "market_news",
-      title: "Second headline",
+      category: "weekly_report",
+      title: "Second report update",
       body: "Second body",
-      source_key: "market_news:second",
+      source_key: "weekly_report:second",
       occurred_at: occurred_at + 5.minutes
     )
 
@@ -115,8 +115,8 @@ class BarkNotificationDispatcherTest < ActiveSupport::TestCase
 
     assert_equal 2, dispatched
     assert_equal 1, FakeNotifier.deliveries.size
-    assert_match "Market news digest (2)", FakeNotifier.deliveries.first[:title]
-    assert_match "1. First headline", FakeNotifier.deliveries.first[:body]
-    assert_match "2. Second headline", FakeNotifier.deliveries.first[:body]
+    assert_match "Weekly report updates (2)", FakeNotifier.deliveries.first[:title]
+    assert_match "1. First report update", FakeNotifier.deliveries.first[:body]
+    assert_match "2. Second report update", FakeNotifier.deliveries.first[:body]
   end
 end
