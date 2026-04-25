@@ -105,7 +105,10 @@ class User < ApplicationRecord
   after_update_commit :purge_later, if: -> { saved_change_to_active?(from: true, to: false) }
 
   def deactivate
-    update active: false, email: deactivated_email
+    transaction do
+      revoke_access!
+      update active: false, email: deactivated_email
+    end
   end
 
   def can_deactivate
@@ -123,6 +126,21 @@ class User < ApplicationRecord
       family.destroy
     else
       destroy
+    end
+  end
+
+  def revoke_access!
+    revoked_at = Time.current
+
+    sessions.delete_all
+    api_keys.active.update_all(revoked_at: revoked_at)
+
+    mobile_devices.find_each do |device|
+      device.revoke_all_tokens!
+    end
+
+    if defined?(Doorkeeper::AccessToken)
+      Doorkeeper::AccessToken.where(resource_owner_id: id, revoked_at: nil).update_all(revoked_at: revoked_at)
     end
   end
 

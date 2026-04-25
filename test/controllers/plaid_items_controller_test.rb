@@ -4,6 +4,8 @@ require "ostruct"
 class PlaidItemsControllerTest < ActionDispatch::IntegrationTest
   setup do
     sign_in @user = users(:family_admin)
+    @user.setup_mfa!
+    @user.enable_mfa!
   end
 
   test "create" do
@@ -72,5 +74,33 @@ class PlaidItemsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to accounts_path
     assert_equal "Could not rebuild this connection. Please try again.", flash[:alert]
+  end
+
+  test "new requires mfa before opening plaid link" do
+    user = users(:family_member)
+    sign_in user
+
+    get new_plaid_item_url(region: "us", accountable_type: "Investment")
+
+    assert_redirected_to settings_security_path
+    assert_equal "Enable multi-factor authentication in Security settings before connecting or syncing Plaid accounts.", flash[:alert]
+  end
+
+  test "create requires mfa before linking plaid item" do
+    user = users(:family_member)
+    sign_in user
+
+    assert_no_difference "PlaidItem.count" do
+      post plaid_items_url, params: {
+        plaid_item: {
+          public_token: "public-sandbox-1234",
+          region: "us",
+          metadata: { institution: { name: "Blocked Institution" } }
+        }
+      }
+    end
+
+    assert_redirected_to settings_security_path
+    assert_equal "Enable multi-factor authentication in Security settings before connecting or syncing Plaid accounts.", flash[:alert]
   end
 end

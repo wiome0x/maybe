@@ -1,6 +1,8 @@
 ---
 zh-CN:
   plaid_items:
+    security:
+      mfa_required: 请先在安全设置中启用多因素认证，然后再连接或同步 Plaid 账户。
     create:
       success: 账户关联成功，请等待账户同步。
     destroy:

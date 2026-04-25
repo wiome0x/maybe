@@ -1,5 +1,6 @@
 class PlaidItemsController < ApplicationController
   before_action :set_plaid_item, only: %i[edit destroy sync authoritative_rebuild]
+  before_action :require_mfa_for_plaid!, except: :destroy
 
   def new
     region = params[:region] == "eu" ? :eu : :us
@@ -86,6 +87,12 @@ class PlaidItemsController < ApplicationController
   end
 
   private
+    def require_mfa_for_plaid!
+      return if Current.user.otp_required?
+
+      redirect_to settings_security_path, alert: t("plaid_items.security.mfa_required")
+    end
+
     def set_plaid_item
       @plaid_item = Current.family.plaid_items.find(params[:id])
     end

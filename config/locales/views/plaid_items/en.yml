@@ -1,6 +1,8 @@
 ---
 en:
   plaid_items:
+    security:
+      mfa_required: Enable multi-factor authentication in Security settings before connecting or syncing Plaid accounts.
     create:
       success: Account linked successfully.  Please wait for accounts to sync.
     destroy:

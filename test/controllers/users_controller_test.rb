@@ -78,6 +78,44 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_enqueued_with(job: UserPurgeJob, args: [ @member ])
   end
 
+  test "deactivate revokes sessions api keys and oauth tokens" do
+    sign_in @member = users(:family_member)
+
+    @member.api_keys.create!(
+      name: "Mobile API Key",
+      key: "member_active_key_123",
+      scopes: [ "read_write" ],
+      source: "web"
+    )
+
+    device = @member.mobile_devices.create!(
+      device_id: "device-123",
+      device_name: "iPhone",
+      device_type: "ios",
+      os_version: "18.0",
+      app_version: "1.0.0"
+    )
+    oauth_app = device.create_oauth_application!
+    access_token = Doorkeeper::AccessToken.create!(
+      application: oauth_app,
+      resource_owner_id: @member.id,
+      expires_in: 30.days.to_i,
+      scopes: "read_write",
+      use_refresh_token: true
+    )
+
+    assert @member.sessions.any?
+    assert @member.api_keys.active.any?
+    assert_nil access_token.reload.revoked_at
+
+    delete user_url(@member)
+
+    assert_redirected_to root_url
+    assert_equal 0, @member.sessions.reload.count
+    assert_equal 0, @member.api_keys.active.count
+    assert access_token.reload.revoked_at.present?
+  end
+
   test "admin prevented from deactivating when other users are present" do
     sign_in @admin = users(:family_admin)
     delete user_url(users(:family_member))

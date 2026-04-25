@@ -52,7 +52,10 @@ zh-CN:
         close: 关闭
       method_selector:
         connected_entry: 关联账户
+        connected_entry_locked: 启用 MFA 后关联账户
         connected_entry_eu: 关联欧洲账户
+        connected_entry_eu_locked: 启用 MFA 后关联欧洲账户
+        connected_entry_mfa_required: 连接金融机构前，请先在安全设置中启用多因素认证。
         manual_entry: 手动输入余额
         title: 您想如何添加？
       title: 您想添加什么？
