@@ -140,9 +140,8 @@ class PlaidAccount::Investments::HoldingsProcessorTest < ActiveSupport::TestCase
     processor = PlaidAccount::Investments::HoldingsProcessor.new(@plaid_account, security_resolver: @security_resolver)
     processor.process
 
-    # Should have created 3 new holdings + 1 zero-quantity holding for AAPL at snapshot_date
-    # (AAPL's institution_price_as_of is yesterday, but snapshot_date is today due to MSFT's current date)
-    assert_equal 4, account.holdings.count
+    # Should have created 3 new holdings (stale AAPL holding deleted, no zero holdings needed)
+    assert_equal 3, account.holdings.count
 
     # Scenario 3: Should have deleted the stale AAPL holding
     assert_not account.holdings.exists?(stale_aapl_holding.id)

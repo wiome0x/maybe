@@ -68,12 +68,12 @@ class PlaidAccount::Investments::HoldingsProcessor
     end
 
     def upsert_zero_quantity_holdings_for_absent_securities(snapshot_date:, processed_holding_keys:)
-      processed_key_map = processed_holding_keys.each_with_object({}) do |key, memo|
-        memo[key] = true
-      end
+      # Build a set of [security_id, currency] pairs that were processed in this sync
+      processed_security_currencies = processed_holding_keys.map { |key| [ key[0], key[2] ] }.to_set
 
       latest_holdings_by_security_currency.each do |existing_holding|
-        next if processed_key_map[[ existing_holding.security_id, snapshot_date, existing_holding.currency ]]
+        # Skip if this security/currency was already processed in this sync
+        next if processed_security_currencies.include?([ existing_holding.security_id, existing_holding.currency ])
 
         zero_holding = account.holdings.find_or_initialize_by(
           security: existing_holding.security,
