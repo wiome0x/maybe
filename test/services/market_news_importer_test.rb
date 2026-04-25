@@ -84,17 +84,21 @@ class MarketNewsImporterTest < ActiveSupport::TestCase
     feed.expects(:fetch).with(force_refresh: true).returns(items)
     translator.expects(:translate_items).with(items, locale: :"zh-CN").returns(translated_items)
 
-    assert_difference -> { BarkNotification.count }, 1 do
+    assert_difference -> { BarkNotification.count }, 2 do
       MarketNewsImporter.new(feed: feed, translator: translator, now: now).import
     end
 
-    notification = BarkNotification.order(:created_at).last
-    assert_equal user, notification.user
-    assert_equal "market_news", notification.category
-    assert_equal "Market news summary (2)", notification.title
-    assert_equal "https://example.com/markets/stocks/news", notification.target_url
-    assert_match "1. 美债走高", notification.body
-    assert_match "2. 鲍威尔谈通胀", notification.body
+    notifications = BarkNotification.order(:created_at).to_a
+
+    assert_equal [ user, user ], notifications.map(&:user)
+    assert_equal [ "market_news", "market_news" ], notifications.map(&:category)
+    assert_equal [ "美债走高", "鲍威尔谈通胀" ], notifications.map(&:title)
+    assert_equal "https://example.com/markets/stocks/news", notifications.first.target_url
+    assert_equal "Bloomberg: 美债走高", notifications.first.body
+    assert_equal "Fed: 鲍威尔谈通胀", notifications.second.body
+    assert_equal Time.utc(2026, 4, 26, 0, 0, 0), notifications.first.scheduled_for
+    assert_equal Time.utc(2026, 4, 26, 0, 0, 0), notifications.second.scheduled_for
+    assert_equal notifications.first.batch_key, notifications.second.batch_key
   end
 
   test "marketwatch feed list includes realtime and bulletin streams" do

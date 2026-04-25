@@ -9,7 +9,7 @@ class BarkNotificationScheduler
       title:,
       body:,
       target_url: target_url,
-      scheduled_for: subscription.scheduled_for(occurred_at: occurred_at),
+      scheduled_for: subscription.scheduled_for_category(category: category, occurred_at: occurred_at),
       batch_key: subscription.batch_key_for(category:, source_key:, occurred_at: occurred_at),
       payload:
     ).find_or_create_by!(

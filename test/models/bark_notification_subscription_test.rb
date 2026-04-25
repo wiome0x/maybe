@@ -36,4 +36,18 @@ class BarkNotificationSubscriptionTest < ActiveSupport::TestCase
 
     assert_equal Time.utc(2026, 4, 26, 0, 0, 0), subscription.scheduled_for(occurred_at: occurred_at)
   end
+
+  test "forces market news into daily digest scheduling" do
+    subscription = users(:family_admin).build_bark_notification_subscription(
+      timezone: "Asia/Shanghai",
+      delivery_frequency: "realtime",
+      digest_hour: 8
+    )
+
+    occurred_at = Time.utc(2026, 4, 25, 1, 30, 0)
+
+    assert_equal "daily_digest", subscription.delivery_frequency_for("market_news")
+    assert_equal Time.utc(2026, 4, 26, 0, 0, 0), subscription.scheduled_for_category(category: "market_news", occurred_at: occurred_at)
+    assert_equal "realtime", subscription.delivery_frequency_for("weekly_report")
+  end
 end

@@ -23,11 +23,21 @@ class BarkNotificationSubscription < ApplicationRecord
     push_categories.include?(category.to_s)
   end
 
+  def delivery_frequency_for(category)
+    return "daily_digest" if category.to_s == "market_news"
+
+    delivery_frequency
+  end
+
   def scheduled_for(occurred_at: Time.current)
+    scheduled_for_category(category: nil, occurred_at: occurred_at)
+  end
+
+  def scheduled_for_category(category:, occurred_at: Time.current)
     local_time = occurred_at.in_time_zone(timezone)
 
     scheduled_local =
-      case delivery_frequency
+      case delivery_frequency_for(category)
       when "realtime"
         local_time
       when "hourly_digest"
@@ -43,9 +53,9 @@ class BarkNotificationSubscription < ApplicationRecord
   end
 
   def batch_key_for(category:, source_key:, occurred_at: Time.current)
-    return source_key if delivery_frequency == "realtime"
+    return source_key if delivery_frequency_for(category) == "realtime"
 
-    "#{category}:#{scheduled_for(occurred_at: occurred_at).iso8601}"
+    "#{category}:#{scheduled_for_category(category: category, occurred_at: occurred_at).iso8601}"
   end
 
   private

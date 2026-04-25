@@ -31,7 +31,9 @@ class BarkNotificationDispatcher
 
     def render_payload_for(subscription, notifications)
       notification = notifications.first
-      return [ notification.title, notification.body, notification.target_url ] if subscription.delivery_frequency == "realtime" && notifications.one?
+      if subscription.delivery_frequency_for(notification.category) == "realtime" && notifications.one?
+        return [ notification.title, notification.body, notification.target_url ]
+      end
 
       category = notification.category
       title = digest_title(category, notifications.count)

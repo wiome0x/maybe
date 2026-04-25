@@ -1,6 +1,4 @@
 class MarketNewsImporter
-  require "digest"
-
   def initialize(feed: MarketNewsFeed, translator: MarketNewsTranslator, now: Time.current)
     @feed = feed
     @translator = translator
@@ -45,37 +43,24 @@ class MarketNewsImporter
         next unless subscription.configured?
         next unless subscription.wants_category?("market_news")
 
-        summary_items = items.first(5)
-        body = summary_items.map.with_index(1) do |item, index|
+        items.each do |item|
           headline = item.translated_title.presence || item.title
-          "#{index}. #{headline}"
-        end.join("\n")
-        body = "#{body}\n+#{items.count - 5} more" if items.count > 5
 
-        title =
-          if items.one?
-            summary_items.first.translated_title.presence || summary_items.first.title
-          else
-            "Market news summary (#{items.count})"
-          end
-
-        occurred_at = items.map(&:published_at).compact.max || now
-        source_key = "market_news_summary:#{Digest::SHA256.hexdigest(items.map(&:url).sort.join('|'))}"
-
-        BarkNotificationScheduler.enqueue!(
-          user: subscription.user,
-          category: "market_news",
-          title: title,
-          body: body,
-          target_url: AppUrlBuilder.url_for(Rails.application.routes.url_helpers.market_stocks_news_path),
-          source_key: source_key,
-          occurred_at: occurred_at,
-          payload: {
-            article_count: items.count,
-            sources: items.map(&:source).uniq,
-            published_at: occurred_at&.iso8601
-          }
-        )
+          BarkNotificationScheduler.enqueue!(
+            user: subscription.user,
+            category: "market_news",
+            title: headline,
+            body: "#{item.source}: #{headline}",
+            target_url: AppUrlBuilder.url_for(Rails.application.routes.url_helpers.market_stocks_news_path),
+            source_key: "market_news_article:#{item.url}",
+            occurred_at: item.published_at || now,
+            payload: {
+              source: item.source,
+              article_url: item.url,
+              published_at: item.published_at&.iso8601
+            }
+          )
+        end
       end
     end
 end

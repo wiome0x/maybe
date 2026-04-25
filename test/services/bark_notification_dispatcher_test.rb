@@ -48,6 +48,41 @@ class BarkNotificationDispatcherTest < ActiveSupport::TestCase
     assert_equal "sent", BarkNotification.first.status
   end
 
+  test "market news stays queued until daily digest time even for realtime subscriptions" do
+    user = users(:family_admin)
+    user.create_bark_notification_subscription!(
+      enabled: true,
+      device_key: "abc123",
+      push_categories: [ "market_news" ],
+      delivery_frequency: "realtime",
+      digest_hour: 8,
+      timezone: "Asia/Shanghai"
+    )
+
+    BarkNotificationScheduler.enqueue!(
+      user: user,
+      category: "market_news",
+      title: "Fed signals pause",
+      body: "Fed officials kept rates unchanged",
+      target_url: "https://example.com/fed",
+      source_key: "market_news:fed-pause",
+      occurred_at: Time.utc(2026, 4, 25, 2, 0, 0)
+    )
+
+    dispatched = BarkNotificationDispatcher.new(now: Time.utc(2026, 4, 25, 2, 5, 0), notifier_class: FakeNotifier).dispatch_due
+
+    assert_equal 0, dispatched
+    assert_empty FakeNotifier.deliveries
+    assert_equal "pending", BarkNotification.first.status
+
+    dispatched = BarkNotificationDispatcher.new(now: Time.utc(2026, 4, 26, 0, 0, 0), notifier_class: FakeNotifier).dispatch_due
+
+    assert_equal 1, dispatched
+    assert_equal 1, FakeNotifier.deliveries.size
+    assert_equal "Market news digest (1)", FakeNotifier.deliveries.first[:title]
+    assert_equal "sent", BarkNotification.first.reload.status
+  end
+
   test "groups hourly digest notifications into one bark push" do
     user = users(:family_admin)
     user.create_bark_notification_subscription!(
