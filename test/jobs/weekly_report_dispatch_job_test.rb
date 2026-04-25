@@ -77,5 +77,6 @@ class WeeklyReportDispatchJobTest < ActiveJob::TestCase
     notification = BarkNotification.order(:created_at).last
     assert_equal "weekly_report", notification.category
     assert_match "Weekly report ready", notification.title
+    assert_equal "https://example.com/settings/weekly_reports/#{WeeklyReport.order(:created_at).last.id}", notification.target_url
   end
 end

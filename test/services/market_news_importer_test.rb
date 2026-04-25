@@ -67,9 +67,19 @@ class MarketNewsImporterTest < ActiveSupport::TestCase
         url: "https://www.bloomberg.com/example",
         published_at: Time.utc(2026, 4, 25, 8, 0, 0),
         translated_title: nil
+      ),
+      MarketNewsFeed::Item.new(
+        source: "Fed",
+        title: "Powell comments on inflation",
+        url: "https://www.federalreserve.gov/example",
+        published_at: Time.utc(2026, 4, 25, 8, 10, 0),
+        translated_title: nil
       )
     ]
-    translated_items = [ items.first.with(translated_title: "美债走高") ]
+    translated_items = [
+      items.first.with(translated_title: "美债走高"),
+      items.second.with(translated_title: "鲍威尔谈通胀")
+    ]
 
     feed.expects(:fetch).with(force_refresh: true).returns(items)
     translator.expects(:translate_items).with(items, locale: :"zh-CN").returns(translated_items)
@@ -81,7 +91,10 @@ class MarketNewsImporterTest < ActiveSupport::TestCase
     notification = BarkNotification.order(:created_at).last
     assert_equal user, notification.user
     assert_equal "market_news", notification.category
-    assert_equal "美债走高", notification.title
+    assert_equal "Market news summary (2)", notification.title
+    assert_equal "https://example.com/markets/stocks/news", notification.target_url
+    assert_match "1. 美债走高", notification.body
+    assert_match "2. 鲍威尔谈通胀", notification.body
   end
 
   test "marketwatch feed list includes realtime and bulletin streams" do

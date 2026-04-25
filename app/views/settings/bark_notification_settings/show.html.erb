@@ -49,11 +49,24 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-3 md:flex-row md:justify-end">
+    <div class="flex justify-end">
       <%= render DS::Button.new(text: t(".save"), class: "md:w-auto w-full justify-center") %>
-      <% if @subscription.persisted? %>
-        <%= button_to t(".send_test"), test_settings_bark_notification_path, method: :post, class: "inline-flex items-center justify-center rounded-xl border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-container md:w-auto w-full" %>
-      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<% if @subscription.persisted? %>
+  <%= settings_section title: t(".test_title"), subtitle: t(".test_subtitle") do %>
+    <div class="rounded-xl bg-container-inset p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div class="space-y-1">
+        <p class="text-sm font-medium text-primary"><%= t(".send_test") %></p>
+        <p class="text-sm text-secondary"><%= t(".send_test_hint") %></p>
+      </div>
+
+      <%= button_to t(".send_test"),
+          test_settings_bark_notification_path,
+          method: :post,
+          class: "inline-flex items-center justify-center rounded-xl border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-container md:w-auto w-full" %>
     </div>
   <% end %>
 <% end %>

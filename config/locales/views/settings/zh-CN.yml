@@ -156,6 +156,8 @@ zh-CN:
         page_title: Bark 推送
         subscription_title: Bark 消息推送
         subscription_subtitle: 把市场新闻和周报等更新通过 Bark 推送到你的 iPhone。
+        test_title: 测试发送
+        test_subtitle: 立即发一条测试消息，用来确认 Bark key 和手机通知链路都正常。
         enabled_label: 启用 Bark 推送
         enabled_hint: Maybe 会按你的配置收集可推送内容，并通过 Bark 发送到设备。
         server_url: Bark 服务地址
@@ -170,6 +172,7 @@ zh-CN:
         categories_hint: 选择哪些类型的更新需要通过 Bark 推送。
         save: 保存
         send_test: 发送测试消息
+        send_test_hint: 这条测试消息会立即发送，不会等待你设置的推送频率。
         categories:
           market_news: 市场新闻
           weekly_report: 周报更新

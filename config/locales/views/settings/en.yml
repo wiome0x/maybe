@@ -159,6 +159,8 @@ en:
         page_title: Bark push
         subscription_title: Bark push notifications
         subscription_subtitle: Deliver market news and report updates to your iPhone through Bark.
+        test_title: Test delivery
+        test_subtitle: Verify your Bark device key and phone notification path with an immediate push.
         enabled_label: Enable Bark push
         enabled_hint: Maybe will queue eligible updates and send them using your Bark configuration.
         server_url: Bark server URL
@@ -173,6 +175,7 @@ en:
         categories_hint: Choose which types of updates should be routed through Bark.
         save: Save
         send_test: Send test push
+        send_test_hint: This test message sends immediately and does not wait for your selected frequency.
         categories:
           market_news: Market news
           weekly_report: Weekly report

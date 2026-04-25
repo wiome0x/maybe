@@ -58,20 +58,13 @@ class WeeklyReportDispatchJob < ApplicationJob
 
     def enqueue_bark_notification(user, weekly_report)
       report_path = Rails.application.routes.url_helpers.settings_weekly_report_delivery_path(weekly_report)
-      mailer_options = Rails.application.config.action_mailer.default_url_options || {}
-      target_url =
-        if mailer_options[:host].present?
-          "#{mailer_options[:protocol] || 'http'}://#{mailer_options[:host]}#{report_path}"
-        else
-          report_path
-        end
 
       BarkNotificationScheduler.enqueue!(
         user: user,
         category: "weekly_report",
         title: "Weekly report ready",
         body: "#{weekly_report.period_start_date} - #{weekly_report.period_end_date}",
-        target_url: target_url,
+        target_url: AppUrlBuilder.url_for(report_path),
         source_key: "weekly_report:#{weekly_report.id}",
         occurred_at: weekly_report.sent_at || Time.current,
         payload: {

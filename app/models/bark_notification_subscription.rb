@@ -59,12 +59,39 @@ class BarkNotificationSubscription < ApplicationRecord
     end
 
     def normalize_fields
+      parse_bark_url_fields
+
       self.server_url = server_url.to_s.strip.chomp("/")
       self.device_key = device_key.to_s.strip.presence
       self.group_name = group_name.to_s.strip.presence
       self.sound = sound.to_s.strip.presence
       self.icon = icon.to_s.strip.presence
       self.push_categories = Array(push_categories).reject(&:blank?).uniq
+    end
+
+    def parse_bark_url_fields
+      parsed = parse_bark_url(device_key) || parse_bark_url(server_url)
+      return unless parsed
+
+      self.server_url = parsed[:server_url]
+      self.device_key = parsed[:device_key]
+    end
+
+    def parse_bark_url(value)
+      raw = value.to_s.strip
+      return nil if raw.blank?
+      return nil unless raw.match?(URI::DEFAULT_PARSER.make_regexp(%w[http https]))
+
+      uri = URI.parse(raw)
+      segments = uri.path.to_s.split("/").reject(&:blank?)
+      return nil if uri.host.blank? || segments.empty?
+
+      {
+        server_url: "#{uri.scheme}://#{uri.host}#{":#{uri.port}" if uri.port && uri.port != uri.default_port}",
+        device_key: segments.first
+      }
+    rescue URI::InvalidURIError
+      nil
     end
 
     def push_categories_supported
