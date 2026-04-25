@@ -26,6 +26,6 @@ class Family::Syncer
 
   private
     def child_syncables
-      family.plaid_items.active + family.accounts.manual.visible
+      family.plaid_items.active + family.accounts.manual.visible.map { |account| account.broker_connection || account }
     end
 end

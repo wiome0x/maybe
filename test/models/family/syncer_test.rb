@@ -8,15 +8,21 @@ class Family::SyncerTest < ActiveSupport::TestCase
   test "syncs plaid items and manual accounts" do
     family_sync = syncs(:family)
 
-    manual_accounts_count = @family.accounts.manual.count
     items_count = @family.plaid_items.count
+    broker_backed_accounts = @family.accounts.manual.visible.select(&:broker_connection)
+    direct_manual_accounts = @family.accounts.manual.visible.reject(&:broker_connection)
 
     syncer = Family::Syncer.new(@family)
 
     Account.any_instance
            .expects(:sync_later)
            .with(parent_sync: family_sync, window_start_date: nil, window_end_date: nil)
-           .times(manual_accounts_count)
+           .times(direct_manual_accounts.count)
+
+    BrokerConnection.any_instance
+                    .expects(:sync_later)
+                    .with(parent_sync: family_sync, window_start_date: nil, window_end_date: nil)
+                    .times(broker_backed_accounts.count)
 
     PlaidItem.any_instance
              .expects(:sync_later)

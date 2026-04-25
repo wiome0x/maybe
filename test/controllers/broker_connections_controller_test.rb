@@ -27,6 +27,7 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
     )
 
     Provider::Binance.any_instance.expects(:validate_credentials!).once
+    BrokerConnection.any_instance.expects(:sync_later).once
 
     assert_difference "BrokerConnection.count", 1 do
       post broker_connections_url, params: {
@@ -54,6 +55,7 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
     )
 
     Provider::Binance.any_instance.expects(:validate_credentials!).once
+    BrokerConnection.any_instance.expects(:sync_later).once
 
     post broker_connections_url, params: {
       return_to: accounts_path,
@@ -120,6 +122,7 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
       expires_in: 3600,
       broker_account_id: "schwab-acct-001"
     })
+    BrokerConnection.any_instance.expects(:sync_later).once
 
     assert_difference "BrokerConnection.count", 1 do
       get auth_schwab_callback_url, params: { code: "auth_code_123", state: fresh_account.id }
@@ -148,6 +151,7 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
       expires_in: 3600,
       broker_account_id: "schwab-acct-001"
     })
+    BrokerConnection.any_instance.expects(:sync_later).once
 
     get auth_schwab_callback_url, params: { code: "auth_code_123", state: state }
 

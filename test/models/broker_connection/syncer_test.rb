@@ -18,8 +18,8 @@ class BrokerConnection::SyncerTest < ActiveSupport::TestCase
     trade_data = []
 
     mock_provider = mock("provider")
-    mock_provider.stubs(:fetch_account_data).returns(OpenStruct.new(data: account_data))
-    mock_provider.stubs(:fetch_trade_history).returns(OpenStruct.new(data: trade_data))
+    mock_provider.stubs(:fetch_account_data).returns(OpenStruct.new(success?: true, data: account_data, error: nil))
+    mock_provider.stubs(:fetch_trade_history).returns(OpenStruct.new(success?: true, data: trade_data, error: nil))
 
     @syncer.stubs(:build_provider).returns(mock_provider)
     @broker_connection.account.stubs(:sync_later)
@@ -32,8 +32,8 @@ class BrokerConnection::SyncerTest < ActiveSupport::TestCase
 
   test "successful sync triggers account.sync_later" do
     mock_provider = mock("provider")
-    mock_provider.stubs(:fetch_account_data).returns(OpenStruct.new(data: {}))
-    mock_provider.stubs(:fetch_trade_history).returns(OpenStruct.new(data: []))
+    mock_provider.stubs(:fetch_account_data).returns(OpenStruct.new(success?: true, data: {}, error: nil))
+    mock_provider.stubs(:fetch_trade_history).returns(OpenStruct.new(success?: true, data: [], error: nil))
 
     @syncer.stubs(:build_provider).returns(mock_provider)
     @broker_connection.stubs(:upsert_account_snapshot!)
@@ -52,7 +52,8 @@ class BrokerConnection::SyncerTest < ActiveSupport::TestCase
     auth_error = Provider::Error.new("Binance auth error: invalid API key")
 
     mock_provider = mock("provider")
-    mock_provider.stubs(:fetch_account_data).raises(auth_error)
+    mock_provider.stubs(:fetch_account_data).returns(OpenStruct.new(success?: false, data: nil, error: auth_error))
+    mock_provider.stubs(:fetch_trade_history).returns(OpenStruct.new(success?: true, data: [], error: nil))
     @syncer.stubs(:build_provider).returns(mock_provider)
 
     assert_raises(Provider::Error) { @syncer.perform_sync(@sync) }
@@ -70,7 +71,8 @@ class BrokerConnection::SyncerTest < ActiveSupport::TestCase
     network_error = Provider::Error.new("Binance API error: HTTP 503 - Service Unavailable")
 
     mock_provider = mock("provider")
-    mock_provider.stubs(:fetch_account_data).raises(network_error)
+    mock_provider.stubs(:fetch_account_data).returns(OpenStruct.new(success?: false, data: nil, error: network_error))
+    mock_provider.stubs(:fetch_trade_history).returns(OpenStruct.new(success?: true, data: [], error: nil))
     @syncer.stubs(:build_provider).returns(mock_provider)
 
     assert_raises(Provider::Error) { @syncer.perform_sync(@sync) }

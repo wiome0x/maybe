@@ -28,6 +28,7 @@ class BrokerConnectionsController < ApplicationController
     )
 
     @broker_connection.save!
+    @broker_connection.sync_later
     activate_account_if_draft!(@account)
     redirect_to broker_onboarding.success_path_for(account: @account, fallback: account_path(@account)), notice: "Binance account connected successfully."
   rescue Provider::Error => e
@@ -60,6 +61,7 @@ class BrokerConnectionsController < ApplicationController
     )
 
     @broker_connection.save!
+    @broker_connection.sync_later
     activate_account_if_draft!(@account)
     redirect_to broker_onboarding.success_path_for(account: @account, fallback: account_path(@account)), notice: "Charles Schwab account connected successfully."
   rescue Provider::Error, ActiveRecord::RecordInvalid => e
@@ -116,6 +118,7 @@ class BrokerConnectionsController < ApplicationController
       )
     end
 
+    @broker_connection.sync_later
     activate_account_if_draft!(@broker_connection.account)
 
     redirect_to broker_onboarding.success_path_for(account: @broker_connection.account, fallback: account_path(@broker_connection.account)), notice: "Broker connection reauthorized successfully."

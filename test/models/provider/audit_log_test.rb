@@ -30,6 +30,8 @@ class Provider::AuditLogTest < ActiveSupport::TestCase
 
     log = ApiRequestLog.order(created_at: :desc).first
     assert_equal "success", log.request_status
+    assert_equal 200, log.response_code
+    assert_equal "/api/v3/account", log.endpoint
   end
 
   test "Binance: failed call creates exactly one ApiRequestLog record" do
@@ -88,6 +90,8 @@ class Provider::AuditLogTest < ActiveSupport::TestCase
 
     log = ApiRequestLog.order(created_at: :desc).first
     assert_equal "success", log.request_status
+    assert_equal 200, log.response_code
+    assert_equal "/accounts/acct-123/positions", log.endpoint
   end
 
   test "Schwab: failed call creates exactly one ApiRequestLog record" do

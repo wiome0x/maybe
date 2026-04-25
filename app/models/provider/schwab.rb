@@ -53,25 +53,25 @@ class Provider::Schwab < Provider
     attr_reader :access_token, :refresh_token, :broker_connection
 
     def log_api_request(status:, error_message: nil, response_time_ms: nil)
+      audit_context = @last_audit_context || {}
+
       ApiRequestLog.create!(
         provider_name: provider_name_for_audit,
-        endpoint: caller_method_name,
-        http_method: "GET",
+        endpoint: audit_context[:path] || caller_method_name,
+        http_method: audit_context[:http_method] || "GET",
         request_status: status,
+        response_code: audit_context[:response_code],
         response_time_ms: response_time_ms,
-        request_payload: redacted_payload,
-        response_payload: {},
-        error_payload: {},
+        request_payload: audit_context[:request_payload] || {},
+        response_payload: status == "success" ? (audit_context[:response_payload] || {}) : {},
+        error_payload: status == "error" ? (audit_context[:response_payload] || {}) : {},
         error_message: error_message,
         requested_at: Time.current
       )
     rescue => e
       Rails.logger.error("Failed to log API request: #{e.message}")
-    end
-
-    def redacted_payload
-      # Redact Authorization Bearer token and any OAuth credentials from audit logs
-      {}
+    ensure
+      @last_audit_context = nil
     end
 
     def broker_account_id
@@ -92,7 +92,16 @@ class Provider::Schwab < Provider
       request["Accept"] = "application/json"
 
       response = http.request(request)
-      handle_response!(response)
+      handle_response!(
+        response,
+        path: path,
+        http_method: "GET",
+        request_payload: {
+          path: path,
+          params: redact_hash(params),
+          broker_account_id: broker_account_id
+        }
+      )
     end
 
     def post(url, body: {})
@@ -110,13 +119,31 @@ class Provider::Schwab < Provider
       request.body = URI.encode_www_form(body)
 
       response = http.request(request)
-      handle_response!(response)
+      handle_response!(
+        response,
+        path: uri.path,
+        http_method: "POST",
+        request_payload: {
+          path: uri.path,
+          body: redact_hash(body),
+          broker_account_id: broker_account_id
+        }
+      )
     end
 
-    def handle_response!(response)
+    def handle_response!(response, path:, http_method:, request_payload:)
+      parsed_body = parse_json(response.body)
+      @last_audit_context = {
+        path: path,
+        http_method: http_method,
+        response_code: response.code.to_i,
+        request_payload: request_payload,
+        response_payload: redact_hash(parsed_body)
+      }
+
       case response.code.to_i
       when 200
-        JSON.parse(response.body)
+        parsed_body
       when 401
         raise Error.new("Schwab token expired: requires refresh")
       when 403
@@ -125,6 +152,27 @@ class Provider::Schwab < Provider
         raise Error.new("Schwab server error: HTTP #{response.code}")
       else
         raise Error.new("Schwab API error: HTTP #{response.code}")
+      end
+    end
+
+    def parse_json(body)
+      JSON.parse(body)
+    rescue JSON::ParserError
+      { "raw_body" => body.to_s }
+    end
+
+    def redact_hash(value)
+      case value
+      when Hash
+        value.each_with_object({}) do |(key, nested_value), acc|
+          next if key.to_s.match?(/token|authorization|secret/i)
+
+          acc[key] = redact_hash(nested_value)
+        end
+      when Array
+        value.map { |item| redact_hash(item) }
+      else
+        value
       end
     end
 end

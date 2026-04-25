@@ -28,8 +28,14 @@ class AccountsController < ApplicationController
   end
 
   def sync
-    unless @account.syncing?
-      @account.sync_later
+    syncing = @account.syncing? || @account.broker_connection&.syncing?
+
+    unless syncing
+      if @account.broker_connection.present?
+        @account.broker_connection.sync_later
+      else
+        @account.sync_later
+      end
     end
 
     redirect_to account_path(@account)

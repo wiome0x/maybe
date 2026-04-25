@@ -36,8 +36,18 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should sync account" do
+    @account.expects(:sync_later).once
     post sync_account_url(@account)
     assert_redirected_to account_url(@account)
+  end
+
+  test "should sync broker connection for broker-backed account" do
+    broker_account = accounts(:investment)
+    broker_account.broker_connection.expects(:sync_later).once
+
+    post sync_account_url(broker_account)
+
+    assert_redirected_to account_url(broker_account)
   end
 
   test "should get sparkline" do

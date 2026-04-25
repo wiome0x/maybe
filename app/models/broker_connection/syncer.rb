@@ -25,6 +25,8 @@ class BrokerConnection::Syncer
       provider = build_provider
       account_result = provider.fetch_account_data
       transactions_result = fetch_transactions(provider)
+      raise account_result.error unless account_result.success?
+      raise transactions_result.error unless transactions_result.success?
 
       broker_connection.upsert_account_snapshot!(account_result.data)
       broker_connection.upsert_transactions_snapshot!(transactions_result.data)
