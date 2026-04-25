@@ -63,8 +63,8 @@ export default class extends Controller {
     { name: "日经", symbol: "^N225", lon: 139.7, lat: 35.7, dx: 40, dy: -20, compactDx: 28, compactDy: -12, align: "left" },
     { name: "深成", symbol: "399001.SZ", lon: 114.2, lat: 22.9, dx: -44, dy: 42, compactDx: -42, compactDy: 34, align: "center" },
     { name: "印度", symbol: "^NSEI", lon: 78.0, lat: 22.6, dx: -46, dy: -6, compactDx: -34, compactDy: -8, align: "center" },
-    { name: "越南", symbol: "^VNINDEX", lon: 105.8, lat: 16.1, dx: -20, dy: 58, compactDx: -14, compactDy: 46, align: "center" },
-    { name: "澳大利亚", symbol: "^AXJO", lon: 133.8, lat: -25.3, dx: 14, dy: -70, compactDx: 8, compactDy: -58, align: "center" },
+    { name: "越南", symbol: "^VNINDEX", lon: 105.8, lat: 16.1, dx: -18, dy: 88, compactDx: -12, compactDy: 72, align: "center" },
+    { name: "澳大利亚", symbol: "^AXJO", lon: 133.8, lat: -25.3, dx: 18, dy: -34, compactDx: 12, compactDy: -24, align: "center" },
     { name: "巴西", symbol: "^BVSP", lon: -47.9, lat: -15.8, dx: -12, dy: -88, compactDx: -10, compactDy: -72, align: "center" },
   ];
 
@@ -215,15 +215,22 @@ export default class extends Controller {
   async loadMarkets() {
     try {
       const res = await fetch("/markets/indices.json");
-      if (res.ok) {
-        const data = await res.json();
-        if (data && Object.keys(data).length > 0) {
-          this.latestPriceMap = data;
-          this.renderMarkets(data);
-          return;
-        }
+      if (!res.ok) {
+        console.warn(`[global-markets] indices request failed with status ${res.status}`);
+        this.renderMarkets(this.latestPriceMap || {});
+        return;
       }
+
+      const data = await res.json();
+      if (data && Object.keys(data).length > 0) {
+        this.latestPriceMap = data;
+        this.renderMarkets(data);
+        return;
+      }
+
+      console.warn("[global-markets] indices request returned empty payload");
     } catch {
+      console.warn("[global-markets] indices request raised an exception");
       // fall through to placeholder rendering
     }
 
@@ -293,13 +300,9 @@ export default class extends Controller {
     const markers = this.MARKETS.map((market) => {
       const quote = priceMap[market.symbol];
       const pct = quote?.change_percent;
-      const price = quote?.price;
       const pctStr = pct != null
         ? `${pct >= 0 ? "+" : ""}${Number(pct).toFixed(2)}%`
         : "--";
-      const priceStr = price != null
-        ? Number(price).toLocaleString("en-US", { maximumFractionDigits: 2 })
-        : null;
 
       let color = "#6b7280";
       if (pct != null) {
@@ -321,16 +324,24 @@ export default class extends Controller {
 
       return `
         <div
-          class="absolute pointer-events-none"
+          class="absolute pointer-events-none z-10"
           style="left:${x}px; top:${y}px; transform: translate(${dx}px, ${dy}px);"
         >
-          <div class="flex flex-col gap-1 leading-none ${alignClass}">
-            <div class="px-1.5 py-1">
-              <div class="text-[clamp(11px,1.2vw,15px)] font-semibold whitespace-nowrap" style="color:${pct != null ? "#1e293b" : "#64748b"}">${market.name}</div>
-              ${priceStr ? `<div class="mt-0.5 text-[clamp(9px,0.9vw,12px)] font-medium whitespace-nowrap" style="color:#64748b">${priceStr}</div>` : ""}
-              <div class="mt-0.5 text-[clamp(12px,1.4vw,18px)] font-semibold whitespace-nowrap" style="color:${color}">${pctStr}</div>
+          <div class="flex flex-col gap-1.5 leading-none ${alignClass}">
+            <div class="px-1 py-0.5">
+              <div
+                class="text-[clamp(12px,1.35vw,17px)] font-semibold tracking-[-0.02em] whitespace-nowrap"
+                style="color:#0f172a; text-shadow: 0 1px 0 rgba(255,255,255,0.92);"
+              >${market.name}</div>
+              <div
+                class="mt-1 text-[clamp(14px,1.7vw,20px)] font-semibold whitespace-nowrap"
+                style="color:${color}; text-shadow: 0 1px 0 rgba(255,255,255,0.9), 0 0 12px rgba(255,255,255,0.28);"
+              >${pctStr}</div>
             </div>
-            <span class="h-2.5 w-2.5 rounded-full shadow-[0_0_0_3px_rgba(255,255,255,.85)]" style="background-color:${color};"></span>
+            <span
+              class="h-3 w-3 rounded-full"
+              style="background-color:${color}; box-shadow: 0 0 0 4px rgba(255,255,255,0.92), 0 10px 18px rgba(15,23,42,0.12);"
+            ></span>
           </div>
         </div>
       `;

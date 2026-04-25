@@ -1,13 +1,13 @@
 <div class="relative overflow-hidden rounded-[32px] border border-[#2b2b2b] bg-container shadow-border-xs" data-controller="global-markets">
 
   <%# 整体背景：更克制的终端面板层次 %>
-  <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#f9fbff_0%,#f3f6fb_48%,#edf1f8_100%)]"></div>
-  <div class="pointer-events-none absolute inset-0 opacity-[0.18]"
+  <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#fbfcff_0%,#f5f8fc_52%,#eef2f8_100%)]"></div>
+  <div class="pointer-events-none absolute inset-0 opacity-[0.12]"
        style="background:
          linear-gradient(90deg, rgba(191,219,254,0.18) 0%, rgba(191,219,254,0.18) 11%, rgba(255,255,255,0) 11%, rgba(255,255,255,0) 22%, rgba(191,219,254,0.12) 22%, rgba(191,219,254,0.12) 33%, rgba(255,255,255,0) 33%, rgba(255,255,255,0) 44%, rgba(191,219,254,0.10) 44%, rgba(191,219,254,0.10) 55%, rgba(255,255,255,0) 55%, rgba(255,255,255,0) 66%, rgba(191,219,254,0.08) 66%, rgba(191,219,254,0.08) 77%, rgba(255,255,255,0) 77%, rgba(255,255,255,0) 88%, rgba(191,219,254,0.10) 88%, rgba(191,219,254,0.10) 100%);
          mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.85) 16%, rgba(0,0,0,0.95) 90%, transparent 100%);">
   </div>
-  <div class="pointer-events-none absolute inset-0 opacity-[0.22]"
+  <div class="pointer-events-none absolute inset-0 opacity-[0.14]"
        style="background-image:
          linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px),
          linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px);
@@ -56,7 +56,7 @@
              style="top:var(--gm-pad-top,0px); right:var(--gm-pad-right,0px); bottom:var(--gm-pad-bottom,0px); left:var(--gm-pad-left,0px);">
           <%= image_tag "global-markets-map.svg", alt: "",
               class: "w-full h-full object-contain",
-              style: "opacity: 0.76; filter: drop-shadow(0 12px 24px rgba(148,163,184,0.05));" %>
+              style: "opacity: 0.44; filter: drop-shadow(0 10px 18px rgba(148,163,184,0.04));" %>
         </div>
         <%# 指数标注层 - 与 SVG 共享同一 inset-0 坐标系 %>
         <div class="absolute inset-0 pointer-events-none" data-global-markets-target="map"></div>

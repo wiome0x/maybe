@@ -4,6 +4,22 @@ class MarketsController < ApplicationController
   INDICES_CACHE_KEY = "markets/indices:v2".freeze
   INDICES_CACHE_TTL = 10.minutes
   MOVERS_CACHE_TTL = 10.minutes
+  STOOQ_INDEX_SYMBOLS = {
+    "^DJI" => "^dji",
+    "^IXIC" => "^ndq",
+    "^GSPC" => "^spx",
+    "^FTSE" => "^ukx",
+    "^GDAXI" => "^dax",
+    "^FCHI" => "^cac",
+    "000001.SS" => "^shc",
+    "^HSI" => "^hsi",
+    "^N225" => "^nkx"
+  }.freeze
+  EASTMONEY_INDEX_SYMBOLS = {
+    "000001.SS" => "1.000001",
+    "399001.SZ" => "0.399001",
+    "899050.BJ" => "0.899050"
+  }.freeze
 
   def stocks
     @watchlist = Current.family.watchlist_items.stocks.ordered
@@ -50,12 +66,32 @@ class MarketsController < ApplicationController
     result.merge!(fetched_quotes) if fetched_quotes.present?
 
     Rails.cache.write(INDICES_CACHE_KEY, result, expires_in: INDICES_CACHE_TTL) if fetched_quotes.present? && result.present?
+    log_indices_response(symbols: symbols, cached_result: cached_result, fetched_quotes: fetched_quotes, result: result)
 
     render json: result
   end
 
-  private
+    private
     def fetch_indices_quotes(symbols)
+      yahoo_quotes = fetch_indices_quotes_from_yahoo(symbols)
+      result = yahoo_quotes.dup
+
+      missing_symbols = symbols - result.keys
+      eastmoney_quotes = missing_symbols.empty? ? {} : fetch_indices_quotes_from_eastmoney(missing_symbols)
+      result.merge!(eastmoney_quotes)
+
+      missing_symbols = symbols - result.keys
+      nse_quotes = missing_symbols.empty? ? {} : fetch_indices_quotes_from_nse(missing_symbols)
+      result.merge!(nse_quotes)
+
+      missing_symbols = symbols - result.keys
+      stooq_quotes = missing_symbols.empty? ? {} : fetch_indices_quotes_from_stooq(missing_symbols)
+      result.merge!(stooq_quotes)
+
+      result
+    end
+
+    def fetch_indices_quotes_from_yahoo(symbols)
       uri = URI("https://query1.finance.yahoo.com/v7/finance/quote")
       uri.query = URI.encode_www_form(symbols: symbols.join(","))
 
@@ -70,14 +106,13 @@ class MarketsController < ApplicationController
 
       res = http.request(req)
       unless res.is_a?(Net::HTTPSuccess)
-        Rails.logger.warn("Indices fetch failed: HTTP #{res.code}")
+        Rails.logger.warn("[Markets::Indices] upstream request failed status=#{res.code} body=#{res.body.to_s.first(200).inspect}")
         return {}
       end
 
       data = JSON.parse(res.body)
       quotes = data.dig("quoteResponse", "result") || []
-
-      quotes.each_with_object({}) do |quote, acc|
+      quote_map = quotes.each_with_object({}) do |quote, acc|
         symbol = quote["symbol"]
         price = quote["regularMarketPrice"]
         pct = quote["regularMarketChangePercent"]
@@ -89,9 +124,201 @@ class MarketsController < ApplicationController
           change_percent: pct&.round(2)
         }
       end
+      missing_symbols = symbols - quote_map.keys
+      Rails.logger.info("[Markets::Indices] upstream success source=yahoo quotes=#{quote_map.size}/#{symbols.size} missing=#{missing_symbols.join(',').presence || 'none'}")
+      quote_map
     rescue => e
-      Rails.logger.warn("Indices fetch failed: #{e.class}: #{e.message}")
+      Rails.logger.warn("[Markets::Indices] upstream exception source=yahoo class=#{e.class} message=#{e.message}")
       {}
+    end
+
+    def fetch_indices_quotes_from_stooq(symbols)
+      supported_symbols = symbols.select { |symbol| STOOQ_INDEX_SYMBOLS.key?(symbol) }
+      unsupported_symbols = symbols - supported_symbols
+
+      if unsupported_symbols.any?
+        Rails.logger.info("[Markets::Indices] fallback source=stooq unsupported=#{unsupported_symbols.join(',')}")
+      end
+
+      quote_map = supported_symbols.each_with_object({}) do |symbol, acc|
+        quote = fetch_stooq_quote(symbol)
+        acc[symbol] = quote if quote.present?
+      end
+
+      missing_symbols = supported_symbols - quote_map.keys
+      Rails.logger.info("[Markets::Indices] fallback source=stooq quotes=#{quote_map.size}/#{supported_symbols.size} missing=#{missing_symbols.join(',').presence || 'none'}") if supported_symbols.any?
+      quote_map
+    end
+
+    def fetch_indices_quotes_from_eastmoney(symbols)
+      supported_symbols = symbols.select { |symbol| EASTMONEY_INDEX_SYMBOLS.key?(symbol) }
+      unsupported_symbols = symbols - supported_symbols
+
+      if unsupported_symbols.any?
+        Rails.logger.info("[Markets::Indices] fallback source=eastmoney unsupported=#{unsupported_symbols.join(',')}")
+      end
+
+      return {} if supported_symbols.empty?
+
+      uri = URI("https://push2.eastmoney.com/api/qt/ulist.np/get")
+      uri.query = URI.encode_www_form(
+        fields: "f2,f3,f12,f14",
+        secids: supported_symbols.map { |symbol| EASTMONEY_INDEX_SYMBOLS.fetch(symbol) }.join(",")
+      )
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.open_timeout = 1
+      http.read_timeout = 2
+
+      req = Net::HTTP::Get.new(uri)
+      req["User-Agent"] = "Mozilla/5.0"
+      req["Accept"] = "application/json"
+
+      res = http.request(req)
+      unless res.is_a?(Net::HTTPSuccess)
+        Rails.logger.warn("[Markets::Indices] fallback source=eastmoney request failed status=#{res.code}")
+        return {}
+      end
+
+      diff = JSON.parse(res.body).dig("data", "diff") || []
+      code_map = EASTMONEY_INDEX_SYMBOLS.each_with_object({}) do |(symbol, secid), acc|
+        acc[secid.split(".").last] = symbol
+      end
+      quote_map = diff.each_with_object({}) do |item, acc|
+        local_symbol = code_map[item["f12"].to_s]
+        next if local_symbol.blank?
+
+        price = eastmoney_scaled_price(item["f2"])
+        next if price.nil?
+
+        acc[local_symbol] = {
+          price: price,
+          change_percent: eastmoney_scaled_percent(item["f3"])
+        }
+      end
+
+      missing_symbols = supported_symbols - quote_map.keys
+      Rails.logger.info("[Markets::Indices] fallback source=eastmoney quotes=#{quote_map.size}/#{supported_symbols.size} missing=#{missing_symbols.join(',').presence || 'none'}")
+      quote_map
+    rescue => e
+      Rails.logger.warn("[Markets::Indices] fallback source=eastmoney exception class=#{e.class} message=#{e.message}")
+      {}
+    end
+
+    def fetch_indices_quotes_from_nse(symbols)
+      return {} unless symbols.include?("^NSEI")
+
+      uri = URI("https://www.nseindia.com/api/allIndices")
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.open_timeout = 1
+      http.read_timeout = 2
+
+      req = Net::HTTP::Get.new(uri)
+      req["User-Agent"] = "Mozilla/5.0"
+      req["Accept"] = "application/json"
+
+      res = http.request(req)
+      unless res.is_a?(Net::HTTPSuccess)
+        Rails.logger.warn("[Markets::Indices] fallback source=nse request failed status=#{res.code}")
+        return {}
+      end
+
+      rows = JSON.parse(res.body).fetch("data", [])
+      nifty = rows.find { |row| row["index"] == "NIFTY 50" || row["indexSymbol"] == "NIFTY 50" }
+      return {} if nifty.blank? || nifty["last"].blank?
+
+      quote = {
+        "^NSEI" => {
+          price: nifty["last"].to_f,
+          change_percent: nifty["percentChange"]&.to_f&.round(2)
+        }
+      }
+      Rails.logger.info("[Markets::Indices] fallback source=nse quotes=1/1 missing=none")
+      quote
+    rescue => e
+      Rails.logger.warn("[Markets::Indices] fallback source=nse exception class=#{e.class} message=#{e.message}")
+      {}
+    end
+
+    def fetch_stooq_quote(symbol)
+      stooq_symbol = STOOQ_INDEX_SYMBOLS.fetch(symbol)
+      uri = URI("https://stooq.com/q/l/")
+      uri.query = URI.encode_www_form(s: stooq_symbol, i: "d", f: "sd2t2ohlcvpn", h: "1", e: "csv")
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.open_timeout = 1
+      http.read_timeout = 2
+
+      req = Net::HTTP::Get.new(uri)
+      req["User-Agent"] = "Mozilla/5.0"
+      req["Accept"] = "text/csv"
+
+      res = http.request(req)
+      unless res.is_a?(Net::HTTPSuccess)
+        Rails.logger.warn("[Markets::Indices] fallback source=stooq request failed symbol=#{symbol} status=#{res.code}")
+        return nil
+      end
+
+      rows = CSV.parse(res.body, headers: true)
+      row = rows.first
+      return nil if row.blank?
+
+      close = numeric_csv_value(row["Close"])
+      prev_close = numeric_csv_value(row["Prev"])
+      return nil if close.nil?
+
+      change_percent = if prev_close.present? && !prev_close.zero?
+        (((close - prev_close) / prev_close) * 100).round(2)
+      end
+
+      {
+        price: close,
+        change_percent: change_percent
+      }
+    rescue => e
+      Rails.logger.warn("[Markets::Indices] fallback source=stooq exception symbol=#{symbol} class=#{e.class} message=#{e.message}")
+      nil
+    end
+
+    def numeric_csv_value(value)
+      return nil if value.blank? || value == "N/D"
+
+      BigDecimal(value).to_f
+    rescue ArgumentError
+      nil
+    end
+
+    def eastmoney_scaled_price(value)
+      return nil if value.blank?
+
+      value.to_f / 100.0
+    end
+
+    def eastmoney_scaled_percent(value)
+      return nil if value.blank?
+
+      (value.to_f / 100.0).round(2)
+    end
+
+    def log_indices_response(symbols:, cached_result:, fetched_quotes:, result:)
+      source =
+        if fetched_quotes.present?
+          cached_result.present? ? "live+cache" : "live"
+        elsif cached_result.present?
+          "cache"
+        else
+          "empty"
+        end
+
+      missing_symbols = symbols - result.keys
+      Rails.logger.info(
+        "[Markets::Indices] response source=#{source} returned=#{result.size}/#{symbols.size} " \
+        "live=#{fetched_quotes.size} cache=#{cached_result.size} missing=#{missing_symbols.join(',').presence || 'none'}"
+      )
     end
 
     def fetch_stock_quotes(watchlist)
