@@ -35,22 +35,6 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
 
   test "should get stocks news" do
     MarketNewsArticle.delete_all
-    filtered_items = [
-      MarketNewsFeed::Item.new(
-        source: "CNBC",
-        title: "CNBC headline",
-        url: "https://www.cnbc.com/example",
-        published_at: Time.utc(2026, 4, 25, 8, 0, 0),
-        translated_title: nil
-      ),
-      MarketNewsFeed::Item.new(
-        source: "Seeking Alpha",
-        title: "Seeking Alpha headline",
-        url: "https://seekingalpha.com/example",
-        published_at: Time.utc(2026, 4, 25, 7, 30, 0),
-        translated_title: nil
-      )
-    ]
     MarketNewsArticle.create!(
       source: "CNBC",
       title: "CNBC headline",
@@ -68,7 +52,7 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
     )
     MarketNewsArticle.stubs(:refresh_if_stale!)
 
-    get market_stocks_news_path
+    get market_stocks_news_path(locale: "zh-CN")
 
     assert_response :success
     assert_includes response.body, "CNBC 中文标题"
@@ -77,24 +61,33 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "news_source=cnbc"
   end
 
+  test "should show original title for non chinese locale" do
+    MarketNewsArticle.delete_all
+    family = users(:family_admin).family
+    original_locale = family.locale
+
+    family.update!(locale: "en")
+    MarketNewsArticle.create!(
+      source: "CNBC",
+      title: "CNBC headline",
+      translated_title: "CNBC 中文标题",
+      url: "https://www.cnbc.com/example",
+      published_at: Time.utc(2026, 4, 25, 8, 0, 0),
+      fetched_at: Time.current
+    )
+    MarketNewsArticle.stubs(:refresh_if_stale!)
+
+    get market_stocks_news_path
+
+    assert_response :success
+    assert_includes response.body, "CNBC headline"
+    assert_not_includes response.body, "CNBC 中文标题"
+  ensure
+    family.update!(locale: original_locale) if family && original_locale
+  end
+
   test "should filter stocks news by source" do
     MarketNewsArticle.delete_all
-    filtered_items = [
-      MarketNewsFeed::Item.new(
-        source: "CNBC",
-        title: "CNBC headline",
-        url: "https://www.cnbc.com/example",
-        published_at: Time.utc(2026, 4, 25, 8, 0, 0),
-        translated_title: nil
-      ),
-      MarketNewsFeed::Item.new(
-        source: "Seeking Alpha",
-        title: "Seeking Alpha headline",
-        url: "https://seekingalpha.com/example",
-        published_at: Time.utc(2026, 4, 25, 7, 30, 0),
-        translated_title: nil
-      )
-    ]
     MarketNewsArticle.create!(
       source: "CNBC",
       title: "CNBC headline",
@@ -120,22 +113,6 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
 
   test "should filter stocks news by sec source" do
     MarketNewsArticle.delete_all
-    items = [
-      MarketNewsFeed::Item.new(
-        source: "SEC",
-        title: "SEC enforcement headline",
-        url: "https://www.sec.gov/example",
-        published_at: Time.utc(2026, 4, 25, 6, 0, 0),
-        translated_title: nil
-      ),
-      MarketNewsFeed::Item.new(
-        source: "MarketWatch",
-        title: "MarketWatch headline",
-        url: "https://www.marketwatch.com/example",
-        published_at: Time.utc(2026, 4, 25, 5, 30, 0),
-        translated_title: nil
-      )
-    ]
     MarketNewsArticle.create!(
       source: "SEC",
       title: "SEC enforcement headline",
