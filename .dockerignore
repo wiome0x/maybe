@@ -40,6 +40,16 @@
 # Ignore CI service files.
 /.github
 
+# Ignore repository-only files not needed to build the production image.
+/docs
+/test
+/data
+/README.md
+/CONTRIBUTING.md
+/CLAUDE.md
+/LICENSE
+/Procfile.dev
+
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*

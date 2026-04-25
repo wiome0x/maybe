@@ -1,0 +1,103 @@
+#!/usr/bin/env sh
+
+set -eu
+
+APP_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+cd "$APP_ROOT"
+
+run_step() {
+  echo
+  echo "== $1 =="
+  shift
+  "$@"
+}
+
+require_command() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "Missing required command: $1" >&2
+    exit 1
+  fi
+}
+
+ensure_executable_if_present() {
+  target="$1"
+
+  if [ -f "$target" ] && [ ! -x "$target" ]; then
+    chmod +x "$target"
+  fi
+}
+
+load_dotenv_file() {
+  dotenv_file="$1"
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in
+      ''|\#*)
+        continue
+        ;;
+    esac
+
+    key="${line%%=*}"
+    value="${line#*=}"
+
+    if [ "$key" = "$line" ] || [ -z "$key" ]; then
+      continue
+    fi
+
+    export "$key=$value"
+  done < "$dotenv_file"
+}
+
+if [ -f ".env.local" ]; then
+  # Load local overrides without executing the file as shell code.
+  load_dotenv_file ".env.local"
+fi
+
+export PLAID_CLIENT_ID="${PLAID_CLIENT_ID:-foo}"
+export PLAID_SECRET="${PLAID_SECRET:-bar}"
+export RAILS_ENV="${RAILS_ENV:-test}"
+export POSTGRES_USER="${POSTGRES_USER:-postgres}"
+export POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
+export POSTGRES_DB="${POSTGRES_DB:-maybe_test}"
+export DB_HOST="${DB_HOST:-127.0.0.1}"
+export DB_PORT="${DB_PORT:-5432}"
+export REDIS_URL="${REDIS_URL:-redis://localhost:6379}"
+
+require_command ruby
+require_command bundle
+require_command npm
+require_command psql
+require_command redis-cli
+
+if ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$POSTGRES_USER" >/dev/null 2>&1; then
+  echo "PostgreSQL is not ready at $DB_HOST:$DB_PORT." >&2
+  echo "Start Postgres first, then rerun bin/ci-local." >&2
+  exit 1
+fi
+
+redis_host="$(printf '%s' "$REDIS_URL" | sed -n 's#redis://\([^:/]*\).*#\1#p')"
+redis_port="$(printf '%s' "$REDIS_URL" | sed -n 's#redis://[^:/]*:\([0-9][0-9]*\).*#\1#p')"
+redis_host="${redis_host:-localhost}"
+redis_port="${redis_port:-6379}"
+
+if ! redis-cli -h "$redis_host" -p "$redis_port" ping >/dev/null 2>&1; then
+  echo "Redis is not ready at $redis_host:$redis_port." >&2
+  echo "Start Redis first, then rerun bin/ci-local." >&2
+  exit 1
+fi
+
+run_step "Bundler check" bundle check
+run_step "Brakeman" bundle exec brakeman --no-pager
+run_step "Importmap audit" bin/importmap audit
+run_step "RuboCop" bin/rubocop -f github
+run_step "Install JS dependencies" npm install
+ensure_executable_if_present "node_modules/.bin/biome"
+ensure_executable_if_present "node_modules/@biomejs/biome/bin/biome"
+run_step "Biome lint" npm run lint
+run_step "DB prepare" bin/rails db:prepare
+run_step "DB seed" bin/rails db:seed
+run_step "Rails tests" bin/rails test
+run_step "System tests" sh -c 'DISABLE_PARALLELIZATION=true bin/rails test:system'
+
+echo
+echo "Local CI checks passed."

@@ -3,9 +3,9 @@ class CreateBrokerConnections < ActiveRecord::Migration[7.2]
     create_table :broker_connections, id: :uuid, default: -> { "gen_random_uuid()" } do |t|
       t.uuid   :account_id,    null: false
       t.uuid   :family_id,     null: false
-      t.string :provider,      null: false   # enum: "binance" | "schwab"
+      t.string :provider,      null: false # enum: "binance" | "schwab"
       t.string :status,        null: false, default: "active"
-                                             # enum: "active" | "error" | "requires_reauth"
+      # enum: "active" | "error" | "requires_reauth"
       t.datetime :connected_at, null: false
 
       # Binance: API Key / Secret (encrypted)
@@ -29,7 +29,7 @@ class CreateBrokerConnections < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :broker_connections, :account_id, unique: true   # one account, one connection
+    add_index :broker_connections, :account_id, unique: true # one account, one connection
     add_index :broker_connections, :family_id
     add_index :broker_connections, :provider
     add_index :broker_connections, :status

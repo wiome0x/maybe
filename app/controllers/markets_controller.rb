@@ -73,7 +73,8 @@ class MarketsController < ApplicationController
     render json: result
   end
 
-    private
+  private
+
     def fetch_indices_quotes(symbols)
       yahoo_quotes = fetch_indices_quotes_from_yahoo(symbols)
       result = yahoo_quotes.dup
@@ -91,7 +92,7 @@ class MarketsController < ApplicationController
       result.merge!(stooq_quotes)
 
       result
-    end
+      end
 
     def fetch_indices_quotes_from_yahoo(symbols)
       uri = URI("https://query1.finance.yahoo.com/v7/finance/quote")

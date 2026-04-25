@@ -6,11 +6,11 @@ class BrokerConnectionsController < ApplicationController
   end
 
   def create
-    @account = Current.family.accounts.find(broker_connection_params[:account_id])
+    @account = Current.family.accounts.find(broker_connection_account_id)
 
     provider = Provider::Binance.new(
-      api_key: broker_connection_params[:api_key],
-      api_secret: broker_connection_params[:api_secret]
+      api_key: broker_connection_api_key,
+      api_secret: broker_connection_api_secret
     )
 
     provider.validate_credentials!
@@ -20,19 +20,19 @@ class BrokerConnectionsController < ApplicationController
       provider: "binance",
       status: "active",
       connected_at: Time.current,
-      api_key: broker_connection_params[:api_key],
-      api_secret: broker_connection_params[:api_secret]
+      api_key: broker_connection_api_key,
+      api_secret: broker_connection_api_secret
     )
 
     @broker_connection.save!
     redirect_to account_path(@account), notice: "Binance account connected successfully."
   rescue Provider::Error => e
     @error_message = e.message
-    @api_key = broker_connection_params[:api_key]
+    @api_key = broker_connection_api_key
     render :new, status: :unprocessable_entity
   rescue ActiveRecord::RecordInvalid => e
     @error_message = e.message
-    @api_key = broker_connection_params[:api_key]
+    @api_key = broker_connection_api_key
     render :new, status: :unprocessable_entity
   end
 
@@ -73,7 +73,8 @@ class BrokerConnectionsController < ApplicationController
     @account = @broker_connection.account
 
     if @broker_connection.schwab?
-      redirect_to Provider::Schwab.authorization_url(state: @broker_connection.id), allow_other_host: true
+      @schwab_authorization_url = Provider::Schwab.authorization_url(state: @broker_connection.id)
+      render :reauth
     else
       render :reauth
     end
@@ -111,6 +112,11 @@ class BrokerConnectionsController < ApplicationController
   end
 
   private
+
+    def broker_connection_attributes
+      @broker_connection_attributes ||= params.require(:broker_connection)
+    end
+
     def set_broker_connection
       @broker_connection = BrokerConnection.find_by!(
         id: params[:id],
@@ -120,11 +126,19 @@ class BrokerConnectionsController < ApplicationController
       head :not_found
     end
 
-    def broker_connection_params
-      params.require(:broker_connection).permit(:account_id, :api_key, :api_secret)
+    def broker_connection_account_id
+      broker_connection_attributes.fetch(:account_id)
+    end
+
+    def broker_connection_api_key
+      broker_connection_attributes.fetch(:api_key)
+    end
+
+    def broker_connection_api_secret
+      broker_connection_attributes.fetch(:api_secret)
     end
 
     def reconnect_params
       params.require(:broker_connection).permit(:api_key, :api_secret)
     end
-  end
+end

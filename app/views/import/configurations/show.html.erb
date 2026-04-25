@@ -31,7 +31,22 @@
     </div>
 
     <div class="mx-auto max-w-lg space-y-4">
-      <%= render partial: permitted_import_configuration_path(@import), locals: { import: @import } %>
+      <% case @import.type.underscore %>
+      <% when "transaction_import" %>
+        <%= render partial: "import/configurations/transaction_import", locals: { import: @import } %>
+      <% when "trade_import" %>
+        <%= render partial: "import/configurations/trade_import", locals: { import: @import } %>
+      <% when "account_import" %>
+        <%= render partial: "import/configurations/account_import", locals: { import: @import } %>
+      <% when "mint_import" %>
+        <%= render partial: "import/configurations/mint_import", locals: { import: @import } %>
+      <% when "ibkr_import" %>
+        <%= render partial: "import/configurations/ibkr_import", locals: { import: @import } %>
+      <% when "historical_data_import" %>
+        <%= render partial: "import/configurations/historical_data_import", locals: { import: @import } %>
+      <% else %>
+        <% raise "Unknown import type: #{@import.type}" %>
+      <% end %>
       <%= render "imports/table", headers: @import.csv_headers, rows: @import.csv_sample, caption: "Sample data from your uploaded CSV" %>
     </div>
   </div>

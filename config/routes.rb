@@ -87,8 +87,11 @@ Rails.application.routes.draw do
   get "markets/stocks", to: "markets#stocks", as: :market_stocks
   get "markets/stocks/heatmap", to: "markets#stocks_heatmap", as: :market_stocks_heatmap
   get "markets/stocks/news", to: "markets#stocks_news", as: :market_stocks_news
-  get "public/markets/stocks/heatmap", to: "public/markets#stocks_heatmap", as: :public_market_stocks_heatmap
-  get "public/markets/stocks/news", to: "public/markets#stocks_news", as: :public_market_stocks_news
+  get "heatmap", to: "public/markets#stocks_heatmap", as: :public_heatmap
+  get "heatmap/news", to: "public/markets#stocks_news", as: :public_heatmap_news
+  get "public", to: redirect("/heatmap")
+  get "public/markets/stocks/heatmap", to: redirect("/heatmap")
+  get "public/markets/stocks/news", to: redirect("/heatmap/news")
   get "markets/cryptos", to: "markets#cryptos", as: :market_cryptos
   get "markets/indices", to: "markets#indices", as: :market_indices
   get "news", to: "news#index", as: :news

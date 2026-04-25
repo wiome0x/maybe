@@ -41,6 +41,20 @@
           <%= form.submit "Reconnect Binance", class: "btn btn--primary w-full" %>
         <% end %>
       </div>
+    <% elsif @broker_connection.schwab? %>
+      <div class="space-y-4">
+        <%= render DS::Alert.new(
+          message: "Your Charles Schwab connection requires reauthorization. Continue to Schwab to reconnect your account.",
+          variant: :warning
+        ) %>
+
+        <%= link_to @schwab_authorization_url,
+                    allow_other_host: true,
+                    class: "flex items-center justify-center gap-2 w-full rounded-lg bg-surface px-4 py-2.5 text-sm font-medium text-white hover:bg-surface-hover transition-colors" do %>
+          <%= icon("link-2", size: "sm") %>
+          Continue to Charles Schwab
+        <% end %>
+      </div>
     <% end %>
   <% end %>
 <% end %>

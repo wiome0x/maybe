@@ -1,6 +1,6 @@
 <nav class="flex items-center gap-2">
-  <% heatmap_path = @public_markets ? public_market_stocks_heatmap_path : market_stocks_heatmap_path %>
-  <% news_path = @public_markets ? public_market_stocks_news_path : market_stocks_news_path %>
+  <% heatmap_path = @public_markets ? public_heatmap_path : market_stocks_heatmap_path %>
+  <% news_path = @public_markets ? public_heatmap_news_path : market_stocks_news_path %>
   <%= render DS::Link.new(
     text: t("markets.stocks.section_nav.heatmap"),
     href: heatmap_path,

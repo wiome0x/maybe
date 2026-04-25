@@ -24,12 +24,12 @@ class Public::MarketsControllerTest < ActionDispatch::IntegrationTest
       )
     ])
 
-    get public_market_stocks_heatmap_path
+    get public_heatmap_path
 
     assert_response :success
     assert_includes response.body, "embed-widget-stock-heatmap.js"
-    assert_includes response.body, %Q(href="#{public_market_stocks_heatmap_path}")
-    assert_includes response.body, %Q(href="#{public_market_stocks_news_path}")
+    assert_includes response.body, %Q(href="#{public_heatmap_path}")
+    assert_includes response.body, %Q(href="#{public_heatmap_news_path}")
     assert_not_includes response.body, %Q(href="#{new_session_path}")
     assert_not_includes response.body, %Q(href="#{market_stocks_path}")
   end
@@ -46,12 +46,26 @@ class Public::MarketsControllerTest < ActionDispatch::IntegrationTest
     )
     MarketNewsArticle.stubs(:refresh_if_stale!)
 
-    get public_market_stocks_news_path(locale: "zh-CN")
+    get public_heatmap_news_path(locale: "zh-CN")
 
     assert_response :success
     assert_includes response.body, "CNBC 中文标题"
-    assert_includes response.body, %Q(href="#{public_market_stocks_heatmap_path}")
-    assert_includes response.body, %Q(href="#{public_market_stocks_news_path}")
+    assert_includes response.body, %Q(href="#{public_heatmap_path}")
+    assert_includes response.body, %Q(href="#{public_heatmap_news_path}")
     assert_not_includes response.body, %Q(href="#{market_stocks_path}")
+  end
+
+  test "should redirect public index to public heatmap" do
+    get "/public"
+
+    assert_redirected_to public_heatmap_path
+  end
+
+  test "should redirect legacy public market routes" do
+    get "/public/markets/stocks/heatmap"
+    assert_redirected_to public_heatmap_path
+
+    get "/public/markets/stocks/news"
+    assert_redirected_to public_heatmap_news_path
   end
 end

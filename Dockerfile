@@ -48,9 +48,20 @@ FROM base
 # Clean up installation packages to reduce image size
 RUN rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-# Copy built artifacts: gems, application
+# Copy built artifacts: gems plus only the runtime application files
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --from=build /rails /rails
+COPY --from=build /rails/app /rails/app
+COPY --from=build /rails/bin /rails/bin
+COPY --from=build /rails/config /rails/config
+COPY --from=build /rails/db /rails/db
+COPY --from=build /rails/lib /rails/lib
+COPY --from=build /rails/public /rails/public
+COPY --from=build /rails/vendor /rails/vendor
+COPY --from=build /rails/Gemfile /rails/Gemfile
+COPY --from=build /rails/Gemfile.lock /rails/Gemfile.lock
+COPY --from=build /rails/Rakefile /rails/Rakefile
+COPY --from=build /rails/config.ru /rails/config.ru
+RUN mkdir -p /rails/log /rails/storage /rails/tmp/pids
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \

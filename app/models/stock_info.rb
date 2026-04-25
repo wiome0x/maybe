@@ -65,58 +65,58 @@ class StockInfo < ApplicationRecord
 
     private_class_method :find_or_fetch
 
-  # Inner class responsible for Wikipedia fetching and parsing
-  class WikipediaSync
-    WIKIPEDIA_API_URL = "https://en.wikipedia.org/w/api.php"
+    # Inner class responsible for Wikipedia fetching and parsing
+    class WikipediaSync
+      WIKIPEDIA_API_URL = "https://en.wikipedia.org/w/api.php"
 
-    def call
-      data = fetch_all
-      return if data.empty?
+      def call
+        data = fetch_all
+        return if data.empty?
 
-      now = Time.current
-      rows = data.map do |sym, (sector, sub_industry)|
-        {
-          symbol: sym,
-          sector: sector,
-          sub_industry: sub_industry,
-          wikipedia_synced_at: now,
-          created_at: now,
-          updated_at: now
-        }
+        now = Time.current
+        rows = data.map do |sym, (sector, sub_industry)|
+          {
+            symbol: sym,
+            sector: sector,
+            sub_industry: sub_industry,
+            wikipedia_synced_at: now,
+            created_at: now,
+            updated_at: now
+          }
+        end
+
+        StockInfo.upsert_all(
+          rows,
+          unique_by: :symbol,
+          update_only: %i[sector sub_industry wikipedia_synced_at]
+        )
+
+        Rails.logger.info("StockInfo: upserted #{rows.size} records from Wikipedia")
+        rows.size
       end
 
-      StockInfo.upsert_all(
-        rows,
-        unique_by: :symbol,
-        update_only: %i[sector sub_industry wikipedia_synced_at]
-      )
+      # Fetch Wikipedia data and upsert just one symbol (used for on-demand lookup)
+      def upsert_symbol(sym)
+        data = fetch_all
+        return unless data.key?(sym)
 
-      Rails.logger.info("StockInfo: upserted #{rows.size} records from Wikipedia")
-      rows.size
-    end
+        sector, sub_industry = data[sym]
+        StockInfo.upsert(
+          { symbol: sym, sector: sector, sub_industry: sub_industry, wikipedia_synced_at: Time.current },
+          unique_by: :symbol,
+          update_only: %i[sector sub_industry wikipedia_synced_at]
+        )
+      end
 
-    # Fetch Wikipedia data and upsert just one symbol (used for on-demand lookup)
-    def upsert_symbol(sym)
-      data = fetch_all
-      return unless data.key?(sym)
+      def fetch_all
+        html = fetch_wikipedia_html
+        return {} if html.blank?
 
-      sector, sub_industry = data[sym]
-      StockInfo.upsert(
-        { symbol: sym, sector: sector, sub_industry: sub_industry, wikipedia_synced_at: Time.current },
-        unique_by: :symbol,
-        update_only: %i[sector sub_industry wikipedia_synced_at]
-      )
-    end
-
-    def fetch_all
-      html = fetch_wikipedia_html
-      return {} if html.blank?
-
-      parse_table(html)
-    rescue => e
-      Rails.logger.warn("StockInfo Wikipedia fetch failed: #{e.class}: #{e.message}")
-      {}
-    end
+        parse_table(html)
+      rescue => e
+        Rails.logger.warn("StockInfo Wikipedia fetch failed: #{e.class}: #{e.message}")
+        {}
+      end
 
     private
 
@@ -185,5 +185,5 @@ class StockInfo < ApplicationRecord
           .gsub(/&[a-z]+;/, " ")
           .strip
       end
-  end
+    end
 end

@@ -6,12 +6,12 @@
 	"version": "1.0.0",
 	"description": "The OS for your personal finances",
 	"scripts": {
-		"style:check": "biome check",
-		"style:fix": "biome check --write",
-		"lint": "biome lint",
-		"lint:fix": "biome lint --write",
-		"format:check": "biome format",
-		"format": "biome format --write"
+		"style:check": "biome check app/javascript",
+		"style:fix": "biome check --write app/javascript",
+		"lint": "biome lint app/javascript",
+		"lint:fix": "biome lint --write app/javascript",
+		"format:check": "biome format app/javascript",
+		"format": "biome format --write app/javascript"
 	},
 	"author": "",
 	"license": "ISC"

@@ -7,6 +7,18 @@ class BrokerConnection < ApplicationRecord
   if Rails.application.credentials.active_record_encryption.present?
     encrypts :api_key, :api_secret                 # Binance
     encrypts :access_token, :refresh_token         # Schwab
+  else
+    %i[api_key api_secret access_token refresh_token].each do |attribute_name|
+      encrypted_column = :"encrypted_#{attribute_name}"
+
+      define_method(attribute_name) do
+        self[encrypted_column]
+      end
+
+      define_method("#{attribute_name}=") do |value|
+        self[encrypted_column] = value
+      end
+    end
   end
 
   enum :provider, { binance: "binance", schwab: "schwab" }
