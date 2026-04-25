@@ -99,6 +99,25 @@ class Provider::Registry
 
         Provider::Openrouter.new(access_token, models: models)
       end
+
+      def binance(broker_connection:)
+        return nil if broker_connection.api_key.blank? || broker_connection.api_secret.blank?
+
+        Provider::Binance.new(
+          api_key: broker_connection.api_key,
+          api_secret: broker_connection.api_secret
+        )
+      end
+
+      def schwab(broker_connection:)
+        return nil if broker_connection.access_token.blank?
+
+        Provider::Schwab.new(
+          access_token: broker_connection.access_token,
+          refresh_token: broker_connection.refresh_token,
+          broker_connection: broker_connection
+        )
+      end
   end
 
   def initialize(concept)

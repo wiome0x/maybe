@@ -11,6 +11,7 @@
       <div class="flex items-center px-3 py-2 text-xs font-medium uppercase text-secondary">
         <div class="w-10 shrink-0">#</div>
         <div class="min-w-0 flex-1"><%= t("markets.stocks_heatmap.symbol") %></div>
+        <div class="hidden lg:block w-48 shrink-0 text-left">业务简介</div>
         <div class="w-24 text-right shrink-0"><%= t("markets.stocks_heatmap.price") %></div>
         <div class="w-24 text-right shrink-0"><%= t("markets.stocks_heatmap.change") %></div>
       </div>
@@ -24,9 +25,25 @@
             <div class="flex items-center gap-3 px-3 py-3">
               <div class="w-10 shrink-0 text-sm text-secondary"><%= index + 1 %></div>
 
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-primary truncate"><%= quote.symbol %></p>
-                <p class="text-xs text-secondary truncate"><%= quote.name %></p>
+              <div class="min-w-0 flex-1 flex items-center gap-2.5">
+                <% if quote.logo_url.present? %>
+                  <img src="<%= quote.logo_url %>"
+                       alt="<%= quote.symbol %>"
+                       class="w-7 h-7 rounded-md object-contain shrink-0 bg-surface-inset"
+                       onerror="this.style.display='none'">
+                <% end %>
+                <div class="min-w-0">
+                  <p class="text-sm font-medium text-primary truncate"><%= quote.symbol %></p>
+                  <p class="text-xs text-secondary truncate"><%= quote.name %></p>
+                </div>
+              </div>
+
+              <div class="hidden lg:block w-48 shrink-0">
+                <% if quote.description.present? %>
+                  <p class="text-xs text-secondary truncate"><%= quote.description %></p>
+                <% else %>
+                  <p class="text-xs text-secondary">—</p>
+                <% end %>
               </div>
 
               <div class="w-24 shrink-0 text-right text-sm text-primary">

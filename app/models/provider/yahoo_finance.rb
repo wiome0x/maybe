@@ -23,6 +23,7 @@ class Provider::YahooFinance < Provider
         MarketQuote.new(
           symbol: quote["symbol"],
           name: quote["shortName"] || quote["longName"],
+          description: nil,
           price: quote["regularMarketPrice"],
           change_percent: quote["regularMarketChangePercent"],
           volume: quote["regularMarketVolume"],

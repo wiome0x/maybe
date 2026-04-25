@@ -1,6 +1,7 @@
 MarketQuote = Data.define(
   :symbol,
   :name,
+  :description,
   :price,
   :change_percent,
   :volume,

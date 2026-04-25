@@ -1,0 +1,46 @@
+<%= render DS::Dialog.new do |dialog| %>
+  <% dialog.with_header(title: "Reauthorize Broker Connection") %>
+  <% dialog.with_body do %>
+    <% if @broker_connection.binance? %>
+      <%# Binance: re-enter API credentials %>
+      <div class="space-y-4">
+        <%= render DS::Alert.new(
+          message: "Your Binance connection requires reauthorization. Please enter your API credentials again.",
+          variant: :warning
+        ) %>
+
+        <%= styled_form_with url: reconnect_broker_connection_path(@broker_connection),
+                             method: :post,
+                             class: "space-y-4" do |form| %>
+          <div class="form-field">
+            <div class="form-field__header">
+              <label class="form-field__label" for="broker_connection_api_key">API Key</label>
+            </div>
+            <input type="text"
+                   id="broker_connection_api_key"
+                   name="broker_connection[api_key]"
+                   placeholder="Enter your Binance API key"
+                   class="form-field__input"
+                   autocomplete="off"
+                   required />
+          </div>
+
+          <div class="form-field">
+            <div class="form-field__header">
+              <label class="form-field__label" for="broker_connection_api_secret">API Secret</label>
+            </div>
+            <input type="password"
+                   id="broker_connection_api_secret"
+                   name="broker_connection[api_secret]"
+                   placeholder="Enter your Binance API secret"
+                   class="form-field__input"
+                   autocomplete="off"
+                   required />
+          </div>
+
+          <%= form.submit "Reconnect Binance", class: "btn btn--primary w-full" %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

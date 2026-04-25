@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_25_132000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_25_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -190,6 +190,30 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_25_132000) do
     t.index ["user_id", "batch_key", "status"], name: "index_bark_notifications_on_user_id_and_batch_key_and_status"
     t.index ["user_id", "source_key"], name: "index_bark_notifications_on_user_id_and_source_key", unique: true
     t.index ["user_id"], name: "index_bark_notifications_on_user_id"
+  end
+
+  create_table "broker_connections", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "family_id", null: false
+    t.string "provider", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "connected_at", null: false
+    t.text "encrypted_api_key"
+    t.text "encrypted_api_secret"
+    t.text "encrypted_access_token"
+    t.text "encrypted_refresh_token"
+    t.datetime "token_expires_at"
+    t.jsonb "raw_account_payload", default: {}
+    t.jsonb "raw_transactions_payload", default: {}
+    t.datetime "last_snapshot_at"
+    t.string "broker_account_id"
+    t.string "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_broker_connections_on_account_id", unique: true
+    t.index ["family_id"], name: "index_broker_connections_on_family_id"
+    t.index ["provider"], name: "index_broker_connections_on_provider"
+    t.index ["status"], name: "index_broker_connections_on_status"
   end
 
   create_table "budget_categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -792,6 +816,17 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_25_132000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["var"], name: "index_settings_on_var", unique: true
+  end
+
+  create_table "stock_infos", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "symbol", null: false
+    t.string "sector"
+    t.string "sub_industry"
+    t.text "description_zh"
+    t.datetime "wikipedia_synced_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["symbol"], name: "index_stock_infos_on_symbol", unique: true
   end
 
   create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

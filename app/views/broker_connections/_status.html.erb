@@ -1,0 +1,76 @@
+<%# locals: (account:) %>
+
+<% broker_connection = account.broker_connection %>
+
+<%= turbo_frame_tag "broker_connection_#{account.id}" do %>
+  <section class="space-y-3">
+    <h3 class="text-sm font-medium text-primary">Broker Connection</h3>
+
+    <% if broker_connection.nil? %>
+      <%# Not connected state %>
+      <div class="flex flex-col gap-2">
+        <p class="text-sm text-secondary">Connect a broker to automatically sync your holdings and transaction history.</p>
+
+        <div class="flex flex-col gap-2">
+          <% if account.crypto? %>
+            <%= link_to new_broker_connection_path(account_id: account.id),
+                        data: { turbo_frame: :modal },
+                        class: "flex items-center gap-2 rounded-lg border border-primary px-4 py-2.5 text-sm text-primary hover:bg-container-inset transition-colors" do %>
+              <%= icon("link-2", size: "sm") %>
+              Connect Binance
+            <% end %>
+          <% end %>
+
+          <% if account.investment? %>
+            <%= link_to new_broker_connection_path(account_id: account.id),
+                        data: { turbo_frame: :modal },
+                        class: "flex items-center gap-2 rounded-lg border border-primary px-4 py-2.5 text-sm text-primary hover:bg-container-inset transition-colors" do %>
+              <%= icon("link-2", size: "sm") %>
+              Connect Charles Schwab
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+    <% elsif broker_connection.requires_reauth? %>
+      <%# Requires reauthorization state %>
+      <div class="flex items-start justify-between gap-4 rounded-lg border border-primary bg-container p-4">
+        <div class="flex items-start gap-3">
+          <span class="text-warning mt-0.5">
+            <%= icon("triangle-alert", size: "sm") %>
+          </span>
+          <div>
+            <p class="text-sm font-medium text-primary"><%= broker_connection.provider.humanize %> authorization expired</p>
+            <p class="text-xs text-secondary mt-0.5">Reauthorize to resume syncing.</p>
+          </div>
+        </div>
+
+        <%= link_to reauth_broker_connection_path(broker_connection),
+                    data: { turbo_frame: :modal },
+                    class: "shrink-0 flex items-center gap-1.5 rounded-lg border border-primary px-3 py-1.5 text-sm text-primary hover:bg-container-inset transition-colors" do %>
+          <%= icon("refresh-cw", size: "sm") %>
+          Reauthorize
+        <% end %>
+      </div>
+
+    <% else %>
+      <%# Connected state %>
+      <div class="flex items-center justify-between gap-4 rounded-lg border border-primary bg-container p-4">
+        <div class="flex items-center gap-3">
+          <%= icon("check-circle", size: "sm", class: "text-success") %>
+          <div>
+            <p class="text-sm font-medium text-primary"><%= broker_connection.provider.humanize %></p>
+            <p class="text-xs text-secondary">Connected <%= broker_connection.connected_at.to_date.strftime("%b %-d, %Y") %></p>
+          </div>
+        </div>
+
+        <%= link_to broker_connection_path(broker_connection),
+                    data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to disconnect?" },
+                    class: "shrink-0 flex items-center gap-1.5 rounded-lg border border-primary px-3 py-1.5 text-sm text-primary hover:bg-container-inset transition-colors" do %>
+          <%= icon("unplug", size: "sm") %>
+          Disconnect
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+<% end %>

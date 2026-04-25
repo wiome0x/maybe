@@ -18,6 +18,7 @@ class Provider::Finnhub < Provider
         MarketQuote.new(
           symbol: symbol.upcase,
           name: profile["name"].presence || symbol,
+          description: profile["finnhubIndustry"].presence,
           price: current,
           change_percent: change_pct,
           volume: quote["v"],

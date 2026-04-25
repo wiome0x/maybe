@@ -7,6 +7,7 @@ class Account < ApplicationRecord
   belongs_to :import, optional: true
 
   has_many :import_mappings, as: :mappable, dependent: :destroy, class_name: "Import::Mapping"
+  has_one :broker_connection, dependent: :destroy
   has_many :entries, dependent: :destroy
   has_many :transactions, through: :entries, source: :entryable, source_type: "Transaction"
   has_many :valuations, through: :entries, source: :entryable, source_type: "Valuation"

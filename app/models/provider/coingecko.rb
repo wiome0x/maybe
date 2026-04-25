@@ -34,6 +34,7 @@ class Provider::Coingecko < Provider
         MarketQuote.new(
           symbol: symbol,
           name: coin["name"],
+          description: nil,
           price: coin["current_price"],
           change_percent: coin["price_change_percentage_24h"],
           volume: coin["total_volume"],

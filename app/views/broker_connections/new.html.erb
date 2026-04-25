@@ -1,0 +1,34 @@
+<%= render DS::Dialog.new do |dialog| %>
+  <% dialog.with_header(title: "Connect Broker") %>
+  <% dialog.with_body do %>
+    <% if @error_message.present? %>
+      <div class="mb-4">
+        <%= render DS::Alert.new(message: @error_message, variant: :error) %>
+      </div>
+    <% end %>
+
+    <% if @account.accountable_type == "Crypto" %>
+      <%# Binance: show API key/secret form %>
+      <%= render "broker_connections/binance_form", account: @account, api_key: @api_key %>
+    <% elsif @account.accountable_type == "Investment" %>
+      <%# Schwab: redirect to OAuth %>
+      <div class="space-y-4">
+        <p class="text-sm text-secondary">
+          Connect your Charles Schwab account to automatically sync your investment holdings and transaction history.
+        </p>
+
+        <%= link_to Provider::Schwab.authorization_url(state: @account.id),
+                    allow_other_host: true,
+                    class: "flex items-center justify-center gap-2 w-full rounded-lg bg-surface px-4 py-2.5 text-sm font-medium text-white hover:bg-surface-hover transition-colors" do %>
+          <%= icon("link-2", size: "sm") %>
+          Connect Charles Schwab (optional)
+        <% end %>
+
+        <%= link_to account_path(@account),
+                    class: "flex items-center justify-center w-full rounded-lg border border-primary px-4 py-2.5 text-sm text-primary hover:bg-container-inset transition-colors" do %>
+          Skip for now
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

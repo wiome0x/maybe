@@ -11,6 +11,7 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
       MarketQuote.new(
         symbol: "AAPL",
         name: "Apple",
+        description: "Technology · Consumer Electronics",
         price: 210.12,
         change_percent: 4.25,
         volume: 1_000_000,

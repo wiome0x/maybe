@@ -278,6 +278,15 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :broker_connections, only: %i[new create destroy] do
+    member do
+      get  :reauth
+      post :reconnect
+    end
+  end
+
+  get "/auth/schwab/callback", to: "broker_connections#schwab_callback"
+
   resources :plaid_items, only: %i[new edit create destroy] do
     member do
       post :sync

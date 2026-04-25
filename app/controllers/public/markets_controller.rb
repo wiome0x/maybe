@@ -50,19 +50,29 @@ class Public::MarketsController < ApplicationController
       return [] unless response.is_a?(Net::HTTPSuccess)
 
       quotes = JSON.parse(response.body).dig("finance", "result", 0, "quotes") || []
+      use_zh = I18n.locale.to_s.start_with?("zh")
 
       quotes.filter_map do |quote|
         price = quote["regularMarketPrice"]
         next if quote["symbol"].blank? || price.nil?
 
+        symbol = quote["symbol"]
+        description = if use_zh
+          StockInfo.description_zh_for(symbol)
+        else
+          StockInfo.description_for(symbol)
+        end
+        description ||= [ quote["industry"], quote["sector"] ].compact.uniq.join(" · ").presence
+
         MarketQuote.new(
-          symbol: quote["symbol"],
-          name: quote["shortName"] || quote["longName"] || quote["symbol"],
+          symbol: symbol,
+          name: quote["shortName"] || quote["longName"] || symbol,
+          description: description,
           price: price,
           change_percent: quote["regularMarketChangePercent"],
           volume: quote["regularMarketVolume"],
           market_cap: quote["marketCap"],
-          logo_url: "https://logo.synthfinance.com/ticker/#{quote['symbol']}",
+          logo_url: "https://logo.synthfinance.com/ticker/#{symbol}",
           item_type: "stock",
           open_price: quote["regularMarketOpen"],
           prev_close: quote["regularMarketPreviousClose"],

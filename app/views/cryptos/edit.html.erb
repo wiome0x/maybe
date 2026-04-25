@@ -2,5 +2,9 @@
   <% dialog.with_header(title: t(".edit", account: @account.name)) %>
   <% dialog.with_body do %>
     <%= render "form", account: @account, url: crypto_path(@account) %>
+
+    <hr class="border-primary my-2" />
+
+    <%= render "broker_connections/status", account: @account %>
   <% end %>
 <% end %>
