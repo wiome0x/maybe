@@ -28,13 +28,10 @@ class MarketNewsFeed
   CACHE_TTL = 10.minutes
   ITEM_LIMIT = 12
 
-  def self.fetch
-    Rails.cache.fetch(CACHE_KEY, expires_in: CACHE_TTL) do
-      FEEDS.flat_map { |feed| fetch_feed(feed) }
-           .sort_by { |item| item.published_at || Time.at(0) }
-           .reverse
-           .first(ITEM_LIMIT)
-    end
+  def self.fetch(force_refresh: false)
+    return fetch_all_feeds if force_refresh
+
+    Rails.cache.fetch(CACHE_KEY, expires_in: CACHE_TTL) { fetch_all_feeds }
   end
 
   def self.fetch_feed(feed)
@@ -89,5 +86,12 @@ class MarketNewsFeed
     CGI.unescapeHTML(text.to_s).gsub(/\s+/, " ").strip
   end
 
-  private_class_method :fetch_feed, :http_get, :normalize_text
+  def self.fetch_all_feeds
+    FEEDS.flat_map { |feed| fetch_feed(feed) }
+         .sort_by { |item| item.published_at || Time.at(0) }
+         .reverse
+         .first(ITEM_LIMIT)
+  end
+
+  private_class_method :fetch_feed, :http_get, :normalize_text, :fetch_all_feeds
 end

@@ -13,6 +13,12 @@ clean_syncs:
   queue: "scheduled"
   description: "Cleans up stale syncs"
 
+import_market_news:
+  cron: "0 * * * *" # every hour
+  class: "ImportMarketNewsJob"
+  queue: "scheduled"
+  description: "Refreshes persisted market news hourly"
+
 run_security_health_checks:
   cron: "0 2 * * 1-5" # 2:00 AM EST / 3:00 AM EDT (NY time) Monday through Friday
   class: "SecurityHealthCheckJob"

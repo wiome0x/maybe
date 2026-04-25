@@ -34,6 +34,7 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get stocks news" do
+    MarketNewsArticle.delete_all
     filtered_items = [
       MarketNewsFeed::Item.new(
         source: "CNBC",
@@ -66,6 +67,7 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should filter stocks news by source" do
+    MarketNewsArticle.delete_all
     filtered_items = [
       MarketNewsFeed::Item.new(
         source: "CNBC",
@@ -93,6 +95,7 @@ class MarketsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should filter stocks news by sec source" do
+    MarketNewsArticle.delete_all
     items = [
       MarketNewsFeed::Item.new(
         source: "SEC",

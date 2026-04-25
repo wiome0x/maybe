@@ -428,7 +428,8 @@ class MarketsController < ApplicationController
 
     def load_market_news
       @market_news_source = params[:news_source].presence_in(%w[all cnbc seeking_alpha sec marketwatch]) || "all"
-      @market_news = filter_market_news(MarketNewsFeed.fetch, @market_news_source)
+      MarketNewsArticle.refresh_if_stale!
+      @market_news = filter_market_news(MarketNewsArticle.latest_feed, @market_news_source)
       @market_news = MarketNewsTranslator.translate_items(@market_news, locale: I18n.locale)
     end
 end
