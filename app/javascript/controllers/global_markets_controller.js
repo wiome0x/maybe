@@ -236,19 +236,28 @@ export default class extends Controller {
     const container = this.mapContainerTarget;
     const cw = container.clientWidth || 1;
     const ch = container.clientHeight || 1;
+    const padding = this.mapPadding(cw);
+    const availableW = Math.max(cw - padding.left - padding.right, 1);
+    const availableH = Math.max(ch - padding.top - padding.bottom, 1);
+
+    container.style.setProperty("--gm-pad-top", `${padding.top}px`);
+    container.style.setProperty("--gm-pad-right", `${padding.right}px`);
+    container.style.setProperty("--gm-pad-bottom", `${padding.bottom}px`);
+    container.style.setProperty("--gm-pad-left", `${padding.left}px`);
 
     // SVG intrinsic size
     const svgW = 1440;
     const svgH = 560;
 
-    // Compute the actual rendered size of the SVG under object-contain
-    const scale = Math.min(cw / svgW, ch / svgH);
+    // Compute the rendered size of the SVG within a padded safe area so
+    // market labels with negative offsets don't get clipped by the card.
+    const scale = Math.min(availableW / svgW, availableH / svgH);
     const renderedW = svgW * scale;
     const renderedH = svgH * scale;
 
-    // Letterbox offsets (SVG is centered in the container)
-    const offsetX = (cw - renderedW) / 2;
-    const offsetY = (ch - renderedH) / 2;
+    // Center the map inside the padded safe area.
+    const offsetX = padding.left + (availableW - renderedW) / 2;
+    const offsetY = padding.top + (availableH - renderedH) / 2;
 
     // Map lon/lat → pixel using the rendered SVG dimensions
     this.projection = geoEquirectangular()
@@ -260,6 +269,18 @@ export default class extends Controller {
     `;
 
     this.markersLayer = this.mapTarget.querySelector("[data-global-markets-map-markers]");
+  }
+
+  mapPadding(width) {
+    if (width <= 720) {
+      return { top: 28, right: 24, bottom: 20, left: 24 };
+    }
+
+    if (width <= 1080) {
+      return { top: 52, right: 44, bottom: 26, left: 44 };
+    }
+
+    return { top: 72, right: 64, bottom: 32, left: 64 };
   }
 
   renderMarkets(priceMap) {

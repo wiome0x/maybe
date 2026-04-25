@@ -1,12 +1,38 @@
 <div class="relative overflow-hidden rounded-[32px] border border-[#2b2b2b] bg-container shadow-border-xs" data-controller="global-markets">
 
-  <%# 整体背景：浅蓝灰渐变，模拟地球仪氛围 %>
-  <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(160deg,#f8faff_0%,#f0f3f9_50%,#f5f7fb_100%)]"></div>
+  <%# 整体背景：更克制的终端面板层次 %>
+  <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#f9fbff_0%,#f3f6fb_48%,#edf1f8_100%)]"></div>
+  <div class="pointer-events-none absolute inset-0 opacity-[0.18]"
+       style="background:
+         linear-gradient(90deg, rgba(191,219,254,0.18) 0%, rgba(191,219,254,0.18) 11%, rgba(255,255,255,0) 11%, rgba(255,255,255,0) 22%, rgba(191,219,254,0.12) 22%, rgba(191,219,254,0.12) 33%, rgba(255,255,255,0) 33%, rgba(255,255,255,0) 44%, rgba(191,219,254,0.10) 44%, rgba(191,219,254,0.10) 55%, rgba(255,255,255,0) 55%, rgba(255,255,255,0) 66%, rgba(191,219,254,0.08) 66%, rgba(191,219,254,0.08) 77%, rgba(255,255,255,0) 77%, rgba(255,255,255,0) 88%, rgba(191,219,254,0.10) 88%, rgba(191,219,254,0.10) 100%);
+         mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.85) 16%, rgba(0,0,0,0.95) 90%, transparent 100%);">
+  </div>
+  <div class="pointer-events-none absolute inset-0 opacity-[0.22]"
+       style="background-image:
+         linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px),
+         linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px);
+         background-size: 56px 56px, 56px 56px;">
+  </div>
+  <div class="pointer-events-none absolute inset-y-0 right-0 left-[18%] hidden md:block opacity-70">
+    <svg class="h-full w-full" viewBox="0 0 1200 420" fill="none" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 92H1200" stroke="rgba(148,163,184,0.18)" stroke-width="1" stroke-dasharray="2 8"/>
+      <path d="M0 178H1200" stroke="rgba(148,163,184,0.14)" stroke-width="1" stroke-dasharray="2 8"/>
+      <path d="M0 264H1200" stroke="rgba(148,163,184,0.14)" stroke-width="1" stroke-dasharray="2 8"/>
+      <path d="M0 350H1200" stroke="rgba(148,163,184,0.18)" stroke-width="1" stroke-dasharray="2 8"/>
+      <path d="M180 0V420" stroke="rgba(148,163,184,0.12)" stroke-width="1" stroke-dasharray="3 10"/>
+      <path d="M390 0V420" stroke="rgba(148,163,184,0.12)" stroke-width="1" stroke-dasharray="3 10"/>
+      <path d="M600 0V420" stroke="rgba(148,163,184,0.12)" stroke-width="1" stroke-dasharray="3 10"/>
+      <path d="M810 0V420" stroke="rgba(148,163,184,0.12)" stroke-width="1" stroke-dasharray="3 10"/>
+      <path d="M1020 0V420" stroke="rgba(148,163,184,0.12)" stroke-width="1" stroke-dasharray="3 10"/>
+    </svg>
+  </div>
 
   <div class="relative flex flex-col md:flex-row" style="min-height:420px;">
 
     <%# 左侧：标题 + 交易时间列表 %>
-    <div class="flex flex-col gap-4 px-5 pt-5 pb-5 md:px-6 md:pt-6 md:pb-6 md:w-[220px] md:shrink-0 md:border-r md:border-white/60 bg-white/30 backdrop-blur-sm">
+    <div class="relative flex flex-col gap-4 px-5 pt-5 pb-5 md:px-6 md:pt-6 md:pb-6 md:w-[220px] md:shrink-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.26)_0%,rgba(255,255,255,0.10)_100%)] backdrop-blur-sm">
+      <div class="pointer-events-none absolute inset-y-0 right-0 hidden md:block w-px bg-[linear-gradient(180deg,rgba(148,163,184,0.00)_0%,rgba(148,163,184,0.22)_20%,rgba(148,163,184,0.14)_80%,rgba(148,163,184,0.00)_100%)]"></div>
+      <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0.03)_100%)]"></div>
       <div class="space-y-1">
         <div class="flex items-center gap-1.5 text-secondary">
           <%= icon "globe", size: "sm" %>
@@ -22,13 +48,15 @@
 
     <%# 右侧：地图，垂直居中 %>
     <div class="relative flex-1" style="min-height:320px;">
+      <div class="pointer-events-none absolute inset-y-0 left-0 w-28 bg-[linear-gradient(90deg,rgba(255,255,255,0.20)_0%,rgba(255,255,255,0.06)_38%,rgba(255,255,255,0.00)_100%)]"></div>
       <%# 地图容器 - SVG 和标注层共享同一坐标系 %>
       <div class="absolute inset-0" data-global-markets-target="mapContainer">
         <%# 地图 SVG - object-contain 居中显示 %>
-        <div class="pointer-events-none absolute inset-0">
+        <div class="pointer-events-none absolute"
+             style="top:var(--gm-pad-top,0px); right:var(--gm-pad-right,0px); bottom:var(--gm-pad-bottom,0px); left:var(--gm-pad-left,0px);">
           <%= image_tag "global-markets-map.svg", alt: "",
               class: "w-full h-full object-contain",
-              style: "opacity: 0.85;" %>
+              style: "opacity: 0.76; filter: drop-shadow(0 12px 24px rgba(148,163,184,0.05));" %>
         </div>
         <%# 指数标注层 - 与 SVG 共享同一 inset-0 坐标系 %>
         <div class="absolute inset-0 pointer-events-none" data-global-markets-target="map"></div>
