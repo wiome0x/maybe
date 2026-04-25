@@ -5,14 +5,14 @@ if ENV["COVERAGE"] == "true"
   end
 end
 
-require_relative "../config/environment"
-
 ENV["RAILS_ENV"] ||= "test"
 
-# Set Plaid to sandbox mode for tests
-ENV["PLAID_ENV"] = "sandbox"
+# Set Plaid to sandbox mode for tests before Rails initializes provider config.
+ENV["PLAID_ENV"] ||= "sandbox"
 ENV["PLAID_CLIENT_ID"] ||= "test_client_id"
 ENV["PLAID_SECRET"] ||= "test_secret"
+
+require_relative "../config/environment"
 
 # Fixes Segfaults on M1 Macs when running tests in parallel (temporary workaround)
 ENV["PGGSSENCMODE"] = "disable"

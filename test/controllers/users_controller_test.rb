@@ -3,6 +3,7 @@ require "test_helper"
 class UsersControllerTest < ActionDispatch::IntegrationTest
   setup do
     sign_in @user = users(:family_admin)
+    clear_enqueued_jobs
   end
 
   test "can supply custom redirect after update" do

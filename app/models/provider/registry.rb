@@ -47,7 +47,10 @@ class Provider::Registry
       end
 
       def plaid_us
-        config = Rails.application.config.plaid
+        config = Rails.application.config.plaid || build_plaid_config(
+          client_id: ENV["PLAID_CLIENT_ID"],
+          secret: ENV["PLAID_SECRET"]
+        )
 
         return nil unless config.present?
 
@@ -55,11 +58,24 @@ class Provider::Registry
       end
 
       def plaid_eu
-        config = Rails.application.config.plaid_eu
+        config = Rails.application.config.plaid_eu || build_plaid_config(
+          client_id: ENV["PLAID_EU_CLIENT_ID"],
+          secret: ENV["PLAID_EU_SECRET"]
+        )
 
         return nil unless config.present?
 
         Provider::Plaid.new(config, region: :eu)
+      end
+
+      def build_plaid_config(client_id:, secret:)
+        return nil if client_id.blank? || secret.blank?
+
+        Plaid::Configuration.new.tap do |config|
+          config.server_index = Plaid::Configuration::Environment[ENV.fetch("PLAID_ENV", "sandbox")]
+          config.api_key["PLAID-CLIENT-ID"] = client_id
+          config.api_key["PLAID-SECRET"] = secret
+        end
       end
 
       def github
