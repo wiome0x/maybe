@@ -84,10 +84,11 @@ class PlaidItem::Importer
         end
 
         # Once we know all data has been imported, save the cursor to avoid re-fetching the same data next time
-        plaid_item.update!(next_cursor: snapshot.transactions_cursor)
+        cursor = snapshot.transactions_cursor
+        plaid_item.update!(next_cursor: cursor)
 
         Rails.logger.tagged("PlaidItem::Importer", "plaid_item=#{plaid_item.id}") do
-          Rails.logger.info("Cursor saved | next_cursor=#{snapshot.transactions_cursor.present? ? '[present]' : 'nil'}")
+          Rails.logger.info("Cursor saved | next_cursor=#{cursor.present? ? '[present]' : 'nil'}")
         end
       end
     end

@@ -41,7 +41,7 @@ class PlaidAccount::Investments::CashReport
   def unsupported_reasons
     reasons = []
     reasons << :missing_forex_counterparty_legs if contains_forex_transactions?
-    reasons << :missing_settlement_dates
+    reasons << :missing_settlement_dates if contains_forex_transactions?
     reasons
   end
 

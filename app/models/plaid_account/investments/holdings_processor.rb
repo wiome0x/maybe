@@ -20,26 +20,11 @@ class PlaidAccount::Investments::HoldingsProcessor
       processed_holding_dates << holding_date
       processed_holding_keys << [ security.id, holding_date, plaid_holding["iso_currency_code"] ]
 
-      holding = account.holdings.find_or_initialize_by(
-        security: security,
-        date: holding_date,
-        currency: plaid_holding["iso_currency_code"]
-      )
-
-      holding.assign_attributes(
-        qty: plaid_holding["quantity"],
-        price: plaid_holding["institution_price"],
-        amount: plaid_holding["quantity"] * plaid_holding["institution_price"]
-      )
-
       ActiveRecord::Base.transaction do
-        holding.save!
-
-        # Plaid returns one aggregate holding per security/currency/date snapshot.
-        # Remove any duplicate rows left behind by prior syncs for the same snapshot key.
+        # Remove any duplicate rows and stale future holdings before upserting.
+        # This must happen before save! to avoid unique constraint violations.
         account.holdings
           .where(security: security, date: holding_date, currency: plaid_holding["iso_currency_code"])
-          .where.not(id: holding.id)
           .destroy_all
 
         # Delete all holdings for this security after the institution price date
@@ -47,6 +32,17 @@ class PlaidAccount::Investments::HoldingsProcessor
           .where(security: security)
           .where("date > ?", holding_date)
           .destroy_all
+
+        holding = account.holdings.build(
+          security: security,
+          date: holding_date,
+          currency: plaid_holding["iso_currency_code"],
+          qty: plaid_holding["quantity"],
+          price: plaid_holding["institution_price"],
+          amount: plaid_holding["quantity"] * plaid_holding["institution_price"]
+        )
+
+        holding.save!
       end
     end
 

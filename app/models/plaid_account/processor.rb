@@ -47,20 +47,23 @@ class PlaidAccount::Processor
           source: "plaid"
         )
 
+        new_balance = balance_calculator.balance
+        new_cash_balance = balance_calculator.cash_balance
+
         account.assign_attributes(
           accountable: map_accountable(plaid_account.plaid_type),
-          balance: balance_calculator.balance,
+          balance: new_balance,
           currency: plaid_account.currency,
-          cash_balance: balance_calculator.cash_balance
+          cash_balance: new_cash_balance
         )
 
         account.save!
 
         Rails.logger.tagged("PlaidAccount::Processor", "plaid_account=#{plaid_account.id}") do
-          Rails.logger.info("Account upserted | account=#{account.id} new=#{account.previously_new_record?} balance=#{balance_calculator.balance} cash=#{balance_calculator.cash_balance}")
+          Rails.logger.info("Account upserted | account=#{account.id} new=#{account.previously_new_record?} balance=#{new_balance} cash=#{new_cash_balance}")
         end
 
-        account.set_current_balance(balance_calculator.balance)
+        account.set_current_balance(new_balance)
       end
     end
 

@@ -94,8 +94,7 @@ class PlaidAccount::ProcessorTest < ActiveSupport::TestCase
   test "calculates balance using BalanceCalculator for investment accounts" do
     @plaid_account.update!(plaid_type: "investment")
 
-    # Balance is called twice: once for account.balance and once for set_current_balance
-    PlaidAccount::Investments::BalanceCalculator.any_instance.expects(:balance).returns(1000).twice
+    PlaidAccount::Investments::BalanceCalculator.any_instance.expects(:balance).returns(1000).once
     PlaidAccount::Investments::BalanceCalculator.any_instance.expects(:cash_balance).returns(1000).once
 
     PlaidAccount::Processor.new(@plaid_account).process
