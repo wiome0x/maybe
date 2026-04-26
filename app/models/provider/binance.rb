@@ -5,12 +5,12 @@ class Provider::Binance < Provider
   QUOTE_ASSETS        = %w[USDT USDC BUSD FDUSD BTC ETH BNB EUR TRY BRL AUD RUB GBP USD].freeze
   STABLE_QUOTE_ASSETS = %w[USDT USDC BUSD FDUSD USD].freeze
 
-   # Probed when the account holds only stable coins (all positions sold).
-   # Covers the most actively traded spot pairs on Binance.
-   FALLBACK_PROBE_ASSETS = %w[
-     BTC ETH BNB SOL XRP ADA DOGE DOT AVAX MATIC LINK UNI ATOM LTC BCH
-     ETC FIL NEAR APT ARB OP SUI PEPE SHIB TRX TON TRUMP FDUSD
-   ].freeze
+  # Probed when the account holds only stable coins (all positions sold).
+  # Covers the most actively traded spot pairs on Binance.
+  FALLBACK_PROBE_ASSETS = %w[
+    BTC ETH BNB SOL XRP ADA DOGE DOT AVAX MATIC LINK UNI ATOM LTC BCH
+    ETC FIL NEAR APT ARB OP SUI PEPE SHIB TRX TON TRUMP FDUSD
+  ].freeze
 
   # Keys that must never appear in audit logs
   REDACTED_KEYS = %w[signature X-MBX-APIKEY api_key api_secret key secret].freeze

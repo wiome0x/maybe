@@ -184,5 +184,4 @@ class Provider::BinanceTest < ActiveSupport::TestCase
     assert result.success?
     assert_empty result.data
   end
-
 end

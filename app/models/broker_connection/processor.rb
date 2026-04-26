@@ -8,11 +8,11 @@ class BrokerConnection::Processor
     @broker_connection = broker_connection
   end
 
-   def process
-     process_holdings
-     process_trades
-     update_account_balance
-   end
+  def process
+    process_holdings
+    process_trades
+    update_account_balance
+  end
 
   private
     def account
@@ -231,29 +231,29 @@ class BrokerConnection::Processor
       payload.is_a?(Hash) ? payload.fetch("balances", []) : []
     end
 
-     def binance_trades
-       Array(broker_connection.raw_transactions_payload)
-     end
+    def binance_trades
+      Array(broker_connection.raw_transactions_payload)
+    end
 
-     # After processing holdings, set the current_anchor valuation so the
-     # reverse balance calculator has a starting point.
-     def update_account_balance
-       total = binance_balances.sum do |b|
-         asset = b["asset"].to_s.upcase
-         qty   = total_balance_for(b)
-         next 0 if qty <= 0
+    # After processing holdings, set the current_anchor valuation so the
+    # reverse balance calculator has a starting point.
+    def update_account_balance
+      total = binance_balances.sum do |b|
+        asset = b["asset"].to_s.upcase
+        qty   = total_balance_for(b)
+        next 0 if qty <= 0
 
-         if stable_asset?(asset)
-           qty * estimated_price_for(asset)
-         else
-           holding = account.holdings.find_by(
-             security: Security.find_by(ticker: asset),
-             date: broker_connection.last_snapshot_at&.to_date || Date.current
-           )
-           holding ? holding.amount : 0
-         end
-       end
+        if stable_asset?(asset)
+          qty * estimated_price_for(asset)
+        else
+          holding = account.holdings.find_by(
+            security: Security.find_by(ticker: asset),
+            date: broker_connection.last_snapshot_at&.to_date || Date.current
+          )
+          holding ? holding.amount : 0
+        end
+      end
 
-       account.set_current_balance(total.to_d)
-     end
+      account.set_current_balance(total.to_d)
+    end
 end
