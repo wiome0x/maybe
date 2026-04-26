@@ -1,5 +1,5 @@
 class Provider::Synth < Provider
-  include ExchangeRateConcept, SecurityConcept
+  include Provider::ExchangeRateConcept, Provider::SecurityConcept
 
   # Subclass so errors caught in this provider are raised as Provider::Synth::Error
   Error = Class.new(Provider::Error)
@@ -12,14 +12,14 @@ class Provider::Synth < Provider
 
   def healthy?
     with_provider_response do
-      response = client.get("#{base_url}/user")
+      response = client.get("/user")
       JSON.parse(response.body).dig("id").present?
     end
   end
 
   def usage
     with_provider_response do
-      response = client.get("#{base_url}/user")
+      response = client.get("/user")
 
       parsed = JSON.parse(response.body)
 
@@ -42,7 +42,7 @@ class Provider::Synth < Provider
 
   def fetch_exchange_rate(from:, to:, date:)
     with_provider_response do
-      response = client.get("#{base_url}/rates/historical") do |req|
+      response = client.get("/rates/historical") do |req|
         req.params["date"] = date.to_s
         req.params["from"] = from
         req.params["to"] = to
@@ -57,7 +57,7 @@ class Provider::Synth < Provider
   def fetch_exchange_rates(from:, to:, start_date:, end_date:)
     with_provider_response do
       data = paginate(
-        "#{base_url}/rates/historical-range",
+        "/rates/historical-range",
         from: from,
         to: to,
         date_start: start_date.to_s,
@@ -90,7 +90,7 @@ class Provider::Synth < Provider
 
   def search_securities(symbol, country_code: nil, exchange_operating_mic: nil)
     with_provider_response do
-      response = client.get("#{base_url}/tickers/search") do |req|
+      response = client.get("/tickers/search") do |req|
         req.params["name"] = symbol
         req.params["dataset"] = "limited"
         req.params["country_code"] = country_code if country_code.present?
@@ -115,7 +115,7 @@ class Provider::Synth < Provider
 
   def fetch_security_info(symbol:, exchange_operating_mic:)
     with_provider_response do
-      response = client.get("#{base_url}/tickers/#{symbol}") do |req|
+      response = client.get("/tickers/#{symbol}") do |req|
         req.params["operating_mic"] = exchange_operating_mic
       end
 
@@ -137,7 +137,7 @@ class Provider::Synth < Provider
     with_provider_response do
       historical_data = fetch_security_prices(symbol:, exchange_operating_mic:, start_date: date, end_date: date)
 
-      raise ProviderError, "No prices found for security #{symbol} on date #{date}" if historical_data.data.empty?
+      raise Error, "No prices found for security #{symbol} on date #{date}" if historical_data.data.empty?
 
       historical_data.data.first
     end
@@ -152,7 +152,7 @@ class Provider::Synth < Provider
       }.compact
 
       data = paginate(
-        "#{base_url}/tickers/#{symbol}/open-close",
+        "/tickers/#{symbol}/open-close",
         params
       ) do |body|
         body.dig("prices")
@@ -189,7 +189,7 @@ class Provider::Synth < Provider
     attr_reader :api_key
 
     def base_url
-      ENV["SYNTH_URL"] || "https://api.synthfinance.com"
+      ENV["SYNTH_URL"].presence || "https://api.synthfinance.com"
     end
 
     def app_name

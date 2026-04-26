@@ -1,5 +1,5 @@
 class Provider::Openrouter < Provider
-  include LlmConcept
+  include Provider::LlmConcept
 
   Error = Class.new(Provider::Error)
 

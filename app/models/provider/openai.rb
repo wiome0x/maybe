@@ -1,5 +1,5 @@
 class Provider::Openai < Provider
-  include LlmConcept
+  include Provider::LlmConcept
 
   # Subclass so errors caught in this provider are raised as Provider::Openai::Error
   Error = Class.new(Provider::Error)
