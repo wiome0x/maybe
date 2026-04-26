@@ -38,7 +38,7 @@ class AccountsController < ApplicationController
       end
     end
 
-    redirect_to accounts_path
+    redirect_to account_url(@account)
   end
 
   def sparkline

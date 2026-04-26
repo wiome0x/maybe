@@ -59,7 +59,8 @@ class BrokerConnection::ProcessorTest < ActiveSupport::TestCase
     usdt_holding = @account.holdings.joins(:security).find_by!(securities: { ticker: "USDT" })
 
     assert_equal 0.6.to_d, btc_holding.qty
-    assert_equal 30_000.to_d, btc_holding.price
+    # estimated_price uses the most recent trade price (sell at 32000)
+    assert_equal 32_000.to_d, btc_holding.price
     assert_equal 25.to_d, usdt_holding.qty
     assert_equal 1.to_d, usdt_holding.price
   end

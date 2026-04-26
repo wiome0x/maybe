@@ -26,7 +26,8 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
       status: "draft"
     )
 
-    Provider::Binance.any_instance.expects(:validate_credentials!).once
+    success_response = Provider::Response.new(success?: true, data: {}, error: nil)
+    Provider::Binance.any_instance.expects(:validate_credentials!).once.returns(success_response)
     BrokerConnection.any_instance.expects(:sync_later).once
 
     assert_difference "BrokerConnection.count", 1 do
@@ -54,7 +55,8 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
       status: "draft"
     )
 
-    Provider::Binance.any_instance.expects(:validate_credentials!).once
+    success_response = Provider::Response.new(success?: true, data: {}, error: nil)
+    Provider::Binance.any_instance.expects(:validate_credentials!).once.returns(success_response)
     BrokerConnection.any_instance.expects(:sync_later).once
 
     post broker_connections_url, params: {
@@ -143,7 +145,11 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
       status: "draft"
     )
 
-    state = BrokerOnboarding.new(session: {}).authorization_state_for(account: fresh_account, return_to: accounts_path)
+    # Stub the onboarding service to return a known state without needing secret_key_base
+    BrokerOnboarding.any_instance.stubs(:resolve_state).returns({
+      account_id: fresh_account.id,
+      return_to: accounts_path
+    })
 
     Provider::Schwab.expects(:exchange_code).with(code: "auth_code_123").returns({
       access_token: "access_abc",
@@ -153,7 +159,7 @@ class BrokerConnectionsControllerTest < ActionDispatch::IntegrationTest
     })
     BrokerConnection.any_instance.expects(:sync_later).once
 
-    get auth_schwab_callback_url, params: { code: "auth_code_123", state: state }
+    get auth_schwab_callback_url, params: { code: "auth_code_123", state: "any_state" }
 
     assert_redirected_to accounts_path
     assert_equal "active", fresh_account.reload.status
