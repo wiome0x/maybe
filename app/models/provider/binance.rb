@@ -63,7 +63,7 @@ class Provider::Binance < Provider
       traded_assets = candidates.select do |asset|
         begin
           call(:my_trades, symbol: "#{asset}USDT", **kwargs).any?
-        rescue Binance::ClientError
+        rescue ::Binance::ClientError
           false
         end
       end
@@ -78,7 +78,7 @@ class Provider::Binance < Provider
         QUOTE_ASSETS.flat_map do |quote|
           begin
             call(:my_trades, symbol: "#{asset}#{quote}", **kwargs)
-          rescue Binance::ClientError
+          rescue ::Binance::ClientError
             []
           end
         end
@@ -120,7 +120,7 @@ class Provider::Binance < Provider
         )
 
         data
-      rescue Binance::ClientError => e
+      rescue ::Binance::ClientError => e
         elapsed_ms = ((Time.current - started_at) * 1000).round
         body   = e.response&.dig(:body) || {}
         parsed = body.is_a?(String) ? (JSON.parse(body) rescue { "raw" => body }) : body
@@ -139,7 +139,7 @@ class Provider::Binance < Provider
         )
 
         raise Error.new(msg)
-      rescue Binance::ServerError => e
+      rescue ::Binance::ServerError => e
         elapsed_ms = ((Time.current - started_at) * 1000).round
         msg = "Binance server error: #{e.message}"
 
