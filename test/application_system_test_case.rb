@@ -17,8 +17,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
         click_on "Log in"
       end
 
-      # Trigger Capybara's wait mechanism to avoid timing issues with logins
-      find("h1", text: "Welcome back, #{user.first_name}")
+      # Wait for the post-login redirect instead of a specific dashboard heading.
+      assert_current_path root_path
     end
 
     def login_as(user)
