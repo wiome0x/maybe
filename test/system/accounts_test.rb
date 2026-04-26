@@ -107,30 +107,32 @@ class AccountsTest < ApplicationSystemTestCase
     end
 
     def assert_account_created(accountable_type, &block)
-      click_link Accountable.from_type(accountable_type).display_name.singularize
-
-      if page.has_link?("Enter account balance")
-        click_link "Enter account balance"
+      within "turbo-frame#modal" do
+        click_link Accountable.from_type(accountable_type).display_name.singularize
       end
 
-      account_name = "[system test] #{accountable_type} Account"
+      within "turbo-frame#modal" do
+        click_link "Enter account balance" if page.has_link?("Enter account balance")
 
-      assert_field "Account name*"
-      fill_in "Account name*", with: account_name
-      fill_in "account[balance]", with: 100.99
+        account_name = "[system test] #{accountable_type} Account"
 
-      yield if block_given?
+        assert_field "Account name*"
+        fill_in "Account name*", with: account_name
+        fill_in "account[balance]", with: 100.99
 
-      click_button "Create Account"
+        yield if block_given?
+
+        click_button "Create Account"
+      end
 
       within_testid("account-sidebar-tabs") do
         click_on "All"
         find("details", text: Accountable.from_type(accountable_type).display_name).click
-        assert_text account_name
+        assert_text "[system test] #{accountable_type} Account"
       end
 
       visit accounts_url
-      assert_text account_name
+      assert_text "[system test] #{accountable_type} Account"
 
       created_account = Account.order(:created_at).last
 
