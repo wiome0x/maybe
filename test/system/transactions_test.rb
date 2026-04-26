@@ -185,6 +185,9 @@ class TransactionsTest < ApplicationSystemTestCase
 
   test "can create deposit transaction for investment account" do
     investment_account = accounts(:investment)
+    # Remove broker connection so the account is treated as manual (shows "New" button)
+    investment_account.broker_connection&.destroy
+    investment_account.reload
     investment_account.entries.create!(name: "Investment account", date: Date.current, amount: 1000, currency: "USD", entryable: Transaction.new)
     transfer_date = Date.current
     visit account_url(investment_account, tab: "activity")

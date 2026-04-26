@@ -9,6 +9,9 @@ class TradesTest < ApplicationSystemTestCase
     @user.update!(show_sidebar: false, show_ai_sidebar: false)
 
     @account = accounts(:investment)
+    # Remove broker connection so the account is treated as manual (shows "New" button)
+    @account.broker_connection&.destroy
+    @account.reload
 
     visit_account_portfolio
 

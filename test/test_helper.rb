@@ -12,6 +12,9 @@ ENV["PLAID_ENV"] ||= "sandbox"
 ENV["PLAID_CLIENT_ID"] ||= "test_client_id"
 ENV["PLAID_SECRET"] ||= "test_secret"
 
+# Set Synth API key for tests
+ENV["SYNTH_API_KEY"] ||= "test_synth_api_key"
+
 require_relative "../config/environment"
 
 # Fixes Segfaults on M1 Macs when running tests in parallel (temporary workaround)

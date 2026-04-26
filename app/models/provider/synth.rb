@@ -197,7 +197,7 @@ class Provider::Synth < Provider
     end
 
     def app_type
-      Rails.application.config.app_mode
+      Rails.application.config.app_mode.to_s
     end
 
     def client
