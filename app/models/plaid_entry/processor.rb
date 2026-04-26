@@ -66,9 +66,13 @@ class PlaidEntry::Processor
     end
 
     def currency
-      plaid_transaction["iso_currency_code"] ||
-        plaid_transaction["unofficial_currency_code"] ||
-        account.currency
+      iso = plaid_transaction["iso_currency_code"]
+      return iso if iso.present? && Money::Currency.find(iso)
+
+      unofficial = plaid_transaction["unofficial_currency_code"]
+      return unofficial if unofficial.present? && Money::Currency.find(unofficial)
+
+      account.currency
     end
 
     def date
