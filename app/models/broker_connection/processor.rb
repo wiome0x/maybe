@@ -141,7 +141,15 @@ class BrokerConnection::Processor
     end
 
     def estimated_price_for(asset)
-      return 1.to_d if stable_asset?(asset) && account.currency == "USD"
+      if stable_asset?(asset)
+        # Stable coins are pegged to USD. Convert 1 USD → account currency.
+        return 1.to_d if account.currency == "USD"
+
+        rate = ExchangeRate.find_or_fetch_rate(from: "USD", to: account.currency, date: Date.current)
+        return rate.rate.to_d if rate.present?
+
+        return 1.to_d # Fallback: treat as 1:1 if no rate available
+      end
 
       trade = binance_trades.reverse.find do |payload|
         base_asset_for(payload) == asset && quote_asset_supported?(quote_asset_for(payload))
@@ -230,10 +238,9 @@ class BrokerConnection::Processor
          qty   = total_balance_for(b)
          next 0 if qty <= 0
 
-         if stable_asset?(asset) && account.currency == "USD"
-           qty
+         if stable_asset?(asset)
+           qty * estimated_price_for(asset)
          else
-           # Use the price we already computed for this asset's holding
            holding = account.holdings.find_by(
              security: Security.find_by(ticker: asset),
              date: broker_connection.last_snapshot_at&.to_date || Date.current
