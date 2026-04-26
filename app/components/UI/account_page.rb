@@ -43,7 +43,7 @@ class UI::AccountPage < ApplicationComponent
   def tabs
     case account.accountable_type
     when "Investment", "Crypto"
-      [ :activity, :holdings, :reports ]
+      [ :holdings, :activity, :reports ]
     when "Property", "Vehicle", "Loan"
       [ :activity, :overview ]
     else
