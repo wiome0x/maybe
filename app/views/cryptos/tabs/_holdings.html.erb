@@ -1,0 +1,221 @@
+<%# locals: (account:) %>
+
+<%
+  stable_coins   = BrokerConnection::Processor::BINANCE_STABLE_QUOTES
+  all_holdings   = account.current_holdings.select { |h| h.qty > 0 }
+  stable_holdings = all_holdings.select { |h| stable_coins.include?(h.ticker) }
+  crypto_holdings = all_holdings.reject { |h| stable_coins.include?(h.ticker) }
+
+  pie_colors = %w[#F59E0B #3B82F6 #10B981 #8B5CF6 #EF4444 #EC4899 #14B8A6 #F97316 #6366F1 #6B7280]
+
+  slices = []
+  all_holdings.each_with_index do |h, i|
+    next unless h.weight.present? && h.weight > 0
+    slices << { label: h.ticker, value: h.weight.round(1), color: pie_colors[i % pie_colors.length] }
+  end
+  total = slices.sum { |s| s[:value] }
+  largest_slice = slices.max_by { |s| s[:value] }
+  labeled_slice_indexes = slices.each_with_index
+    .sort_by { |(s, _i)| -s[:value] }
+    .first(3)
+    .map(&:last)
+%>
+
+<%= turbo_frame_tag dom_id(account, :holdings) do %>
+  <div class="space-y-4">
+
+    <%# ── Top section: pie chart + summary ── %>
+    <div class="bg-container rounded-xl shadow-border-xs p-5">
+      <h2 class="font-medium text-lg mb-4">Portfolio Allocation</h2>
+
+      <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,auto)] xl:items-start">
+
+        <%# Left: holdings table %>
+        <div class="bg-container-inset rounded-xl p-1 min-w-0 space-y-1">
+
+          <%# Crypto holdings %>
+          <% if crypto_holdings.any? %>
+            <div class="px-4 py-2">
+              <p class="text-xs font-semibold uppercase tracking-widest text-secondary">Crypto</p>
+            </div>
+            <div class="grid grid-cols-12 items-center uppercase text-xs font-medium text-secondary px-4 py-2">
+              <p class="col-span-5">Asset</p>
+              <p class="col-span-2 justify-self-end">Weight</p>
+              <p class="col-span-2 justify-self-end">Avg Cost</p>
+              <p class="col-span-3 justify-self-end">Value</p>
+            </div>
+            <div class="bg-container rounded-lg shadow-border-xs divide-y divide-primary">
+              <% crypto_holdings.each do |holding| %>
+                <div class="grid grid-cols-12 items-center text-sm font-medium text-primary p-4">
+                  <div class="col-span-5 flex items-center gap-3">
+                    <%= render DS::FilledIcon.new(variant: :text, text: holding.ticker, rounded: true, size: "sm") %>
+                    <div class="space-y-0.5 min-w-0">
+                      <p class="truncate"><%= holding.name %></p>
+                      <p class="text-xs text-secondary uppercase"><%= holding.ticker %></p>
+                    </div>
+                  </div>
+                  <div class="col-span-2 flex justify-end items-center gap-1">
+                    <% if holding.weight %>
+                      <%= render "shared/progress_circle", progress: holding.weight %>
+                      <span><%= number_to_percentage(holding.weight, precision: 1) %></span>
+                    <% else %>
+                      <span class="text-secondary">--</span>
+                    <% end %>
+                  </div>
+                  <div class="col-span-2 text-right">
+                    <p><%= format_money holding.avg_cost %></p>
+                    <p class="text-xs text-secondary font-normal">per coin</p>
+                  </div>
+                  <div class="col-span-3 text-right">
+                    <p><%= holding.amount_money ? format_money(holding.amount_money) : "--" %></p>
+                    <p class="text-xs text-secondary font-normal"><%= number_with_precision(holding.qty, precision: 4, strip_insignificant_zeros: true) %> coins</p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <%# Stable coin holdings %>
+          <% if stable_holdings.any? %>
+            <div class="px-4 pt-4 pb-2">
+              <p class="text-xs font-semibold uppercase tracking-widest text-secondary">Stablecoins</p>
+            </div>
+            <div class="bg-container rounded-lg shadow-border-xs divide-y divide-primary">
+              <% stable_holdings.each do |holding| %>
+                <% currency_obj = (Money::Currency.find(holding.ticker) rescue nil) %>
+                <div class="grid grid-cols-12 items-center text-sm font-medium text-primary p-4">
+                  <div class="col-span-5 flex items-center gap-3">
+                    <%= render DS::FilledIcon.new(variant: :text, text: currency_obj&.symbol || holding.ticker, rounded: true, size: "sm") %>
+                    <div class="space-y-0.5">
+                      <p><%= holding.ticker %></p>
+                      <p class="text-xs text-secondary">Stablecoin</p>
+                    </div>
+                  </div>
+                  <div class="col-span-2 flex justify-end items-center gap-1">
+                    <% if holding.weight %>
+                      <%= render "shared/progress_circle", progress: holding.weight %>
+                      <span><%= number_to_percentage(holding.weight, precision: 1) %></span>
+                    <% else %>
+                      <span class="text-secondary">--</span>
+                    <% end %>
+                  </div>
+                  <div class="col-span-2 text-right">
+                    <p><%= format_money holding.avg_cost %></p>
+                    <p class="text-xs text-secondary font-normal">per coin</p>
+                  </div>
+                  <div class="col-span-3 text-right">
+                    <p><%= holding.amount_money ? format_money(holding.amount_money) : "--" %></p>
+                    <p class="text-xs text-secondary font-normal"><%= number_with_precision(holding.qty, precision: 2) %> coins</p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <% if all_holdings.empty? %>
+            <div class="p-8 text-center text-secondary text-sm">
+              No holdings found. Sync your Binance account to see your portfolio.
+            </div>
+          <% end %>
+        </div>
+
+        <%# Right: pie chart %>
+        <% if slices.any? %>
+          <div class="bg-container-inset rounded-xl p-4">
+            <h3 class="text-xs font-medium text-secondary uppercase mb-3">Allocation</h3>
+            <div class="flex flex-col items-center gap-5">
+              <svg width="220" height="220" viewBox="0 0 180 180" class="shrink-0 overflow-visible">
+                <%
+                  cx = 90; cy = 90; outer_r = 75; inner_r = 45
+                  angle = -90.0
+                  slices.each_with_index do |s, i|
+                    pct   = total > 0 ? s[:value] / total : 0
+                    sweep = pct * 360.0
+                    start_rad = angle * Math::PI / 180
+                    end_rad   = (angle + sweep) * Math::PI / 180
+                    large = sweep > 180 ? 1 : 0
+                    color = s[:color]
+
+                    ox1 = cx + outer_r * Math.cos(start_rad); oy1 = cy + outer_r * Math.sin(start_rad)
+                    ox2 = cx + outer_r * Math.cos(end_rad);   oy2 = cy + outer_r * Math.sin(end_rad)
+                    ix1 = cx + inner_r * Math.cos(end_rad);   iy1 = cy + inner_r * Math.sin(end_rad)
+                    ix2 = cx + inner_r * Math.cos(start_rad); iy2 = cy + inner_r * Math.sin(start_rad)
+                %>
+                  <path d="M<%= ox1 %> <%= oy1 %> A<%= outer_r %> <%= outer_r %> 0 <%= large %> 1 <%= ox2 %> <%= oy2 %> L<%= ix1 %> <%= iy1 %> A<%= inner_r %> <%= inner_r %> 0 <%= large %> 0 <%= ix2 %> <%= iy2 %> Z"
+                        fill="<%= color %>" stroke="white" stroke-width="2"/>
+
+                  <% if labeled_slice_indexes.include?(i) %>
+                    <%
+                      mid_angle = angle + (sweep / 2.0)
+                      mid_rad   = mid_angle * Math::PI / 180
+                      ls_r = outer_r + 2; lb_r = outer_r + 10; lt_r = outer_r + 18
+                      sx = cx + ls_r * Math.cos(mid_rad); sy = cy + ls_r * Math.sin(mid_rad)
+                      bx = cx + lb_r * Math.cos(mid_rad); by = cy + lb_r * Math.sin(mid_rad)
+                      tx = cx + lt_r * Math.cos(mid_rad)
+                      on_right = Math.cos(mid_rad) >= 0
+                      anchor = on_right ? "start" : "end"
+                      lx = on_right ? tx + 6 : tx - 6
+                    %>
+                    <path d="M<%= sx.round(2) %> <%= sy.round(2) %> L<%= bx.round(2) %> <%= by.round(2) %> L<%= lx.round(2) %> <%= by.round(2) %>"
+                          fill="none" stroke="<%= color %>" stroke-width="1.5" stroke-linecap="round"/>
+                    <text x="<%= lx.round(2) %>" y="<%= (by - 2).round(2) %>" text-anchor="<%= anchor %>"
+                          class="fill-current text-primary" style="font-size:9px;font-weight:700;"><%= s[:label] %></text>
+                    <text x="<%= lx.round(2) %>" y="<%= (by + 9).round(2) %>" text-anchor="<%= anchor %>"
+                          class="fill-current text-secondary" style="font-size:8px;font-weight:600;"><%= number_to_percentage(s[:value], precision: 1) %></text>
+                  <% end %>
+                <% angle += sweep; end %>
+
+                <% if largest_slice %>
+                  <text x="<%= cx %>" y="<%= cy - 10 %>" text-anchor="middle" class="fill-current text-secondary" style="font-size:10px;font-weight:500;">Largest</text>
+                  <text x="<%= cx %>" y="<%= cy + 10 %>" text-anchor="middle" class="fill-current text-primary" style="font-size:16px;font-weight:700;"><%= largest_slice[:label] %></text>
+                  <text x="<%= cx %>" y="<%= cy + 28 %>" text-anchor="middle" class="fill-current text-primary" style="font-size:12px;font-weight:600;"><%= number_to_percentage(largest_slice[:value], precision: 1) %></text>
+                <% end %>
+              </svg>
+
+              <div class="grid w-full gap-x-4 gap-y-2 grid-cols-2">
+                <% slices.each do |s| %>
+                  <div class="flex items-center gap-2 py-0.5">
+                    <span class="h-2.5 w-2.5 rounded-[3px] shrink-0" style="background:<%= s[:color] %>"></span>
+                    <span class="text-xs text-secondary truncate"><%= s[:label] %></span>
+                    <span class="text-xs font-medium text-primary ml-auto"><%= s[:value] %>%</span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# ── Summary cards ── %>
+    <% if all_holdings.any? %>
+      <div class="grid gap-3 sm:grid-cols-3">
+        <%
+          crypto_value  = crypto_holdings.sum { |h| h.amount || 0 }
+          stable_value  = stable_holdings.sum { |h| h.amount || 0 }
+          total_value   = account.balance
+        %>
+        <div class="bg-container rounded-xl shadow-border-xs p-4">
+          <p class="text-xs uppercase tracking-widest text-secondary">Total Value</p>
+          <p class="mt-2 text-2xl font-medium text-primary"><%= format_money account.balance_money %></p>
+          <p class="mt-1 text-sm text-secondary"><%= all_holdings.count %> assets</p>
+        </div>
+        <div class="bg-container rounded-xl shadow-border-xs p-4">
+          <p class="text-xs uppercase tracking-widest text-secondary">Crypto</p>
+          <p class="mt-2 text-2xl font-medium text-primary"><%= format_money Money.new(crypto_value, account.currency) %></p>
+          <p class="mt-1 text-sm text-secondary">
+            <%= total_value > 0 ? number_to_percentage(crypto_value / total_value * 100, precision: 1) : "0%" %> of portfolio
+          </p>
+        </div>
+        <div class="bg-container rounded-xl shadow-border-xs p-4">
+          <p class="text-xs uppercase tracking-widest text-secondary">Stablecoins</p>
+          <p class="mt-2 text-2xl font-medium text-primary"><%= format_money Money.new(stable_value, account.currency) %></p>
+          <p class="mt-1 text-sm text-secondary">
+            <%= total_value > 0 ? number_to_percentage(stable_value / total_value * 100, precision: 1) : "0%" %> of portfolio
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+  </div>
+<% end %>

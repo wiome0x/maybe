@@ -1,0 +1,221 @@
+<%# locals: (account:, period:) %>
+<% report = Account::InvestmentReport.new(account, period: period || Period.last_30_days) %>
+
+<div class="space-y-4">
+  <%# ── Header + period selector ── %>
+  <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+      <div class="space-y-1">
+        <p class="text-sm font-medium uppercase tracking-[0.16em] text-secondary">Crypto Report</p>
+        <h2 class="text-2xl font-medium text-primary"><%= report.title %></h2>
+        <p class="text-sm text-secondary"><%= report.subtitle %></p>
+      </div>
+
+      <%= form_with url: account_path(account), method: :get, data: { controller: "auto-submit-form" }, class: "flex items-center gap-2" do |form| %>
+        <%= form.hidden_field :tab, value: "reports" %>
+        <%= form.select :period,
+            Period.as_options,
+            { selected: report.period.key },
+            data: { "auto-submit-form-target": "auto" },
+            class: "bg-container border border-secondary rounded-lg px-3 py-2 text-sm pr-7 cursor-pointer text-primary focus:outline-hidden focus:ring-0" %>
+      <% end %>
+    </div>
+
+    <%# Metrics: trading turnover + net buys only (relevant for crypto) %>
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <% crypto_metrics = report.metrics.select { |m| %i[trading_turnover net_buys contributions taxes_fees].include?(m.id) } %>
+      <% crypto_metrics.each do |metric| %>
+        <div class="rounded-xl bg-container-inset p-4">
+          <p class="text-xs uppercase tracking-[0.12em] text-secondary"><%= metric.label %></p>
+          <p class="mt-2 text-2xl font-medium text-primary"><%= format_money Money.new(metric.amount, account.currency) %></p>
+          <p class="mt-1 text-sm" style="color: <%= metric.color %>"><%= metric.note %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# ── Trading turnover chart + activity mix donut ── %>
+  <div class="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(22rem,0.9fr)]">
+    <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+      <div>
+        <p class="text-sm font-medium text-primary">Trading Activity</p>
+        <p class="text-sm text-secondary">Daily buy/sell volume over the selected period</p>
+      </div>
+      <div class="h-64">
+        <div
+          id="<%= dom_id(account, :turnover_report_chart) %>"
+          class="w-full h-full"
+          data-controller="time-series-chart"
+          data-time-series-chart-data-value="<%= report.turnover_chart_data.to_json %>"
+          data-time-series-chart-x-axis-activity-dates-only-value="true"
+          data-time-series-chart-x-axis-date-format-value="%b %d"
+          data-time-series-chart-use-annotations-value="true"></div>
+      </div>
+    </div>
+
+    <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+      <div>
+        <p class="text-sm font-medium text-primary">Activity Mix</p>
+        <p class="text-sm text-secondary">Breakdown of trading activity by type</p>
+      </div>
+
+      <% if report.breakdowns.any? %>
+        <div class="relative h-[18rem]"
+             data-controller="donut-chart"
+             data-donut-chart-segments-value="<%= report.breakdowns.map { |r| { id: r.id, amount: r.amount.to_f, color: r.color } }.to_json %>"
+             data-donut-chart-segment-height-value="6"
+             data-donut-chart-segment-opacity-value="0.92">
+          <div data-donut-chart-target="chartContainer" class="absolute inset-0 pointer-events-none"></div>
+          <div data-donut-chart-target="contentContainer" class="flex h-full items-center justify-center">
+            <div data-donut-chart-target="defaultContent" class="flex max-w-[14rem] flex-col items-center text-center">
+              <p class="text-sm text-secondary">Largest bucket</p>
+              <% largest = report.breakdowns.max_by(&:amount) %>
+              <p class="mt-2 text-3xl font-medium text-primary"><%= largest.label %></p>
+              <p class="mt-1 text-sm text-secondary"><%= format_money Money.new(largest.amount, account.currency) %></p>
+            </div>
+            <% report.breakdowns.each do |row| %>
+              <div id="segment_<%= row.id %>" class="hidden">
+                <div class="flex max-w-[14rem] flex-col items-center text-center">
+                  <p class="text-sm text-secondary"><%= row.label %></p>
+                  <p class="mt-2 text-3xl font-medium text-primary"><%= format_money Money.new(row.amount, account.currency) %></p>
+                  <p class="mt-1 text-sm" style="color: <%= row.color %>"><%= pluralize(row.count, "trade") %></p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="grid gap-2 sm:grid-cols-2">
+          <% report.breakdowns.each do |row| %>
+            <div class="rounded-lg bg-container-inset px-3 py-2">
+              <div class="flex items-center gap-2">
+                <span class="h-2.5 w-2.5 rounded-full" style="background-color: <%= row.color %>"></span>
+                <p class="text-sm font-medium text-primary"><%= row.label %></p>
+              </div>
+              <p class="mt-2 text-lg font-medium text-primary"><%= format_money(Money.new(row.amount, account.currency), precision: 0) %></p>
+              <p class="text-xs text-secondary"><%= pluralize(row.count, "entry") %></p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="rounded-xl bg-container-inset p-5 text-sm text-secondary">No trading activity in this period</div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# ── Holdings value vs stablecoin balance ── %>
+  <div class="grid gap-4 xl:grid-cols-2">
+    <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+      <div>
+        <p class="text-sm font-medium text-primary">Portfolio Value Over Time</p>
+        <p class="text-sm text-secondary">Total crypto holdings value</p>
+      </div>
+      <div class="h-56">
+        <div
+          id="<%= dom_id(account, :holdings_split_chart) %>"
+          class="w-full h-full"
+          data-controller="time-series-chart"
+          data-time-series-chart-data-value="<%= report.holdings_series.to_json %>"
+          data-time-series-chart-use-labels-value="false"></div>
+      </div>
+    </div>
+
+    <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+      <div>
+        <p class="text-sm font-medium text-primary">Stablecoin Balance Over Time</p>
+        <p class="text-sm text-secondary">Cash / stablecoin portion of the account</p>
+      </div>
+      <div class="h-56">
+        <div
+          id="<%= dom_id(account, :cash_split_chart) %>"
+          class="w-full h-full"
+          data-controller="time-series-chart"
+          data-time-series-chart-data-value="<%= report.cash_series.to_json %>"
+          data-time-series-chart-use-labels-value="false"></div>
+      </div>
+    </div>
+  </div>
+
+  <%# ── Top traded coins + recent activity ── %>
+  <div class="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+    <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+      <div>
+        <p class="text-sm font-medium text-primary">Top Traded Coins</p>
+        <p class="text-sm text-secondary">Coins with the highest buy + sell volume</p>
+      </div>
+
+      <% if report.top_securities.any? %>
+        <div class="space-y-3">
+          <% report.top_securities.each do |row| %>
+            <% turnover = row.buy_volume + row.sell_volume %>
+            <% width = report.max_security_turnover.zero? ? 0 : (turnover / report.max_security_turnover * 100).round(1) %>
+            <div class="rounded-xl bg-container-inset p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-base font-medium text-primary"><%= row.ticker %></p>
+                  <p class="text-sm text-secondary"><%= row.name %></p>
+                </div>
+                <div class="text-right">
+                  <p class="text-base font-medium text-primary"><%= format_money(Money.new(turnover, account.currency), precision: 0) %></p>
+                  <p class="text-sm text-secondary"><%= pluralize(row.trade_count, "trade") %></p>
+                </div>
+              </div>
+              <div class="mt-3 h-2 overflow-hidden rounded-full bg-alpha-black-100">
+                <div class="h-full rounded-full" style="width:<%= width %>%;background:linear-gradient(90deg,#F59E0B 0%,#EF4444 100%);"></div>
+              </div>
+              <div class="mt-3 grid gap-2 sm:grid-cols-3 text-sm">
+                <div>
+                  <p class="text-secondary">Buys</p>
+                  <p class="font-medium text-primary"><%= format_money(Money.new(row.buy_volume, account.currency), precision: 0) %></p>
+                </div>
+                <div>
+                  <p class="text-secondary">Sells</p>
+                  <p class="font-medium text-primary"><%= format_money(Money.new(row.sell_volume, account.currency), precision: 0) %></p>
+                </div>
+                <div>
+                  <p class="text-secondary">Net flow</p>
+                  <p class="font-medium" style="color:<%= row.net_flow.positive? ? '#0F766E' : '#1D4ED8' %>">
+                    <%= format_money(Money.new(row.net_flow, account.currency), precision: 0) %>
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="rounded-xl bg-container-inset p-5 text-sm text-secondary">No trade activity in this period</div>
+      <% end %>
+    </div>
+
+    <div class="bg-container rounded-xl shadow-border-xs p-5 space-y-4">
+      <div>
+        <p class="text-sm font-medium text-primary">Recent Activity</p>
+        <p class="text-sm text-secondary">Latest trades and transactions</p>
+      </div>
+
+      <% if report.recent_activity.any? %>
+        <div class="space-y-2">
+          <% report.recent_activity.each do |row| %>
+            <div class="rounded-xl bg-container-inset px-4 py-3">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background-color:<%= row.color %>"></span>
+                    <p class="truncate text-sm font-medium text-primary"><%= row.label %></p>
+                  </div>
+                  <p class="mt-1 text-sm text-secondary"><%= row.detail %></p>
+                  <p class="mt-1 text-xs uppercase tracking-[0.12em] text-secondary"><%= l(row.entry.date, format: :long) %></p>
+                </div>
+                <p class="text-sm font-medium shrink-0" style="color:<%= row.color %>">
+                  <%= format_money Money.new(row.amount, account.currency) %>
+                </p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="rounded-xl bg-container-inset p-5 text-sm text-secondary">No activity in this period</div>
+      <% end %>
+    </div>
+  </div>
+</div>

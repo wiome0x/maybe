@@ -19,7 +19,7 @@
 
     <%= form_with url: account_path(account), method: :get, data: { controller: "auto-submit-form" } do |form| %>
       <div class="flex items-center gap-2">
-        <% if account.investment? %>
+        <% if account.investment? || account.crypto? %>
           <%= form.select :chart_view,
             [["Total value", "balance"], ["Holdings", "holdings_balance"], ["Cash", "cash_balance"]],
             { selected: view },
