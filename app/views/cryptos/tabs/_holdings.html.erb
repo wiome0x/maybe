@@ -1,8 +1,8 @@
 <%# locals: (account:) %>
 
 <%
-  stable_coins   = BrokerConnection::Processor::BINANCE_STABLE_QUOTES
-  all_holdings   = account.current_holdings.select { |h| h.qty > 0 }
+  stable_coins    = BrokerConnection::Processor::BINANCE_STABLE_QUOTES
+  all_holdings    = account.current_holdings.select { |h| h.qty > 0 }
   stable_holdings = all_holdings.select { |h| stable_coins.include?(h.ticker) }
   crypto_holdings = all_holdings.reject { |h| stable_coins.include?(h.ticker) }
 
@@ -24,9 +24,9 @@
 <%= turbo_frame_tag dom_id(account, :holdings) do %>
   <div class="space-y-4">
 
-    <%# ── Top section: pie chart + summary ── %>
+    <%# ── Top section: pie chart + holdings table ── %>
     <div class="bg-container rounded-xl shadow-border-xs p-5">
-      <h2 class="font-medium text-lg mb-4">Portfolio Allocation</h2>
+      <h2 class="font-medium text-lg mb-4"><%= t(".title") %></h2>
 
       <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,auto)] xl:items-start">
 
@@ -36,13 +36,13 @@
           <%# Crypto holdings %>
           <% if crypto_holdings.any? %>
             <div class="px-4 py-2">
-              <p class="text-xs font-semibold uppercase tracking-widest text-secondary">Crypto</p>
+              <p class="text-xs font-semibold uppercase tracking-widest text-secondary"><%= t(".crypto_section") %></p>
             </div>
             <div class="grid grid-cols-12 items-center uppercase text-xs font-medium text-secondary px-4 py-2">
-              <p class="col-span-5">Asset</p>
-              <p class="col-span-2 justify-self-end">Weight</p>
-              <p class="col-span-2 justify-self-end">Avg Cost</p>
-              <p class="col-span-3 justify-self-end">Value</p>
+              <p class="col-span-5"><%= t(".name") %></p>
+              <p class="col-span-2 justify-self-end"><%= t(".weight") %></p>
+              <p class="col-span-2 justify-self-end"><%= t(".avg_cost") %></p>
+              <p class="col-span-3 justify-self-end"><%= t(".holdings") %></p>
             </div>
             <div class="bg-container rounded-lg shadow-border-xs divide-y divide-primary">
               <% crypto_holdings.each do |holding| %>
@@ -64,11 +64,13 @@
                   </div>
                   <div class="col-span-2 text-right">
                     <p><%= format_money holding.avg_cost %></p>
-                    <p class="text-xs text-secondary font-normal">per coin</p>
+                    <p class="text-xs text-secondary font-normal"><%= t(".per_coin") %></p>
                   </div>
                   <div class="col-span-3 text-right">
                     <p><%= holding.amount_money ? format_money(holding.amount_money) : "--" %></p>
-                    <p class="text-xs text-secondary font-normal"><%= number_with_precision(holding.qty, precision: 4, strip_insignificant_zeros: true) %> coins</p>
+                    <p class="text-xs text-secondary font-normal">
+                      <%= t(".coins", qty: number_with_precision(holding.qty, precision: 4, strip_insignificant_zeros: true)) %>
+                    </p>
                   </div>
                 </div>
               <% end %>
@@ -78,7 +80,7 @@
           <%# Stable coin holdings %>
           <% if stable_holdings.any? %>
             <div class="px-4 pt-4 pb-2">
-              <p class="text-xs font-semibold uppercase tracking-widest text-secondary">Stablecoins</p>
+              <p class="text-xs font-semibold uppercase tracking-widest text-secondary"><%= t(".stablecoins_section") %></p>
             </div>
             <div class="bg-container rounded-lg shadow-border-xs divide-y divide-primary">
               <% stable_holdings.each do |holding| %>
@@ -88,7 +90,7 @@
                     <%= render DS::FilledIcon.new(variant: :text, text: currency_obj&.symbol || holding.ticker, rounded: true, size: "sm") %>
                     <div class="space-y-0.5">
                       <p><%= holding.ticker %></p>
-                      <p class="text-xs text-secondary">Stablecoin</p>
+                      <p class="text-xs text-secondary"><%= t(".stablecoin_type") %></p>
                     </div>
                   </div>
                   <div class="col-span-2 flex justify-end items-center gap-1">
@@ -101,11 +103,13 @@
                   </div>
                   <div class="col-span-2 text-right">
                     <p><%= format_money holding.avg_cost %></p>
-                    <p class="text-xs text-secondary font-normal">per coin</p>
+                    <p class="text-xs text-secondary font-normal"><%= t(".per_coin") %></p>
                   </div>
                   <div class="col-span-3 text-right">
                     <p><%= holding.amount_money ? format_money(holding.amount_money) : "--" %></p>
-                    <p class="text-xs text-secondary font-normal"><%= number_with_precision(holding.qty, precision: 2) %> coins</p>
+                    <p class="text-xs text-secondary font-normal">
+                      <%= t(".coins", qty: number_with_precision(holding.qty, precision: 2)) %>
+                    </p>
                   </div>
                 </div>
               <% end %>
@@ -114,7 +118,7 @@
 
           <% if all_holdings.empty? %>
             <div class="p-8 text-center text-secondary text-sm">
-              No holdings found. Sync your Binance account to see your portfolio.
+              <%= t(".no_holdings") %>
             </div>
           <% end %>
         </div>
@@ -122,7 +126,7 @@
         <%# Right: pie chart %>
         <% if slices.any? %>
           <div class="bg-container-inset rounded-xl p-4">
-            <h3 class="text-xs font-medium text-secondary uppercase mb-3">Allocation</h3>
+            <h3 class="text-xs font-medium text-secondary uppercase mb-3"><%= t(".allocation") %></h3>
             <div class="flex flex-col items-center gap-5">
               <svg width="220" height="220" viewBox="0 0 180 180" class="shrink-0 overflow-visible">
                 <%
@@ -166,7 +170,7 @@
                 <% angle += sweep; end %>
 
                 <% if largest_slice %>
-                  <text x="<%= cx %>" y="<%= cy - 10 %>" text-anchor="middle" class="fill-current text-secondary" style="font-size:10px;font-weight:500;">Largest</text>
+                  <text x="<%= cx %>" y="<%= cy - 10 %>" text-anchor="middle" class="fill-current text-secondary" style="font-size:10px;font-weight:500;"><%= t(".largest") %></text>
                   <text x="<%= cx %>" y="<%= cy + 10 %>" text-anchor="middle" class="fill-current text-primary" style="font-size:16px;font-weight:700;"><%= largest_slice[:label] %></text>
                   <text x="<%= cx %>" y="<%= cy + 28 %>" text-anchor="middle" class="fill-current text-primary" style="font-size:12px;font-weight:600;"><%= number_to_percentage(largest_slice[:value], precision: 1) %></text>
                 <% end %>
@@ -191,27 +195,29 @@
     <% if all_holdings.any? %>
       <div class="grid gap-3 sm:grid-cols-3">
         <%
-          crypto_value  = crypto_holdings.sum { |h| h.amount || 0 }
-          stable_value  = stable_holdings.sum { |h| h.amount || 0 }
-          total_value   = account.balance
+          crypto_value = crypto_holdings.sum { |h| h.amount || 0 }
+          stable_value = stable_holdings.sum { |h| h.amount || 0 }
+          total_value  = account.balance
         %>
         <div class="bg-container rounded-xl shadow-border-xs p-4">
-          <p class="text-xs uppercase tracking-widest text-secondary">Total Value</p>
+          <p class="text-xs uppercase tracking-widest text-secondary"><%= t(".total_value") %></p>
           <p class="mt-2 text-2xl font-medium text-primary"><%= format_money account.balance_money %></p>
-          <p class="mt-1 text-sm text-secondary"><%= all_holdings.count %> assets</p>
+          <p class="mt-1 text-sm text-secondary"><%= t(".assets_count", count: all_holdings.count) %></p>
         </div>
         <div class="bg-container rounded-xl shadow-border-xs p-4">
-          <p class="text-xs uppercase tracking-widest text-secondary">Crypto</p>
+          <p class="text-xs uppercase tracking-widest text-secondary"><%= t(".crypto_label") %></p>
           <p class="mt-2 text-2xl font-medium text-primary"><%= format_money Money.new(crypto_value, account.currency) %></p>
           <p class="mt-1 text-sm text-secondary">
-            <%= total_value > 0 ? number_to_percentage(crypto_value / total_value * 100, precision: 1) : "0%" %> of portfolio
+            <%= total_value > 0 ? number_to_percentage(crypto_value / total_value * 100, precision: 1) : "0%" %>
+            <%= t(".of_portfolio") %>
           </p>
         </div>
         <div class="bg-container rounded-xl shadow-border-xs p-4">
-          <p class="text-xs uppercase tracking-widest text-secondary">Stablecoins</p>
+          <p class="text-xs uppercase tracking-widest text-secondary"><%= t(".stablecoins_label") %></p>
           <p class="mt-2 text-2xl font-medium text-primary"><%= format_money Money.new(stable_value, account.currency) %></p>
           <p class="mt-1 text-sm text-secondary">
-            <%= total_value > 0 ? number_to_percentage(stable_value / total_value * 100, precision: 1) : "0%" %> of portfolio
+            <%= total_value > 0 ? number_to_percentage(stable_value / total_value * 100, precision: 1) : "0%" %>
+            <%= t(".of_portfolio") %>
           </p>
         </div>
       </div>

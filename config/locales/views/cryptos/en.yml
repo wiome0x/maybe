@@ -5,3 +5,47 @@ en:
       edit: Edit %{account}
     new:
       title: Enter account balance
+    tabs:
+      holdings:
+        title: Portfolio Allocation
+        crypto_section: Crypto
+        stablecoins_section: Stablecoins
+        no_holdings: No holdings found. Sync your Binance account to see your portfolio.
+        allocation: Allocation
+        largest: Largest
+        name: Asset
+        weight: Weight
+        avg_cost: Avg Cost
+        holdings: Value
+        per_coin: per coin
+        coins: "%{qty} coins"
+        total_value: Total Value
+        assets_count: "%{count} assets"
+        crypto_label: Crypto
+        of_portfolio: of portfolio
+        stablecoins_label: Stablecoins
+        stablecoin_type: Stablecoin
+      reports:
+        eyebrow: Crypto Report
+        trading_activity_title: Trading Activity
+        trading_activity_description: Daily buy/sell volume over the selected period
+        activity_mix_title: Activity Mix
+        activity_mix_description: Breakdown of trading activity by type
+        largest_bucket: Largest bucket
+        portfolio_value_title: Portfolio Value Over Time
+        portfolio_value_description: Total crypto holdings value
+        stablecoin_balance_title: Stablecoin Balance Over Time
+        stablecoin_balance_description: Cash / stablecoin portion of the account
+        top_coins_title: Top Traded Coins
+        top_coins_description: Coins with the highest buy + sell volume
+        buys: Buys
+        sells: Sells
+        net_flow: Net flow
+        trade_count:
+          one: 1 trade
+          other: "%{count} trades"
+        no_trade_activity: No trade activity in this period
+        recent_activity_title: Recent Activity
+        recent_activity_description: Latest trades and transactions
+        no_activity: No activity in this period
+        no_activity_in_period: No activity in this period

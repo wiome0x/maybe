@@ -5,3 +5,47 @@ zh-CN:
       edit: 编辑 %{account}
     new:
       title: 输入账户余额
+    tabs:
+      holdings:
+        title: 持仓配置
+        crypto_section: 加密货币
+        stablecoins_section: 稳定币
+        no_holdings: 暂无持仓，请同步您的 Binance 账户以查看投资组合。
+        allocation: 配置比例
+        largest: 最大持仓
+        name: 资产
+        weight: 权重
+        avg_cost: 均价
+        holdings: 持仓价值
+        per_coin: 每枚
+        coins: "%{qty} 枚"
+        total_value: 总价值
+        assets_count: "%{count} 种资产"
+        crypto_label: 加密货币
+        of_portfolio: 占投资组合
+        stablecoins_label: 稳定币
+        stablecoin_type: 稳定币
+      reports:
+        eyebrow: 加密报告
+        trading_activity_title: 交易活动
+        trading_activity_description: 所选周期内每日买卖成交金额
+        activity_mix_title: 活动构成
+        activity_mix_description: 按类型划分的交易活动占比
+        largest_bucket: 最大类别
+        portfolio_value_title: 持仓价值走势
+        portfolio_value_description: 加密货币持仓总价值
+        stablecoin_balance_title: 稳定币余额走势
+        stablecoin_balance_description: 账户中的现金/稳定币部分
+        top_coins_title: 交易量最高的币种
+        top_coins_description: 按买卖成交额排名
+        buys: 买入
+        sells: 卖出
+        net_flow: 净流向
+        trade_count:
+          one: 1 笔交易
+          other: "%{count} 笔交易"
+        no_trade_activity: 当前周期没有交易活动
+        recent_activity_title: 最近活动
+        recent_activity_description: 最近的交易与操作记录
+        no_activity: 当前周期没有活动
+        no_activity_in_period: 当前周期没有活动
