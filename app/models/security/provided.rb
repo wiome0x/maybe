@@ -90,6 +90,10 @@ module Security::Provided
     end
   end
 
+  def import_provider_details_later
+    SecurityDetailsJob.perform_later(id)
+  end
+
   def import_provider_prices(start_date:, end_date:, clear_cache: false)
     unless provider.present?
       Rails.logger.warn("No provider configured for Security.import_provider_prices")

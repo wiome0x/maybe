@@ -216,9 +216,14 @@ class BrokerConnection::Processor
     end
 
     def find_or_create_security!(ticker)
-      Security.find_or_create_by!(ticker: ticker.upcase) do |security|
-        security.name = ticker.upcase
+      security = Security.find_or_create_by!(ticker: ticker.upcase) do |s|
+        s.name = ticker.upcase
       end
+
+      # Fetch logo + name from provider in the background if not yet populated
+      security.import_provider_details_later if security.logo_url.blank?
+
+      security
     end
 
     def binance_balances

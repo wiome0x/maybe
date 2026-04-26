@@ -22,6 +22,11 @@
               <%= image_tag transaction.merchant.logo_url,
                   class: "w-6 h-6 rounded-full",
                   loading: "lazy" %>
+            <% elsif entry.trade? %>
+              <%= render "shared/ticker_logo",
+                    ticker: entry.trade.security.ticker,
+                    security: entry.trade.security,
+                    size: "w-6 h-6" %>
             <% else %>
               <%= render DS::FilledIcon.new(
                 variant: :text,

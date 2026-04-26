@@ -48,7 +48,7 @@
               <% crypto_holdings.each do |holding| %>
                 <div class="grid grid-cols-12 items-center text-sm font-medium text-primary p-4">
                   <div class="col-span-5 flex items-center gap-3">
-                    <%= render DS::FilledIcon.new(variant: :text, text: holding.ticker, rounded: true, size: "sm") %>
+                    <%= render "shared/ticker_logo", ticker: holding.ticker, security: holding.security, size: "w-8 h-8" %>
                     <div class="space-y-0.5 min-w-0">
                       <p class="truncate"><%= holding.name %></p>
                       <p class="text-xs text-secondary uppercase"><%= holding.ticker %></p>
@@ -87,7 +87,7 @@
                 <% currency_obj = (Money::Currency.find(holding.ticker) rescue nil) %>
                 <div class="grid grid-cols-12 items-center text-sm font-medium text-primary p-4">
                   <div class="col-span-5 flex items-center gap-3">
-                    <%= render DS::FilledIcon.new(variant: :text, text: currency_obj&.symbol || holding.ticker, rounded: true, size: "sm") %>
+                    <%= render "shared/ticker_logo", ticker: holding.ticker, security: holding.security, size: "w-8 h-8" %>
                     <div class="space-y-0.5">
                       <p><%= holding.ticker %></p>
                       <p class="text-xs text-secondary"><%= t(".stablecoin_type") %></p>
