@@ -34,61 +34,81 @@ class Provider::Binance < Provider
   # Strategy:
   #   1. Collect candidate base assets from current balances + prior trade history.
   #   2. If none found (account holds only stable coins), fall back to FALLBACK_PROBE_ASSETS.
-  #   3. Phase 1 — USDT probe: find which candidates actually have any trades (avoids N×14 requests).
-  #   4. Phase 2 — full quote sweep: for confirmed assets, collect trades across all quote pairs.
+  #   3. Phase 1 — multi-quote probe (USDT + BTC + ETH): find which candidates actually have
+  #      trades and which quote pairs they use.  Covers assets that only trade against BTC/ETH
+  #      and have no USDT pair (e.g. ETHBTC, niche altcoins).
+  #   4. Phase 2 — full quote sweep: for confirmed assets, collect trades across all remaining
+  #      quote pairs (skipping the ones already fetched in Phase 1).
+  PHASE1_PROBE_QUOTES = %w[USDT BTC ETH].freeze
+
   def fetch_trade_history(since: nil, balances: nil)
     with_provider_response do
       raw_balances = balances || call(:account).fetch("balances", [])
 
-       # Assets currently held (excluding stable coins)
-       held_assets = raw_balances
-                       .map    { |b| b["asset"].to_s.upcase }
-                       .reject { |a| STABLE_QUOTE_ASSETS.include?(a) || a.blank? }
+      # Assets currently held (excluding stable coins)
+      held_assets = raw_balances
+                      .map    { |b| b["asset"].to_s.upcase }
+                      .reject { |a| STABLE_QUOTE_ASSETS.include?(a) || a.blank? }
 
-       # Assets seen in previously stored trade history (incremental syncs)
-       prior_assets = Array(broker_connection&.raw_transactions_payload)
-                        .filter_map { |t| extract_base_asset(t["symbol"].to_s.upcase) }
-                        .reject     { |a| STABLE_QUOTE_ASSETS.include?(a) }
+      # Assets seen in previously stored trade history (incremental syncs)
+      prior_assets = Array(broker_connection&.raw_transactions_payload)
+                       .filter_map { |t| extract_base_asset(t["symbol"].to_s.upcase) }
+                       .reject     { |a| STABLE_QUOTE_ASSETS.include?(a) }
                        .select     { |a| a.match?(/\A[A-Z0-9]+\z/) }
 
       candidates = (held_assets + prior_assets).uniq
 
       # Fallback: account holds only stable coins (e.g. all positions sold to USDT).
-      # Probe common assets so we don't miss closed-position trade history.
       candidates = FALLBACK_PROBE_ASSETS if candidates.empty?
 
       kwargs = {}
       kwargs[:startTime] = (since.to_time.to_i * 1000) if since
 
-      # Phase 1 — USDT probe: find which assets actually have trades.
-      traded_assets = candidates.select do |asset|
-        begin
-          call(:my_trades, symbol: "#{asset}USDT", **kwargs).any?
-        rescue Error
-          false
+      # Phase 1 — probe USDT, BTC, ETH pairs to discover which assets have trades
+      # and collect those trades in one pass.
+      phase1_trades   = []   # trades already fetched
+      phase1_hits     = {}   # asset => Set of quote pairs already fetched
+
+      candidates.each do |asset|
+        PHASE1_PROBE_QUOTES.each do |quote|
+          # An asset cannot trade against itself (e.g. skip BTCBTC)
+          next if asset == quote
+
+          begin
+            trades = call(:my_trades, symbol: "#{asset}#{quote}", **kwargs)
+            if trades.any?
+              phase1_trades.concat(trades)
+              (phase1_hits[asset] ||= Set.new) << quote
+            end
+          rescue Error
+            # Invalid / delisted pair — skip silently, already logged in call().
+          end
         end
       end
+
+      traded_assets = phase1_hits.keys
 
       if traded_assets.empty?
         log_no_op(method_name: "fetch_trade_history", note: "no trades found for any candidate asset")
         next []
       end
 
-       # Phase 2 — full quote sweep: collect trades across all quote pairs for confirmed assets.
-       # Skip USDT as we already checked it in Phase 1 to avoid duplicate requests
-       traded_assets.flat_map do |asset|
-         QUOTE_ASSETS.flat_map do |quote|
-           # Skip USDT quote since we already checked it in Phase 1
-           next [] if quote == "USDT"
-           
-           begin
-             call(:my_trades, symbol: "#{asset}#{quote}", **kwargs)
-           rescue Error
-             # Invalid or delisted symbol pair — skip silently, already logged in call().
-             []
-           end
-         end
-       end
+      # Phase 2 — sweep remaining quote pairs for confirmed assets.
+      phase2_trades = traded_assets.flat_map do |asset|
+        QUOTE_ASSETS.flat_map do |quote|
+          # Skip pairs already fetched in Phase 1
+          next [] if phase1_hits[asset]&.include?(quote)
+          next [] if asset == quote
+
+          begin
+            call(:my_trades, symbol: "#{asset}#{quote}", **kwargs)
+          rescue Error
+            []
+          end
+        end
+      end
+
+      phase1_trades + phase2_trades
     end
   end
 
