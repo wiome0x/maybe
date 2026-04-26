@@ -80,10 +80,20 @@ class ApiRateLimiter
     end
   end
 
+  def self.redis_key_for(api_key)
+    key = "api_rate_limit:#{api_key.id}"
+
+    # Test workers share the same Redis instance in CI, so namespace the key
+    # by process to avoid cross-worker collisions and cleanup races.
+    return key unless Rails.env.test?
+
+    "#{key}:#{Process.pid}"
+  end
+
   private
 
     def redis_key
-      "api_rate_limit:#{@api_key.id}"
+      self.class.redis_key_for(@api_key)
     end
 
     def determine_tier
