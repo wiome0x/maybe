@@ -57,6 +57,7 @@ COPY --from=build /rails/db /rails/db
 COPY --from=build /rails/lib /rails/lib
 COPY --from=build /rails/public /rails/public
 COPY --from=build /rails/vendor /rails/vendor
+COPY --from=build /rails/.ruby-version /rails/.ruby-version
 COPY --from=build /rails/Gemfile /rails/Gemfile
 COPY --from=build /rails/Gemfile.lock /rails/Gemfile.lock
 COPY --from=build /rails/Rakefile /rails/Rakefile
