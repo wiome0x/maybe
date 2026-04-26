@@ -5,12 +5,12 @@ class Provider::Binance < Provider
   QUOTE_ASSETS        = %w[USDT USDC BUSD FDUSD BTC ETH BNB EUR TRY BRL AUD RUB GBP USD].freeze
   STABLE_QUOTE_ASSETS = %w[USDT USDC BUSD FDUSD USD].freeze
 
-  # Probed when the account holds only stable coins (all positions sold).
-  # Covers the most actively traded spot pairs on Binance.
-  FALLBACK_PROBE_ASSETS = %w[
-    BTC ETH BNB SOL XRP ADA DOGE DOT AVAX MATIC LINK UNI ATOM LTC BCH
-    ETC FIL NEAR APT ARB OP SUI PEPE SHIB TRX TON
-  ].freeze
+   # Probed when the account holds only stable coins (all positions sold).
+   # Covers the most actively traded spot pairs on Binance.
+   FALLBACK_PROBE_ASSETS = %w[
+     BTC ETH BNB SOL XRP ADA DOGE DOT AVAX MATIC LINK UNI ATOM LTC BCH
+     ETC FIL NEAR APT ARB OP SUI PEPE SHIB TRX TON TRUMP FDUSD
+   ].freeze
 
   # Keys that must never appear in audit logs
   REDACTED_KEYS = %w[signature X-MBX-APIKEY api_key api_secret key secret].freeze
@@ -40,15 +40,16 @@ class Provider::Binance < Provider
     with_provider_response do
       raw_balances = balances || call(:account).fetch("balances", [])
 
-      # Assets currently held (excluding stable coins)
-      held_assets = raw_balances
-                      .map    { |b| b["asset"].to_s.upcase }
-                      .reject { |a| STABLE_QUOTE_ASSETS.include?(a) || a.blank? }
+       # Assets currently held (excluding stable coins)
+       held_assets = raw_balances
+                       .map    { |b| b["asset"].to_s.upcase }
+                       .reject { |a| STABLE_QUOTE_ASSETS.include?(a) || a.blank? }
 
-      # Assets seen in previously stored trade history (incremental syncs)
-      prior_assets = Array(broker_connection&.raw_transactions_payload)
-                       .filter_map { |t| extract_base_asset(t["symbol"].to_s.upcase) }
-                       .reject     { |a| STABLE_QUOTE_ASSETS.include?(a) }
+       # Assets seen in previously stored trade history (incremental syncs)
+       prior_assets = Array(broker_connection&.raw_transactions_payload)
+                        .filter_map { |t| extract_base_asset(t["symbol"].to_s.upcase) }
+                        .reject     { |a| STABLE_QUOTE_ASSETS.include?(a) }
+                       .select     { |a| a.match?(/\A[A-Z0-9]+\z/) }
 
       candidates = (held_assets + prior_assets).uniq
 
@@ -73,17 +74,21 @@ class Provider::Binance < Provider
         next []
       end
 
-      # Phase 2 — full quote sweep: collect trades across all quote pairs for confirmed assets.
-      traded_assets.flat_map do |asset|
-        QUOTE_ASSETS.flat_map do |quote|
-          begin
-            call(:my_trades, symbol: "#{asset}#{quote}", **kwargs)
-          rescue Error
-            # Invalid or delisted symbol pair — skip silently, already logged in call().
-            []
-          end
-        end
-      end
+       # Phase 2 — full quote sweep: collect trades across all quote pairs for confirmed assets.
+       # Skip USDT as we already checked it in Phase 1 to avoid duplicate requests
+       traded_assets.flat_map do |asset|
+         QUOTE_ASSETS.flat_map do |quote|
+           # Skip USDT quote since we already checked it in Phase 1
+           next [] if quote == "USDT"
+           
+           begin
+             call(:my_trades, symbol: "#{asset}#{quote}", **kwargs)
+           rescue Error
+             # Invalid or delisted symbol pair — skip silently, already logged in call().
+             []
+           end
+         end
+       end
     end
   end
 
