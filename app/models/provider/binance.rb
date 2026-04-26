@@ -63,7 +63,7 @@ class Provider::Binance < Provider
       traded_assets = candidates.select do |asset|
         begin
           call(:my_trades, symbol: "#{asset}USDT", **kwargs).any?
-        rescue ::Binance::ClientError
+        rescue Error
           false
         end
       end
@@ -78,7 +78,8 @@ class Provider::Binance < Provider
         QUOTE_ASSETS.flat_map do |quote|
           begin
             call(:my_trades, symbol: "#{asset}#{quote}", **kwargs)
-          rescue ::Binance::ClientError
+          rescue Error
+            # Invalid or delisted symbol pair — skip silently, already logged in call().
             []
           end
         end
