@@ -17,6 +17,8 @@ class ImportMarketDataJob < ApplicationJob
     mode = opts.fetch(:mode, :full)
     clear_cache = opts.fetch(:clear_cache, false)
 
-    MarketDataImporter.new(mode: mode, clear_cache: clear_cache).import_all
+    track_run("import_market_data") do
+      MarketDataImporter.new(mode: mode, clear_cache: clear_cache).import_all
+    end
   end
 end

@@ -82,6 +82,7 @@ Rails.application.routes.draw do
     resource :api_audit, only: [ :show ] do
       get :log, on: :collection
     end
+    resources :scheduled_job_runs, only: :index
   end
 
   get "markets/stocks", to: "markets#stocks", as: :market_stocks

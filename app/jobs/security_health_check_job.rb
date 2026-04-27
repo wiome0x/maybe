@@ -4,6 +4,8 @@ class SecurityHealthCheckJob < ApplicationJob
   def perform
     return if Rails.env.development?
 
-    Security::HealthChecker.check_all
+    track_run("run_security_health_checks") do
+      Security::HealthChecker.check_all
+    end
   end
 end

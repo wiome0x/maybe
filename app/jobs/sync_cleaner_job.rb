@@ -2,6 +2,8 @@ class SyncCleanerJob < ApplicationJob
   queue_as :scheduled
 
   def perform
-    Sync.clean
+    track_run("clean_syncs") do
+      Sync.clean
+    end
   end
 end

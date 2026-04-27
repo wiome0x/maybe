@@ -126,6 +126,7 @@ en:
     settings_nav:
       accounts_label: Accounts
       api_audit_label: API Audit
+      scheduled_jobs_label: Scheduled Jobs
       back: Back
       billing_label: Billing
       categories_label: Categories

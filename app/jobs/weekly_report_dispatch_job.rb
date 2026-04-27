@@ -2,10 +2,12 @@ class WeeklyReportDispatchJob < ApplicationJob
   queue_as :scheduled
 
   def perform(reference_time: Time.current)
-    WeeklyReportSubscription.enabled.includes(:user).find_each do |subscription|
-      next unless subscription.due_for_dispatch?(reference_time: reference_time)
+    track_run("dispatch_weekly_reports") do
+      WeeklyReportSubscription.enabled.includes(:user).find_each do |subscription|
+        next unless subscription.due_for_dispatch?(reference_time: reference_time)
 
-      dispatch_for(subscription, reference_time: reference_time)
+        dispatch_for(subscription, reference_time: reference_time)
+      end
     end
   end
 
