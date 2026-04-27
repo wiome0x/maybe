@@ -2,6 +2,11 @@ class BrokerConnection::Processor
   BINANCE_KNOWN_QUOTES = %w[USDT USDC BUSD FDUSD USD BTC ETH BNB EUR TRY BRL AUD RUB GBP].freeze
   BINANCE_STABLE_QUOTES = %w[USD USDT USDC BUSD FDUSD].freeze
 
+  # Schwab transaction types that represent equity trades
+  SCHWAB_BUY_TYPES  = %w[BUY_TRADE RECEIVE_AND_DELIVER].freeze
+  SCHWAB_SELL_TYPES = %w[SELL_TRADE].freeze
+  SCHWAB_TRADE_TYPES = (SCHWAB_BUY_TYPES + SCHWAB_SELL_TYPES).freeze
+
   attr_reader :broker_connection
 
   def initialize(broker_connection)
@@ -9,15 +14,23 @@ class BrokerConnection::Processor
   end
 
   def process
-    process_holdings
-    process_trades
-    update_account_balance
+    if broker_connection.binance?
+      process_holdings
+      process_trades
+      update_account_balance
+    elsif broker_connection.schwab?
+      process_schwab_holdings
+      process_schwab_trades
+      update_schwab_account_balance
+    end
   end
 
   private
     def account
       broker_connection.account
     end
+
+    # ─── Binance ────────────────────────────────────────────────────────────────
 
     def process_holdings
       return unless broker_connection.binance?
@@ -255,5 +268,138 @@ class BrokerConnection::Processor
       end
 
       account.set_current_balance(total.to_d)
+    end
+
+    # ─── Schwab ─────────────────────────────────────────────────────────────────
+
+    def process_schwab_holdings
+      snapshot_date = broker_connection.last_snapshot_at&.to_date || Date.current
+      processed_keys = []
+
+      schwab_positions.each do |position|
+        instrument = position.dig("instrument") || {}
+        symbol = instrument["symbol"].to_s.upcase
+        asset_type = instrument["assetType"].to_s
+
+        # Only process equity positions (skip options, fixed income, etc.)
+        next if symbol.blank? || asset_type == "OPTION"
+
+        qty = position["longQuantity"].to_d - position["shortQuantity"].to_d
+        market_value = position["marketValue"].to_d
+        price = qty.nonzero? ? (market_value / qty).abs : position["currentDayProfitLossPercentage"].to_d
+
+        security = find_or_create_security!(symbol)
+
+        holding = account.holdings.find_or_initialize_by(
+          security: security,
+          date: snapshot_date,
+          currency: account.currency
+        )
+        holding.assign_attributes(qty: qty, price: price, amount: market_value.abs)
+        holding.save!
+
+        processed_keys << [ security.id, account.currency ]
+      end
+
+      upsert_zero_quantity_holdings(snapshot_date:, processed_keys:)
+    end
+
+    def process_schwab_trades
+      schwab_transactions.each do |txn|
+        type = txn["type"].to_s
+        next unless SCHWAB_TRADE_TYPES.include?(type)
+
+        item = txn["transactionItem"] || {}
+        instrument = item["instrument"] || {}
+        symbol = instrument["symbol"].to_s.upcase
+        asset_type = instrument["assetType"].to_s
+
+        next if symbol.blank? || asset_type == "OPTION"
+
+        qty_raw = item["amount"].to_d.abs
+        price = item["price"].to_d
+        date = parse_schwab_date(txn["transactionDate"])
+        txn_id = txn["transactionId"].to_s
+
+        is_buy = SCHWAB_BUY_TYPES.include?(type)
+        qty = is_buy ? qty_raw : -qty_raw
+        trade_type = is_buy ? "buy" : "sell"
+
+        security = find_or_create_security!(symbol)
+
+        entry = account.entries.find_or_initialize_by(
+          import_idempotency_key: "broker:schwab:trade:#{txn_id}"
+        ) do |new_entry|
+          new_entry.entryable = Trade.new
+        end
+
+        entry.assign_attributes(
+          amount: qty * price,
+          currency: account.currency,
+          date: date,
+          name: Trade.build_name(trade_type, qty, security.ticker)
+        )
+        entry.trade.assign_attributes(
+          security: security,
+          qty: qty,
+          price: price,
+          currency: account.currency
+        )
+        entry.save!
+
+        # Schwab charges commission separately — upsert as a fee transaction if present
+        fees = txn["fees"]
+        if fees.is_a?(Hash)
+          commission = fees.values.sum(&:to_d)
+          if commission > 0
+            fee_entry = account.entries.find_or_initialize_by(
+              import_idempotency_key: "broker:schwab:trade_fee:#{txn_id}"
+            ) do |new_entry|
+              new_entry.entryable = Transaction.new(kind: "funds_movement")
+            end
+            fee_entry.assign_attributes(
+              amount: commission,
+              currency: account.currency,
+              date: date,
+              name: "Trading fee for #{symbol}"
+            )
+            fee_entry.transaction.kind = "funds_movement"
+            fee_entry.save!
+          end
+        end
+      end
+    end
+
+    def update_schwab_account_balance
+      # Sum market values of all current positions
+      total = schwab_positions.sum do |position|
+        position["marketValue"].to_d.abs
+      end
+
+      # Add cash balance if present
+      cash = schwab_account_payload.dig("securitiesAccount", "currentBalances", "cashBalance").to_d
+      account.set_current_balance((total + cash).to_d)
+    end
+
+    def schwab_positions
+      Array(schwab_account_payload.dig("securitiesAccount", "positions"))
+    end
+
+    def schwab_account_payload
+      payload = broker_connection.raw_account_payload
+      payload.is_a?(Hash) ? payload : {}
+    end
+
+    def schwab_transactions
+      Array(broker_connection.raw_transactions_payload)
+    end
+
+    def parse_schwab_date(value)
+      return Date.current if value.blank?
+
+      # Schwab returns ISO8601 datetime strings like "2024-01-15T10:30:00+0000"
+      Time.parse(value).to_date
+    rescue ArgumentError
+      Date.current
     end
 end

@@ -62,6 +62,7 @@ class BrokerConnection::Syncer
           broker_connection: broker_connection
         )
       when "schwab"
+        refresh_schwab_token_if_needed!
         provider = Provider::Schwab.new(
           access_token: broker_connection.access_token,
           refresh_token: broker_connection.refresh_token,
@@ -74,6 +75,24 @@ class BrokerConnection::Syncer
 
     def last_sync_date
       broker_connection.last_synced_at&.to_date || 2.years.ago.to_date
+    end
+
+    def refresh_schwab_token_if_needed!
+      return unless broker_connection.schwab?
+      return if broker_connection.token_expires_at.nil?
+      # Refresh if token expires within 5 minutes
+      return unless broker_connection.token_expires_at < 5.minutes.from_now
+
+      result = Provider::Schwab.refresh_token(refresh_token: broker_connection.refresh_token)
+      broker_connection.update!(
+        access_token: result[:access_token],
+        refresh_token: result[:refresh_token],
+        token_expires_at: Time.current + result[:expires_in].seconds
+      )
+    rescue Provider::Schwab::Error => e
+      # Refresh token expired — require full reauth
+      broker_connection.update!(status: "requires_reauth", error_message: e.message)
+      raise Provider::Error.new("Schwab token refresh failed: #{e.message}")
     end
 
     def handle_provider_error(error)

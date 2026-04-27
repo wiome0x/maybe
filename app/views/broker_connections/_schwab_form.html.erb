@@ -1,0 +1,52 @@
+<%# locals: (account:, schwab_authorization_url:, return_to: nil) %>
+
+<div class="space-y-5">
+  <%# Branding header %>
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-lg bg-container-inset flex items-center justify-center shrink-0">
+      <%= icon("landmark", size: "sm", color: "secondary") %>
+    </div>
+    <div>
+      <p class="text-sm font-medium text-primary">Charles Schwab</p>
+      <p class="text-xs text-secondary">Brokerage &amp; Retirement Accounts</p>
+    </div>
+  </div>
+
+  <p class="text-sm text-secondary">
+    Connect your Schwab account to automatically sync your investment holdings and transaction history.
+    You'll be redirected to Schwab to authorize access — no credentials are stored.
+  </p>
+
+  <%# How it works %>
+  <div class="bg-container-inset rounded-lg p-4 space-y-2">
+    <p class="text-xs font-medium text-secondary uppercase">How it works</p>
+    <ol class="space-y-1.5 text-sm text-secondary list-none">
+      <li class="flex items-start gap-2">
+        <span class="text-xs font-medium text-primary mt-0.5 w-4 shrink-0">1.</span>
+        Click "Connect" to open Schwab's secure login page
+      </li>
+      <li class="flex items-start gap-2">
+        <span class="text-xs font-medium text-primary mt-0.5 w-4 shrink-0">2.</span>
+        Log in and authorize read-only access to your account
+      </li>
+      <li class="flex items-start gap-2">
+        <span class="text-xs font-medium text-primary mt-0.5 w-4 shrink-0">3.</span>
+        Your holdings and trade history will sync automatically
+      </li>
+    </ol>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <%= link_to schwab_authorization_url,
+                allow_other_host: true,
+                class: "flex items-center justify-center gap-2 w-full rounded-lg bg-surface px-4 py-2.5 text-sm font-medium text-white hover:bg-surface-hover transition-colors" do %>
+      <%= icon("link-2", size: "sm") %>
+      Connect Charles Schwab
+    <% end %>
+
+    <%= link_to return_to.presence || account_path(account),
+                class: "flex items-center justify-center w-full rounded-lg border border-primary px-4 py-2.5 text-sm text-primary hover:bg-container-inset transition-colors" do %>
+      Skip for now
+    <% end %>
+  </div>
+</div>

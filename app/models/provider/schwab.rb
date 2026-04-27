@@ -1,4 +1,5 @@
 require "net/http"
+require "base64"
 
 class Provider::Schwab < Provider
   BASE_URL  = "https://api.schwabapi.com/trader/v1".freeze
@@ -46,9 +47,83 @@ class Provider::Schwab < Provider
     "#{AUTH_URL}?#{URI.encode_www_form(params)}"
   end
 
+  private_class_method def self.extract_account_id_from_token(id_token)
+    return nil if id_token.blank?
+
+    # JWT is three Base64url-encoded segments separated by dots
+    payload_segment = id_token.split(".")[1]
+    return nil if payload_segment.blank?
+
+    # Base64url decode (pad to multiple of 4)
+    padded = payload_segment + "=" * ((4 - payload_segment.length % 4) % 4)
+    claims = JSON.parse(Base64.urlsafe_decode64(padded))
+    claims["sub"]
+  rescue
+    nil
+  end
+
   def self.exchange_code(code:)
-    # Returns { access_token:, refresh_token:, expires_in: }
-    # TODO: implement per Schwab OAuth docs during debug phase
+    # Schwab requires Basic auth: Base64(client_id:client_secret)
+    credentials = Base64.strict_encode64("#{ENV['SCHWAB_CLIENT_ID']}:#{ENV['SCHWAB_CLIENT_SECRET']}")
+
+    uri = URI(TOKEN_URL)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.open_timeout = 10
+    http.read_timeout = 15
+
+    request = Net::HTTP::Post.new(uri)
+    request["Authorization"] = "Basic #{credentials}"
+    request["Content-Type"] = "application/x-www-form-urlencoded"
+    request.body = URI.encode_www_form(
+      grant_type: "authorization_code",
+      code: code,
+      redirect_uri: ENV["SCHWAB_REDIRECT_URI"]
+    )
+
+    response = http.request(request)
+    body = JSON.parse(response.body)
+
+    raise Error.new("Schwab token exchange failed: HTTP #{response.code} — #{body['error_description'] || body['error']}") unless response.code.to_i == 200
+
+    # Decode the id_token JWT to extract the account number hash (sub claim)
+    broker_account_id = extract_account_id_from_token(body["id_token"])
+
+    {
+      access_token: body["access_token"],
+      refresh_token: body["refresh_token"],
+      expires_in: body["expires_in"].to_i,
+      broker_account_id: broker_account_id
+    }
+  end
+
+  def self.refresh_token(refresh_token:)
+    credentials = Base64.strict_encode64("#{ENV['SCHWAB_CLIENT_ID']}:#{ENV['SCHWAB_CLIENT_SECRET']}")
+
+    uri = URI(TOKEN_URL)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.open_timeout = 10
+    http.read_timeout = 15
+
+    request = Net::HTTP::Post.new(uri)
+    request["Authorization"] = "Basic #{credentials}"
+    request["Content-Type"] = "application/x-www-form-urlencoded"
+    request.body = URI.encode_www_form(
+      grant_type: "refresh_token",
+      refresh_token: refresh_token
+    )
+
+    response = http.request(request)
+    body = JSON.parse(response.body)
+
+    raise Error.new("Schwab token refresh failed: HTTP #{response.code} — #{body['error_description'] || body['error']}") unless response.code.to_i == 200
+
+    {
+      access_token: body["access_token"],
+      refresh_token: body["refresh_token"],
+      expires_in: body["expires_in"].to_i
+    }
   end
 
   private
