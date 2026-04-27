@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_27_100001) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_27_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -532,6 +532,19 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_27_100001) do
     t.integer "term_months"
     t.decimal "initial_balance", precision: 19, scale: 4
     t.jsonb "locked_attributes", default: {}
+  end
+
+  create_table "market_alert_rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "symbol", null: false
+    t.string "name"
+    t.string "condition", null: false
+    t.decimal "threshold", precision: 8, scale: 4, null: false
+    t.boolean "enabled", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "symbol", "condition"], name: "index_market_alert_rules_on_user_id_and_symbol_and_condition", unique: true
+    t.index ["user_id"], name: "index_market_alert_rules_on_user_id"
   end
 
   create_table "market_news_articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1101,6 +1114,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_27_100001) do
   add_foreign_key "imports", "families"
   add_foreign_key "invitations", "families"
   add_foreign_key "invitations", "users", column: "inviter_id"
+  add_foreign_key "market_alert_rules", "users"
   add_foreign_key "merchants", "families"
   add_foreign_key "messages", "chats"
   add_foreign_key "mobile_devices", "users"

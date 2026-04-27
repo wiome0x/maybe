@@ -10,7 +10,7 @@ class CreateMarketAlertRules < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :market_alert_rules, :user_id
-    add_index :market_alert_rules, [ :user_id, :symbol, :condition ], unique: true
+    add_index :market_alert_rules, :user_id, if_not_exists: true
+    add_index :market_alert_rules, [ :user_id, :symbol, :condition ], unique: true, if_not_exists: true
   end
 end
