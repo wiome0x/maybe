@@ -1,0 +1,140 @@
+<%= content_for :page_title, "定时任务" %>
+
+<%= settings_section title: "执行概览" do %>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-container-inset rounded-lg p-4">
+      <p class="text-xs text-secondary uppercase font-medium">总执行次数</p>
+      <p class="text-xl font-semibold text-primary mt-1"><%= number_with_delimiter(@stats[:total]) %></p>
+    </div>
+    <div class="bg-container-inset rounded-lg p-4">
+      <p class="text-xs text-secondary uppercase font-medium">成功</p>
+      <p class="text-xl font-semibold text-success mt-1"><%= number_with_delimiter(@stats[:completed]) %></p>
+    </div>
+    <div class="bg-container-inset rounded-lg p-4">
+      <p class="text-xs text-secondary uppercase font-medium">失败</p>
+      <p class="text-xl font-semibold text-destructive mt-1"><%= number_with_delimiter(@stats[:failed]) %></p>
+    </div>
+    <div class="bg-container-inset rounded-lg p-4">
+      <p class="text-xs text-secondary uppercase font-medium">最近执行</p>
+      <p class="text-sm font-semibold text-primary mt-1">
+        <% if @stats[:last_run] %>
+          <%= @stats[:last_run].run_date.strftime("%Y-%m-%d") %>
+        <% else %>
+          —
+        <% end %>
+      </p>
+    </div>
+  </div>
+<% end %>
+
+<%= settings_section title: "执行记录", subtitle: "最近 100 条" do %>
+  <div class="space-y-4">
+
+    <%# 过滤栏 %>
+    <div class="flex flex-wrap items-center gap-2">
+      <nav class="flex items-center gap-2 flex-wrap" aria-label="Job filter">
+        <%= link_to "全部任务",
+          settings_job_run_path(status: params[:status]),
+          class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{params[:job_name].blank? ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
+        <% @job_names.each do |name| %>
+          <%= link_to name.humanize,
+            settings_job_run_path(job_name: name, status: params[:status]),
+            class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{params[:job_name] == name ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
+        <% end %>
+      </nav>
+
+      <nav class="flex items-center gap-2 ml-auto" aria-label="Status filter">
+        <%= link_to "全部状态",
+          settings_job_run_path(job_name: params[:job_name]),
+          class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{params[:status].blank? ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
+        <% [["completed", "成功"], ["failed", "失败"], ["running", "运行中"], ["pending", "等待中"]].each do |val, label| %>
+          <%= link_to label,
+            settings_job_run_path(job_name: params[:job_name], status: val),
+            class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{params[:status] == val ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
+        <% end %>
+      </nav>
+    </div>
+
+    <% if @runs.any? %>
+      <div class="bg-container-inset rounded-xl p-1">
+        <div class="px-4 py-2 grid grid-cols-12 text-xs font-medium text-secondary uppercase hidden md:grid">
+          <div class="col-span-3">任务名称</div>
+          <div class="col-span-2">执行日期</div>
+          <div class="col-span-1">状态</div>
+          <div class="col-span-1 text-right">耗时</div>
+          <div class="col-span-1 text-right">请求数</div>
+          <div class="col-span-1 text-right">成功数</div>
+          <div class="col-span-1 text-right">写入数</div>
+          <div class="col-span-2 text-right">数据源</div>
+        </div>
+
+        <div class="bg-container rounded-lg shadow-border-xs divide-y divide-primary">
+          <% @runs.each do |run| %>
+            <div class="px-4 py-3 grid grid-cols-12 items-center text-sm">
+              <div class="col-span-3 font-medium text-primary truncate">
+                <%= run.job_name.humanize %>
+              </div>
+              <div class="col-span-2 text-secondary text-xs">
+                <%= run.run_date.strftime("%Y-%m-%d") %>
+                <% if run.started_at %>
+                  <div class="text-[11px]"><%= run.started_at.strftime("%H:%M:%S") %></div>
+                <% end %>
+              </div>
+              <div class="col-span-1">
+                <% badge_class = case run.status
+                   when "completed" then "text-success"
+                   when "failed"    then "text-destructive"
+                   when "running"   then "text-warning"
+                   else "text-secondary"
+                   end %>
+                <span class="text-xs font-medium <%= badge_class %>">
+                  <%= case run.status
+                      when "completed" then "✓ 成功"
+                      when "failed"    then "✗ 失败"
+                      when "running"   then "⟳ 运行中"
+                      else run.status
+                      end %>
+                </span>
+              </div>
+              <div class="col-span-1 text-right text-secondary text-xs">
+                <% if run.duration_seconds %>
+                  <%= run.duration_seconds %>s
+                <% else %>
+                  —
+                <% end %>
+              </div>
+              <div class="col-span-1 text-right text-secondary text-xs">
+                <%= run.symbols_requested || "—" %>
+              </div>
+              <div class="col-span-1 text-right text-xs">
+                <% if run.symbols_succeeded && run.symbols_requested&.positive? %>
+                  <span class="<%= run.success_rate == 100.0 ? 'text-success' : 'text-warning' %>">
+                    <%= run.symbols_succeeded %>
+                    <span class="text-secondary">(<%= run.success_rate %>%)</span>
+                  </span>
+                <% else %>
+                  <span class="text-secondary">—</span>
+                <% end %>
+              </div>
+              <div class="col-span-1 text-right text-secondary text-xs">
+                <%= run.records_written || "—" %>
+              </div>
+              <div class="col-span-2 text-right text-secondary text-xs truncate">
+                <%= run.source.presence || "—" %>
+                <% if run.status == "failed" && run.error_message.present? %>
+                  <div class="text-destructive text-[11px] truncate" title="<%= run.error_message %>">
+                    <%= truncate(run.error_message, length: 40) %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="text-center py-8">
+        <p class="text-secondary text-sm">暂无执行记录</p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

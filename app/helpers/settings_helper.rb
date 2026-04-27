@@ -12,6 +12,7 @@ module SettingsHelper
     { name: "Imports", path: :imports_path },
     { name: "Database", path: :settings_database_path, condition: :admin_user? },
     { name: "API Audit", path: :settings_api_audit_path, condition: :admin_user? },
+    { name: "定时任务", path: :settings_job_run_path, condition: :admin_user? },
     { name: "Transaction organization", path: :settings_transaction_organization_path },
     { name: "Watchlist", path: :settings_watchlist_path },
     { name: "What's new", path: :changelog_path },

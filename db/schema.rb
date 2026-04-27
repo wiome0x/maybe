@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_25_161000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_27_100001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -548,6 +548,28 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_25_161000) do
     t.index ["source", "url"], name: "index_market_news_articles_on_source_and_url", unique: true
   end
 
+  create_table "market_snapshots", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "symbol", null: false
+    t.string "name"
+    t.date "date", null: false
+    t.string "item_type", null: false
+    t.decimal "price", precision: 19, scale: 4
+    t.decimal "open_price", precision: 19, scale: 4
+    t.decimal "prev_close", precision: 19, scale: 4
+    t.decimal "high", precision: 19, scale: 4
+    t.decimal "low", precision: 19, scale: 4
+    t.decimal "change_percent", precision: 8, scale: 4
+    t.bigint "volume"
+    t.bigint "market_cap"
+    t.string "currency", default: "USD"
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_market_snapshots_on_date"
+    t.index ["item_type"], name: "index_market_snapshots_on_item_type"
+    t.index ["symbol", "date"], name: "index_market_snapshots_on_symbol_and_date", unique: true
+  end
+
   create_table "merchants", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.string "color"
@@ -768,6 +790,24 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_25_161000) do
     t.datetime "updated_at", null: false
     t.string "name"
     t.index ["family_id"], name: "index_rules_on_family_id"
+  end
+
+  create_table "scheduled_job_runs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "job_name", null: false
+    t.date "run_date", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "started_at"
+    t.datetime "finished_at"
+    t.integer "records_written"
+    t.integer "symbols_requested"
+    t.integer "symbols_succeeded"
+    t.string "error_message"
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_name", "run_date"], name: "index_scheduled_job_runs_on_job_name_and_run_date", unique: true
+    t.index ["run_date"], name: "index_scheduled_job_runs_on_run_date"
+    t.index ["status"], name: "index_scheduled_job_runs_on_status"
   end
 
   create_table "securities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
