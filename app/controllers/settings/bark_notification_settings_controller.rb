@@ -3,6 +3,8 @@ class Settings::BarkNotificationSettingsController < ApplicationController
 
   def show
     @subscription = Current.user.bark_notification_subscription || Current.user.build_bark_notification_subscription
+    @alert_rules = Current.user.market_alert_rules.order(:symbol, :condition)
+    @new_rule = Current.user.market_alert_rules.build
     load_form_options
   end
 

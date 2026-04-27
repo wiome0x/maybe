@@ -176,6 +176,7 @@ zh-CN:
         send_test_hint: 这条测试消息会立即发送，不会等待你设置的推送频率。
         categories:
           market_news: 市场新闻
+          market_alerts: 大盘异动
           weekly_report: 周报更新
           system_alerts: 系统提醒
         frequencies:

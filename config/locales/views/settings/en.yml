@@ -179,6 +179,7 @@ en:
         send_test_hint: This test message sends immediately and does not wait for your selected frequency.
         categories:
           market_news: Market news
+          market_alerts: Market alerts
           weekly_report: Weekly report
           system_alerts: System alerts
         frequencies:

@@ -69,4 +69,93 @@
           class: "inline-flex items-center justify-center rounded-xl border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-container md:w-auto w-full" %>
     </div>
   <% end %>
+
+  <%= settings_section title: "大盘异动预警", subtitle: "当美股指数或个股涨跌幅触发阈值时，立即推送 Bark 通知。" do %>
+    <%# Preset quick-add buttons %>
+    <div class="space-y-4">
+      <div>
+        <p class="text-xs font-medium text-secondary uppercase mb-2">快速添加预设</p>
+        <div class="flex flex-wrap gap-2">
+          <% MarketAlertRule::PRESETS.each do |preset| %>
+            <% already_exists = @alert_rules.any? { |r| r.symbol == preset[:symbol] && r.condition == preset[:condition] } %>
+            <% unless already_exists %>
+              <%= styled_form_with url: settings_market_alert_rules_path, method: :post do |f| %>
+                <%= hidden_field_tag "market_alert_rule[symbol]", preset[:symbol] %>
+                <%= hidden_field_tag "market_alert_rule[name]", preset[:name] %>
+                <%= hidden_field_tag "market_alert_rule[condition]", preset[:condition] %>
+                <%= hidden_field_tag "market_alert_rule[threshold]", preset[:threshold] %>
+                <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary text-sm text-secondary hover:bg-container-inset transition-colors">
+                  <%= icon("plus", size: "sm") %>
+                  <%= preset[:name] %> 跌 <%= preset[:threshold].abs %>%
+                </button>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Existing rules %>
+      <% if @alert_rules.any? %>
+        <div class="bg-container-inset rounded-xl p-1">
+          <% @alert_rules.each_with_index do |rule, idx| %>
+            <div class="flex items-center justify-between px-4 py-3 text-sm">
+              <div class="flex items-center gap-3">
+                <span class="font-mono text-xs bg-container px-2 py-0.5 rounded text-secondary"><%= rule.symbol %></span>
+                <span class="text-primary"><%= rule.name.presence || rule.symbol %></span>
+                <span class="text-secondary"><%= rule.condition_label %> <%= rule.threshold_display %></span>
+              </div>
+              <%= button_to settings_market_alert_rule_path(rule),
+                            method: :delete,
+                            data: { turbo_confirm: "Remove this alert rule?" },
+                            class: "text-destructive hover:text-destructive/80 transition-colors" do %>
+                <%= icon("x", size: "sm") %>
+              <% end %>
+            </div>
+            <% if idx < @alert_rules.size - 1 %>
+              <%= render "shared/ruler" %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%# Custom rule form %>
+      <details class="group">
+        <summary class="cursor-pointer text-sm text-secondary hover:text-primary flex items-center gap-1.5 list-none">
+          <%= icon("plus", size: "sm") %>
+          自定义预警规则
+        </summary>
+        <div class="mt-3">
+          <%= styled_form_with url: settings_market_alert_rules_path, method: :post, class: "space-y-3" do |f| %>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="form-field">
+                <div class="form-field__header"><label class="form-field__label">股票代码</label></div>
+                <input type="text" name="market_alert_rule[symbol]" placeholder="^GSPC" class="form-field__input" required />
+              </div>
+              <div class="form-field">
+                <div class="form-field__header"><label class="form-field__label">名称（可选）</label></div>
+                <input type="text" name="market_alert_rule[name]" placeholder="S&P 500" class="form-field__input" />
+              </div>
+              <div class="form-field">
+                <div class="form-field__header"><label class="form-field__label">条件</label></div>
+                <select name="market_alert_rule[condition]" class="form-field__input">
+                  <option value="change_percent_below">跌幅超过</option>
+                  <option value="change_percent_above">涨幅超过</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <div class="form-field__header"><label class="form-field__label">阈值 (%)</label></div>
+                <input type="number" name="market_alert_rule[threshold]" placeholder="-5.0" step="0.1" class="form-field__input" required />
+              </div>
+            </div>
+            <div>
+              <button type="submit" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface text-white text-sm hover:bg-surface-hover transition-colors">
+                <%= icon("plus", size: "sm") %>
+                添加规则
+              </button>
+            </div>
+          <% end %>
+        </div>
+      </details>
+    </div>
+  <% end %>
 <% end %>

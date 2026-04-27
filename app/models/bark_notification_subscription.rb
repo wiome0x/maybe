@@ -1,6 +1,6 @@
 class BarkNotificationSubscription < ApplicationRecord
   DELIVERY_FREQUENCIES = %w[realtime hourly_digest daily_digest].freeze
-  PUSH_CATEGORIES = %w[market_news weekly_report system_alerts].freeze
+  PUSH_CATEGORIES = %w[market_news market_alerts weekly_report system_alerts].freeze
 
   belongs_to :user
 
@@ -24,6 +24,7 @@ class BarkNotificationSubscription < ApplicationRecord
   end
 
   def delivery_frequency_for(category)
+    return "realtime" if category.to_s == "market_alerts"
     return "daily_digest" if category.to_s == "market_news"
 
     delivery_frequency
@@ -62,7 +63,7 @@ class BarkNotificationSubscription < ApplicationRecord
     def apply_defaults
       self.enabled = false if enabled.nil?
       self.server_url = BarkNotifier::DEFAULT_SERVER_URL if server_url.blank?
-      self.push_categories = %w[market_news weekly_report] if push_categories.blank?
+      self.push_categories = %w[market_news market_alerts weekly_report] if push_categories.blank?
       self.delivery_frequency ||= "realtime"
       self.digest_hour = 8 if digest_hour.nil?
       self.timezone ||= user&.family&.timezone || Time.zone.tzinfo.identifier
