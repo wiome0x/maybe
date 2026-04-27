@@ -13,6 +13,7 @@ class MarketDataImporter
   def import_all
     import_security_prices
     import_exchange_rates
+    import_market_snapshots
   end
 
   # Syncs historical security prices (and details)
@@ -52,6 +53,10 @@ class MarketDataImporter
         clear_cache: clear_cache
       )
     end
+  end
+
+  def import_market_snapshots
+    MarketSnapshot::Importer.new(date: end_date).import
   end
 
   private

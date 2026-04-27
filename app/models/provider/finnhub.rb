@@ -1,6 +1,10 @@
 class Provider::Finnhub < Provider
   BASE_URL = "https://finnhub.io/api/v1".freeze
 
+  def initialize(api_key = nil)
+    @api_key = api_key
+  end
+
   def fetch_market_data(symbols)
     with_provider_response do
       raise ProviderError, "Finnhub API key not configured" if api_key.blank?
@@ -50,7 +54,7 @@ class Provider::Finnhub < Provider
 
   private
     def api_key
-      ENV["FINNHUB_API_KEY"].presence || Setting.finnhub_api_key
+      @api_key.presence || ENV["FINNHUB_API_KEY"].presence || Setting.finnhub_api_key
     end
 
     def get(path, params = {})

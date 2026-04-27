@@ -82,6 +82,12 @@ class Provider::Registry
         Provider::Github.new
       end
 
+      def finnhub
+        api_key = ENV["FINNHUB_API_KEY"].presence || Setting.finnhub_api_key
+        return nil unless api_key.present?
+        Provider::Finnhub.new(api_key)
+      end
+
       def openai
         access_token = ENV.fetch("OPENAI_ACCESS_TOKEN", Setting.openai_access_token)
 
