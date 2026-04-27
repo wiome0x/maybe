@@ -5,7 +5,10 @@
   </header>
 
   <% if @quotes.any? %>
-    <div class="space-y-2">
+    <%# Wrap the entire list in binance-ticker so one WebSocket covers all symbols %>
+    <div class="space-y-2"
+         data-controller="binance-ticker"
+         data-binance-ticker-symbols-value="<%= @quotes.map(&:symbol).to_json %>">
       <% @quotes.each do |quote| %>
         <div class="bg-container rounded-xl shadow-border-xs"
              data-controller="market-chart"
@@ -32,7 +35,10 @@
             <div class="flex-1 min-w-0 hidden md:grid grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-1 text-xs">
               <div>
                 <p class="text-secondary"><%= t(".change_label") %></p>
-                <p class="font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>"><%= quote.change_formatted %></p>
+                <%# change target: updated in real-time by binance-ticker controller %>
+                <p class="font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>"
+                   data-binance-ticker-target="change"
+                   data-symbol="<%= quote.symbol %>"><%= quote.change_formatted %></p>
               </div>
               <div>
                 <p class="text-secondary"><%= t(".volume_label") %></p>
@@ -48,12 +54,14 @@
               </div>
             </div>
 
-            <%# Price + Change (always visible) %>
+            <%# Price + Change (always visible) — updated in real-time by binance-ticker controller %>
             <div class="text-right shrink-0">
-              <p class="font-medium text-primary text-lg">$<%= quote.price_formatted %></p>
-              <p class="text-sm font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>">
-                <%= quote.change_formatted %>
-              </p>
+              <p class="font-medium text-primary text-lg"
+                 data-binance-ticker-target="price"
+                 data-symbol="<%= quote.symbol %>">$<%= quote.price_formatted %></p>
+              <p class="text-sm font-medium <%= quote.change_positive? ? trend_up_color_class : trend_down_color_class %>"
+                 data-binance-ticker-target="change"
+                 data-symbol="<%= quote.symbol %>"><%= quote.change_formatted %></p>
             </div>
 
             <%# Chart button %>
