@@ -1,0 +1,27 @@
+---
+en:
+  settings:
+    scheduled_job_runs:
+      show:
+        title: Scheduled Jobs
+        name: Name
+        schedule: Schedule
+        class: Class
+        status: Status
+        enabled: Enabled
+        disabled: Disabled
+        empty: No scheduled jobs configured.
+        history_title: Run History
+        job: Job
+        select_job: "— Select a job —"
+        select_job_prompt: Select a job above to view its run history.
+        days_n: Last %{count} days
+        search: Search
+        run_date: Date
+        run_status: Status
+        duration: Duration
+        records: Records
+        requested: Requested
+        succeeded: Succeeded
+        error: Error
+        no_runs: No runs found for the selected period.

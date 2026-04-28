@@ -4,10 +4,11 @@ class ScheduledJobRun < ApplicationRecord
   validates :job_name, :run_date, :status, presence: true
   validates :status, inclusion: { in: STATUSES }
 
-  scope :recent,    -> { order(run_date: :desc) }
-  scope :for_job,   ->(name) { where(job_name: name) }
-  scope :completed, -> { where(status: "completed") }
-  scope :failed,    -> { where(status: "failed") }
+  scope :recent,        -> { order(run_date: :desc, started_at: :desc) }
+  scope :for_job,       ->(name) { where(job_name: name) }
+  scope :completed,     -> { where(status: "completed") }
+  scope :failed,        -> { where(status: "failed") }
+  scope :in_date_range, ->(start_date, end_date) { where(run_date: start_date..end_date) }
 
   def duration_seconds
     return nil unless started_at && finished_at

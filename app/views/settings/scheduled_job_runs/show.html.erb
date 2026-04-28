@@ -1,0 +1,126 @@
+<%= content_for :page_title, t(".title") %>
+
+<%# ── Scheduled jobs list ─────────────────────────────────────────── %>
+<%= settings_section title: t(".title") do %>
+  <% if @jobs.any? %>
+    <div class="bg-container-inset rounded-xl p-1">
+      <div class="px-4 py-2 grid grid-cols-12 text-xs font-medium text-secondary uppercase hidden md:grid">
+        <div class="col-span-4"><%= t(".name") %></div>
+        <div class="col-span-5"><%= t(".schedule") %></div>
+        <div class="col-span-1"><%= t(".class") %></div>
+        <div class="col-span-2 text-right"><%= t(".status") %></div>
+      </div>
+      <div class="bg-container rounded-lg shadow-border-xs divide-y divide-primary">
+        <% @jobs.each do |job| %>
+          <div class="px-4 py-3 grid grid-cols-12 items-center text-sm">
+            <div class="col-span-4 font-medium text-primary truncate"><%= job.name %></div>
+            <div class="col-span-5 font-mono text-xs text-secondary"><%= job.human_cron.presence || job.cron %></div>
+            <div class="col-span-1 text-xs text-secondary truncate"><%= job.klass %></div>
+            <div class="col-span-2 text-right">
+              <span class="text-xs font-medium <%= job.enabled? ? 'text-success' : 'text-secondary' %>">
+                <%= job.enabled? ? t(".enabled") : t(".disabled") %>
+              </span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <p class="text-secondary text-sm text-center py-8"><%= t(".empty") %></p>
+  <% end %>
+<% end %>
+
+<%# ── Run history ─────────────────────────────────────────────────── %>
+<%= settings_section title: t(".history_title") do %>
+  <%# Filter form %>
+  <%= form_with url: settings_scheduled_job_runs_path, method: :get, data: { turbo_frame: "run_history" } do |f| %>
+    <div class="flex flex-wrap items-end gap-3 mb-4">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-secondary"><%= t(".job") %></label>
+        <%= f.select :job_name,
+          options_for_select(@job_names.map { |n| [ n, n ] }, @selected_job),
+          { include_blank: t(".select_job") },
+          class: "text-sm rounded-lg border border-primary bg-container px-3 py-1.5 text-primary focus:outline-none" %>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <% [["7", t(".days_n", count: 7)], ["15", t(".days_n", count: 15)], ["30", t(".days_n", count: 30)]].each do |val, label| %>
+          <%= link_to label,
+            settings_scheduled_job_runs_path(job_name: @selected_job, days: val),
+            class: "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors #{@days == val && @start_date.nil? ? 'bg-container-inset text-primary' : 'text-secondary hover:text-primary'}" %>
+        <% end %>
+      </div>
+
+      <div class="flex items-center gap-2 ml-auto">
+        <%= f.date_field :start_date, value: @start_date,
+          class: "text-sm rounded-lg border border-primary bg-container px-3 py-1.5 text-primary focus:outline-none" %>
+        <span class="text-secondary text-sm">–</span>
+        <%= f.date_field :end_date, value: @end_date,
+          class: "text-sm rounded-lg border border-primary bg-container px-3 py-1.5 text-primary focus:outline-none" %>
+        <%= f.submit t(".search"), class: "px-3 py-1.5 text-sm font-medium rounded-lg bg-container-inset text-primary hover:bg-container cursor-pointer transition-colors" %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag "run_history" do %>
+    <% if @selected_job.nil? %>
+      <p class="text-secondary text-sm text-center py-8"><%= t(".select_job_prompt") %></p>
+    <% elsif @runs.any? %>
+      <div class="bg-container-inset rounded-xl p-1">
+        <div class="px-4 py-2 grid grid-cols-12 text-xs font-medium text-secondary uppercase hidden md:grid">
+          <div class="col-span-2"><%= t(".run_date") %></div>
+          <div class="col-span-2"><%= t(".run_status") %></div>
+          <div class="col-span-1 text-right"><%= t(".duration") %></div>
+          <div class="col-span-1 text-right"><%= t(".records") %></div>
+          <div class="col-span-1 text-right"><%= t(".requested") %></div>
+          <div class="col-span-1 text-right"><%= t(".succeeded") %></div>
+          <div class="col-span-4"><%= t(".error") %></div>
+        </div>
+        <div class="bg-container rounded-lg shadow-border-xs divide-y divide-primary">
+          <% @runs.each do |run| %>
+            <div class="px-4 py-3 grid grid-cols-12 items-start text-sm gap-y-1">
+              <div class="col-span-2 text-secondary text-xs">
+                <%= run.run_date %>
+                <% if run.started_at %>
+                  <div class="text-[11px]"><%= run.started_at.strftime("%H:%M:%S") %></div>
+                <% end %>
+              </div>
+              <div class="col-span-2">
+                <% color = case run.status
+                   when "completed" then "text-success"
+                   when "failed"    then "text-destructive"
+                   when "running"   then "text-warning"
+                   else "text-secondary"
+                   end %>
+                <span class="text-xs font-medium <%= color %>"><%= run.status %></span>
+              </div>
+              <div class="col-span-1 text-right text-secondary text-xs">
+                <%= run.duration_seconds ? "#{run.duration_seconds}s" : "—" %>
+              </div>
+              <div class="col-span-1 text-right text-secondary text-xs">
+                <%= run.records_written || "—" %>
+              </div>
+              <div class="col-span-1 text-right text-secondary text-xs">
+                <%= run.symbols_requested || "—" %>
+              </div>
+              <div class="col-span-1 text-right text-xs">
+                <% if run.symbols_succeeded && run.symbols_requested&.positive? %>
+                  <span class="<%= run.success_rate == 100.0 ? 'text-success' : 'text-warning' %>">
+                    <%= run.symbols_succeeded %> (<%= run.success_rate %>%)
+                  </span>
+                <% else %>
+                  <span class="text-secondary">—</span>
+                <% end %>
+              </div>
+              <div class="col-span-4 text-xs text-destructive break-words">
+                <%= run.error_message.presence || "—" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <p class="text-secondary text-sm text-center py-8"><%= t(".no_runs") %></p>
+    <% end %>
+  <% end %>
+<% end %>

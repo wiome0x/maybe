@@ -1,0 +1,27 @@
+---
+zh-CN:
+  settings:
+    scheduled_job_runs:
+      show:
+        title: 定时任务
+        name: 任务名称
+        schedule: 执行计划
+        class: 任务类
+        status: 状态
+        enabled: 已启用
+        disabled: 已禁用
+        empty: 暂无定时任务。
+        history_title: 执行历史
+        job: 任务
+        select_job: "— 请选择任务 —"
+        select_job_prompt: 请在上方选择一个任务以查看执行历史。
+        days_n: 最近 %{count} 天
+        search: 查询
+        run_date: 执行日期
+        run_status: 状态
+        duration: 耗时
+        records: 写入数
+        requested: 请求数
+        succeeded: 成功数
+        error: 错误信息
+        no_runs: 所选时间段内暂无执行记录。
