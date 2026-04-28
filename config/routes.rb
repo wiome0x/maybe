@@ -54,6 +54,8 @@ Rails.application.routes.draw do
     end
   end
 
+  get "settings", to: redirect("/settings/profile")
+
   namespace :settings do
     resource :profile, only: [ :show, :destroy ]
     resource :preferences, only: :show
@@ -83,7 +85,7 @@ Rails.application.routes.draw do
     resource :api_audit, only: [ :show ] do
       get :log, on: :collection
     end
-    resources :scheduled_job_runs, only: :index
+    resource :scheduled_job_runs, only: [ :show ]
   end
 
   get "markets/stocks", to: "markets#stocks", as: :market_stocks

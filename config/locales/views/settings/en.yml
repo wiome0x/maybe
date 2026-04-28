@@ -127,6 +127,7 @@ en:
       accounts_label: Accounts
       api_audit_label: API Audit
       scheduled_jobs_label: Scheduled Jobs
+      api_key_label: API Key
       back: Back
       billing_label: Billing
       categories_label: Categories

@@ -124,6 +124,7 @@ zh-CN:
       accounts_label: 账户
       api_audit_label: API 审计
       scheduled_jobs_label: 定时任务
+      api_key_label: API 密钥
       back: 返回
       billing_label: 账单
       categories_label: 分类
