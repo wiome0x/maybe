@@ -6,6 +6,12 @@ class Settings::ScheduledJobRunsController < ApplicationController
   def show
     @jobs = Sidekiq::Cron::Job.all.sort_by(&:name)
     @job_names = @jobs.map(&:name)
+    @latest_runs_by_job = ScheduledJobRun.recent
+                                         .where(job_name: @job_names)
+                                         .to_a
+                                         .each_with_object({}) do |run, latest|
+      latest[run.job_name] ||= run
+    end
 
     @selected_job = params[:job_name].presence
     @days         = params[:days].presence

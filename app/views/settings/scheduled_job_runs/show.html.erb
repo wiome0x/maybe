@@ -5,21 +5,44 @@
   <% if @jobs.any? %>
     <div class="bg-container-inset rounded-xl p-1">
       <div class="px-4 py-2 grid grid-cols-12 text-xs font-medium text-secondary uppercase hidden md:grid">
-        <div class="col-span-4"><%= t(".name") %></div>
-        <div class="col-span-5"><%= t(".schedule") %></div>
+        <div class="col-span-3"><%= t(".name") %></div>
+        <div class="col-span-4"><%= t(".schedule") %></div>
         <div class="col-span-1"><%= t(".class") %></div>
         <div class="col-span-2 text-right"><%= t(".status") %></div>
+        <div class="col-span-2 text-right"><%= t(".latest_status") %></div>
       </div>
       <div class="bg-container rounded-lg shadow-border-xs divide-y divide-primary">
         <% @jobs.each do |job| %>
           <div class="px-4 py-3 grid grid-cols-12 items-center text-sm">
-            <div class="col-span-4 font-medium text-primary truncate"><%= job.name %></div>
-            <div class="col-span-5 font-mono text-xs text-secondary"><%= job.human_cron.presence || job.cron %></div>
+            <div class="col-span-3 font-medium text-primary truncate"><%= job.name %></div>
+            <div class="col-span-4 font-mono text-xs text-secondary"><%= job.human_cron.presence || job.cron %></div>
             <div class="col-span-1 text-xs text-secondary truncate"><%= job.klass %></div>
             <div class="col-span-2 text-right">
               <span class="text-xs font-medium <%= job.enabled? ? 'text-success' : 'text-secondary' %>">
                 <%= job.enabled? ? t(".enabled") : t(".disabled") %>
               </span>
+            </div>
+            <% latest_run = @latest_runs_by_job[job.name] %>
+            <div class="col-span-2 text-right">
+              <% if latest_run %>
+                <% latest_status_class = case latest_run.status
+                   when "completed" then "text-success"
+                   when "failed"    then "text-destructive"
+                   when "running"   then "text-warning"
+                   else "text-secondary"
+                   end %>
+                <span class="text-xs font-medium <%= latest_status_class %>">
+                  <%= case latest_run.status
+                      when "completed" then t(".completed")
+                      when "failed"    then t(".failed")
+                      when "running"   then t(".running")
+                      when "pending"   then t(".pending")
+                      else latest_run.status
+                      end %>
+                </span>
+              <% else %>
+                <span class="text-xs text-secondary">—</span>
+              <% end %>
             </div>
           </div>
         <% end %>

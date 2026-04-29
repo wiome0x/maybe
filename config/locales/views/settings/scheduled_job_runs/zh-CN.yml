@@ -8,8 +8,13 @@ zh-CN:
         schedule: 执行计划
         class: 任务类
         status: 状态
+        latest_status: 最新执行
         enabled: 已启用
         disabled: 已禁用
+        completed: 成功
+        failed: 失败
+        running: 运行中
+        pending: 等待中
         empty: 暂无定时任务。
         history_title: 执行历史
         job: 任务

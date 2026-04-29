@@ -8,8 +8,13 @@ en:
         schedule: Schedule
         class: Class
         status: Status
+        latest_status: Latest Run
         enabled: Enabled
         disabled: Disabled
+        completed: Success
+        failed: Failed
+        running: Running
+        pending: Pending
         empty: No scheduled jobs configured.
         history_title: Run History
         job: Job
