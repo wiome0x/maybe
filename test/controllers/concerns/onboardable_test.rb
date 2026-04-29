@@ -4,6 +4,7 @@ class OnboardableTest < ActionDispatch::IntegrationTest
   setup do
     sign_in @user = users(:empty)
     @user.family.subscription.destroy
+    Rails.configuration.stubs(:app_mode).returns("managed".inquiry)
   end
 
   test "must complete onboarding before any other action" do

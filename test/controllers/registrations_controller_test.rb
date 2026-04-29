@@ -15,6 +15,8 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create when hosted requires an invite code" do
+    Rails.configuration.stubs(:app_mode).returns("managed".inquiry)
+
     with_env_overrides REQUIRE_INVITE_CODE: "true" do
       assert_no_difference "User.count" do
         post registration_url, params: { user: {

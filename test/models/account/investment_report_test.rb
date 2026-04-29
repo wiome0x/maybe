@@ -41,7 +41,7 @@ class Account::InvestmentReportTest < ActiveSupport::TestCase
     report = Account::InvestmentReport.new(@account, period: Period.custom(start_date: Date.parse("2026-04-01"), end_date: Date.parse("2026-04-06")))
 
     assert_equal 6, report.metrics.size
-    assert_equal %i[activity holdings reports], UI::AccountPage.new(account: @account).tabs
+    assert_equal %i[holdings activity reports], UI::AccountPage.new(account: @account).tabs
     assert_equal [ "QQQM" ], report.top_securities.map(&:ticker)
     assert_equal %w[buys sells deposits dividends taxes fx], report.breakdowns.map(&:id)
     assert_includes report.coverage_warnings.first, "Plaid only exposes one currency leg"

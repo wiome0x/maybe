@@ -67,7 +67,6 @@ require_command ruby
 require_command bundle
 require_command npm
 require_command psql
-require_command redis-cli
 
 if ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$POSTGRES_USER" >/dev/null 2>&1; then
   echo "PostgreSQL is not ready at $DB_HOST:$DB_PORT." >&2
@@ -80,7 +79,13 @@ redis_port="$(printf '%s' "$REDIS_URL" | sed -n 's#redis://[^:/]*:\([0-9][0-9]*\
 redis_host="${redis_host:-localhost}"
 redis_port="${redis_port:-6379}"
 
-if ! redis-cli -h "$redis_host" -p "$redis_port" ping >/dev/null 2>&1; then
+if command -v redis-cli >/dev/null 2>&1; then
+  redis_ok=$(redis-cli -h "$redis_host" -p "$redis_port" ping 2>/dev/null || true)
+elif command -v ruby >/dev/null 2>&1; then
+  redis_ok=$(ruby -e "require 'socket'; s=TCPSocket.new('$redis_host',$redis_port); s.print \"PING\r\n\"; r=s.gets; s.close; print r" 2>/dev/null || true)
+fi
+
+if [ -z "$redis_ok" ] || ! printf '%s' "$redis_ok" | grep -qi "PONG"; then
   echo "Redis is not ready at $redis_host:$redis_port." >&2
   echo "Start Redis first, then rerun bin/ci-local." >&2
   exit 1
@@ -90,7 +95,7 @@ run_step "Bundler check" bundle check
 run_step "Brakeman" bundle exec brakeman --no-pager
 run_step "Importmap audit" bin/importmap audit
 run_step "RuboCop" bin/rubocop -f github
-run_step "Install JS dependencies" npm install
+run_step "Install JS dependencies" npm install --include=dev
 ensure_executable_if_present "node_modules/.bin/biome"
 ensure_executable_if_present "node_modules/@biomejs/biome/bin/biome"
 run_step "Biome lint" npm run lint

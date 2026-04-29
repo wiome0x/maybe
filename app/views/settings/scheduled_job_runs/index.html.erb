@@ -41,7 +41,7 @@
   </div>
 <% end %>
 
-<%= settings_section title: "Run history (last <%= @days %> days)" do %>
+<%= settings_section title: "Run history (last #{@days} days)" do %>
   <% if @recent_runs.any? %>
     <div class="bg-container-inset rounded-xl p-1">
       <div class="px-4 py-2 grid grid-cols-12 text-xs font-medium text-secondary uppercase hidden md:grid">

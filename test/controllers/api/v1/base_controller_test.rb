@@ -11,6 +11,9 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
       scopes: "read read_write"
     )
 
+    # Ensure rate limiting is active (not noop) for these tests
+    Rails.configuration.stubs(:app_mode).returns("managed".inquiry)
+
     # Clean up any existing API keys for the test user
     @user.api_keys.destroy_all
 

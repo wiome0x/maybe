@@ -6,6 +6,9 @@ class ApiRateLimiterTest < ActiveSupport::TestCase
     # Destroy any existing active API keys for this user
     @user.api_keys.active.destroy_all
 
+    # Ensure rate limiting is active (not noop) for these tests
+    Rails.configuration.stubs(:app_mode).returns("managed".inquiry)
+
     @api_key = ApiKey.create!(
       user: @user,
       name: "Rate Limiter Test Key",

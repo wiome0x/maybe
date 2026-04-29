@@ -6,6 +6,8 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     sign_in @user = users(:empty)
     @family = @user.family
 
+    Rails.configuration.stubs(:app_mode).returns("managed".inquiry)
+
     @mock_stripe = mock
     Provider::Registry.stubs(:get_provider).with(:stripe).returns(@mock_stripe)
   end

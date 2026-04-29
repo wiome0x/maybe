@@ -3,7 +3,7 @@ class MarketAlertRule < ApplicationRecord
 
   CONDITIONS = %w[
     change_percent_below change_percent_above
-    ma5_deviation_below  ma5_deviation_above
+    ma5_deviation_below ma5_deviation_above
     ma10_deviation_below ma10_deviation_above
     ma20_deviation_below ma20_deviation_above
     ma60_deviation_below ma60_deviation_above

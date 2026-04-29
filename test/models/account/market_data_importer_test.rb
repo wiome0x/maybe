@@ -20,6 +20,9 @@ class Account::MarketDataImporterTest < ActiveSupport::TestCase
                       .stubs(:get_provider)
                       .with(:synth)
                       .returns(@provider)
+
+    # Ensure exchange rate provider resolves to :synth regardless of env
+    ExchangeRate.stubs(:provider).returns(@provider)
   end
 
   test "syncs required exchange rates for a foreign-currency account" do

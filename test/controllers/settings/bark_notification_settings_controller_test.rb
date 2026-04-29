@@ -34,6 +34,7 @@ class Settings::BarkNotificationSettingsControllerTest < ActionDispatch::Integra
   end
 
   test "should send bark test push" do
+    users(:family_admin).bark_notification_subscription&.destroy
     users(:family_admin).create_bark_notification_subscription!(
       enabled: true,
       server_url: "https://api.day.app",

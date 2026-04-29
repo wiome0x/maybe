@@ -134,11 +134,13 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "provisioning_uri generates correct URI" do
-    user = users(:family_member)
-    user.setup_mfa!
+    with_env_overrides APP_NAME: "Maybe" do
+      user = users(:family_member)
+      user.setup_mfa!
 
-    assert_match %r{otpauth://totp/}, user.provisioning_uri
-    assert_match %r{secret=#{user.otp_secret}}, user.provisioning_uri
-    assert_match %r{issuer=Maybe}, user.provisioning_uri
+      assert_match %r{otpauth://totp/}, user.provisioning_uri
+      assert_match %r{secret=#{user.otp_secret}}, user.provisioning_uri
+      assert_match %r{issuer=Maybe}, user.provisioning_uri
+    end
   end
 end
