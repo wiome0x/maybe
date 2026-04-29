@@ -13,7 +13,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "disabled for self hosted users" do
-    Rails.application.config.app_mode.stubs(:self_hosted?).returns(true)
+    Rails.configuration.app_mode.stubs(:self_hosted?).returns(true)
     post subscription_path
     assert_response :forbidden
   end
