@@ -137,6 +137,7 @@ zh-CN:
       preferences_label: 偏好设置
       profile_label: 个人资料
       bark_notification_label: Bark 推送
+      market_alert_label: 异动提醒
       weekly_report_label: 周报
       rules_label: 规则
       self_hosting_label: 自托管
@@ -184,6 +185,42 @@ zh-CN:
           realtime: 实时推送
           hourly_digest: 每小时汇总
           daily_digest: 每日汇总
+    market_alerts:
+      show:
+        title: 异动提醒
+        market_title: 大盘预警
+        market_subtitle: 当主要指数涨跌幅超过阈值时，发送提醒。
+        watchlist_title: 自选股预警
+        watchlist_subtitle: 监控自选股相对均线的偏离程度。
+        presets: 快速添加
+        custom_rule: 添加自定义规则
+        symbol: 代码
+        name_optional: 名称（可选）
+        condition: 条件
+        threshold_pct: 阈值（%）
+        add_rule: 添加规则
+        select_symbol: 选择标的
+        confirm_delete: 确认删除此预警规则？
+        cond_change_below: 日跌幅超过
+        cond_change_above: 日涨幅超过
+        cond_ma5_below: 偏离 MA5 低于
+        cond_ma5_above: 偏离 MA5 高于
+        cond_ma10_below: 偏离 MA10 低于
+        cond_ma10_above: 偏离 MA10 高于
+        cond_ma20_below: 偏离 MA20 低于
+        cond_ma20_above: 偏离 MA20 高于
+        cond_ma60_below: 偏离 MA60 低于
+        cond_ma60_above: 偏离 MA60 高于
+        history_title: 最近触发记录
+        history_subtitle: 最近 20 条已触发的异动提醒。
+        no_history_title: 暂无触发记录
+        no_history_body: 规则触发后，通知记录会显示在这里。
+        triggered_at: 触发时间
+        status: 状态
+        statuses:
+          pending: 待发送
+          sent: 已发送
+          failed: 发送失败
     weekly_report_settings:
       update:
         success: 周报设置已更新

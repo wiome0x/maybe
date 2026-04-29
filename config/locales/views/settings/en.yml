@@ -140,6 +140,7 @@ en:
       preferences_label: Preferences
       profile_label: Profile
       bark_notification_label: Bark push
+      market_alert_label: Market alerts
       weekly_report_label: Weekly report
       rules_label: Rules
       self_hosting_label: Self hosting
@@ -187,6 +188,42 @@ en:
           realtime: Real-time
           hourly_digest: Hourly digest
           daily_digest: Daily digest
+    market_alerts:
+      show:
+        title: Market alerts
+        market_title: Index alerts
+        market_subtitle: Get notified when major indices move beyond your thresholds.
+        watchlist_title: Watchlist alerts
+        watchlist_subtitle: Monitor moving-average deviations for stocks in your watchlist.
+        presets: Quick add
+        custom_rule: Add custom rule
+        symbol: Symbol
+        name_optional: Name (optional)
+        condition: Condition
+        threshold_pct: Threshold (%)
+        add_rule: Add rule
+        select_symbol: Select a symbol
+        confirm_delete: Remove this alert rule?
+        cond_change_below: Daily drop exceeds
+        cond_change_above: Daily gain exceeds
+        cond_ma5_below: Deviation below MA5
+        cond_ma5_above: Deviation above MA5
+        cond_ma10_below: Deviation below MA10
+        cond_ma10_above: Deviation above MA10
+        cond_ma20_below: Deviation below MA20
+        cond_ma20_above: Deviation above MA20
+        cond_ma60_below: Deviation below MA60
+        cond_ma60_above: Deviation above MA60
+        history_title: Recent triggered alerts
+        history_subtitle: The last 20 alerts that fired for your rules.
+        no_history_title: No alerts triggered yet
+        no_history_body: Once a rule fires, the notification will appear here.
+        triggered_at: Triggered at
+        status: Status
+        statuses:
+          pending: Pending
+          sent: Sent
+          failed: Failed
     weekly_report_settings:
       update:
         success: Weekly report settings updated

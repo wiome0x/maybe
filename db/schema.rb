@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_27_120000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_28_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -543,6 +543,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_27_120000) do
     t.boolean "enabled", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "rule_type", default: "market", null: false
+    t.index ["user_id", "rule_type"], name: "index_market_alert_rules_on_user_id_and_rule_type"
     t.index ["user_id", "symbol", "condition"], name: "index_market_alert_rules_on_user_id_and_symbol_and_condition", unique: true
     t.index ["user_id"], name: "index_market_alert_rules_on_user_id"
   end

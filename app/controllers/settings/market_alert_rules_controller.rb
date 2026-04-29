@@ -3,22 +3,20 @@ class Settings::MarketAlertRulesController < ApplicationController
 
   def create
     @rule = Current.user.market_alert_rules.build(rule_params)
-
     if @rule.save
-      redirect_to settings_bark_notification_path, notice: "Alert rule added."
+      redirect_to settings_market_alert_path, notice: "Alert rule added."
     else
-      redirect_to settings_bark_notification_path, alert: @rule.errors.full_messages.to_sentence
+      redirect_to settings_market_alert_path, alert: @rule.errors.full_messages.to_sentence
     end
   end
 
   def destroy
     Current.user.market_alert_rules.find(params[:id]).destroy!
-    redirect_to settings_bark_notification_path, notice: "Alert rule removed."
+    redirect_to settings_market_alert_path, notice: "Alert rule removed."
   end
 
   private
-
     def rule_params
-      params.require(:market_alert_rule).permit(:symbol, :name, :condition, :threshold, :enabled)
+      params.require(:market_alert_rule).permit(:symbol, :name, :condition, :threshold, :enabled, :rule_type)
     end
 end

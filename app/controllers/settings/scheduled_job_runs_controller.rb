@@ -5,7 +5,7 @@ class Settings::ScheduledJobRunsController < ApplicationController
 
   def show
     @jobs = Sidekiq::Cron::Job.all.sort_by(&:name)
-    @job_names = ScheduledJobRun.distinct.order(:job_name).pluck(:job_name)
+    @job_names = @jobs.map(&:name)
 
     @selected_job = params[:job_name].presence
     @days         = params[:days].presence
