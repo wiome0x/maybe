@@ -40,4 +40,27 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test "create when self hosted uses setting for invite code requirement" do
+    Rails.configuration.stubs(:app_mode).returns("self_hosted".inquiry)
+
+    Setting.require_invite_for_signup = true
+
+    assert_no_difference "User.count" do
+      post registration_url, params: { user: {
+        email: "john@example.com",
+        password: "Password1!" } }
+      assert_redirected_to new_registration_url
+    end
+
+    assert_difference "User.count", +1 do
+      post registration_url, params: { user: {
+        email: "john@example.com",
+        password: "Password1!",
+        invite_code: InviteCode.generate! } }
+      assert_redirected_to root_url
+    end
+  ensure
+    Setting.require_invite_for_signup = false
+  end
 end

@@ -8,6 +8,8 @@ class MarketDataImporterTest < ActiveSupport::TestCase
   PROVIDER_BUFFER     = 5.days
 
   setup do
+    ENV["EXCHANGE_RATE_PROVIDER"] = "currency_api"
+
     Security::Price.delete_all
     ExchangeRate.delete_all
     Trade.delete_all
@@ -19,9 +21,11 @@ class MarketDataImporterTest < ActiveSupport::TestCase
                       .stubs(:get_provider)
                       .with(:synth)
                       .returns(@provider)
+    Provider::Registry.any_instance
+                      .stubs(:get_provider)
+                      .with(:currency_api)
+                      .returns(@provider)
 
-    # Ensure exchange rate provider resolves to :synth regardless of env
-    ExchangeRate.stubs(:provider).returns(@provider)
   end
 
   test "syncs required exchange rates" do
