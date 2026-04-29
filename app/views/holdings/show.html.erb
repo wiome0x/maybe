@@ -48,6 +48,16 @@
       <div class="space-y-2">
         <div class="px-3 py-4">
           <% if @holding.trades.any? %>
+            <% if @price_series.any? %>
+              <div class="mb-5">
+                <div data-controller="trend-chart"
+                     data-trend-chart-prices-value="<%= @price_series.map { |p| { date: p.date.iso8601, close: p.close.to_f } }.to_json %>"
+                     data-trend-chart-markers-value="<%= @trade_markers.to_json %>">
+                  <div data-trend-chart-target="canvas" class="h-64"></div>
+                </div>
+              </div>
+            <% end %>
+
             <% buy_trades = @holding.trades.select { |entry| entry.trade.qty.positive? } %>
             <% sell_trades = @holding.trades.select { |entry| entry.trade.qty.negative? } %>
 

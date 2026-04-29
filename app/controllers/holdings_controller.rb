@@ -6,6 +6,24 @@ class HoldingsController < ApplicationController
   end
 
   def show
+    @price_series = @holding.security.historical_prices
+      .where(family: Current.family)
+      .ordered_by_date
+      .last(365)
+
+    closes_by_date = @price_series.index_by(&:date)
+    sorted_dates = closes_by_date.keys.sort
+
+    @trade_markers = @holding.trades.filter_map do |trade_entry|
+      marker_date = sorted_dates.select { |d| d <= trade_entry.date }.last
+      next unless marker_date
+
+      {
+        date: marker_date.iso8601,
+        close: closes_by_date[marker_date].close.to_f,
+        kind: trade_entry.trade.qty.negative? ? "sell" : "buy"
+      }
+    end
   end
 
   def destroy

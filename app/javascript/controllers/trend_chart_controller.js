@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 
 // Renders a simple SVG line chart from historical price data
 export default class extends Controller {
-  static values = { prices: Array };
+  static values = { prices: Array, markers: Array };
   static targets = ["canvas"];
 
   connect() {
@@ -38,6 +38,19 @@ export default class extends Controller {
       .map((p, i) => `${xScale(i)},${yScale(p.close)}`)
       .join(" ");
 
+    const markerPoints = (this.markersValue || [])
+      .map((marker) => {
+        const idx = prices.findIndex((p) => p.date === marker.date);
+        if (idx === -1) return null;
+
+        const x = xScale(idx);
+        const y = yScale(marker.close);
+        const color = marker.kind === "sell" ? "#dc2626" : "#2563eb";
+        return `<circle cx="${x}" cy="${y}" r="4.5" fill="${color}" stroke="white" stroke-width="2"></circle>`;
+      })
+      .filter(Boolean)
+      .join("");
+
     const lineColor = isDark ? "#60a5fa" : "#2563eb";
     const textColor = isDark ? "#a1a1aa" : "#71717a";
     const gridColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
@@ -66,6 +79,7 @@ export default class extends Controller {
       <svg viewBox="0 0 ${width} ${height}" class="w-full h-full" preserveAspectRatio="xMidYMid meet">
         ${gridLines}
         <polyline fill="none" stroke="${lineColor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${points}"/>
+        ${markerPoints}
         ${yLabels}
         ${xLabels}
       </svg>
